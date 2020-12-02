@@ -1,0 +1,3 @@
+include ':contract'
+include ':app'
+rootProject.name = "BASDK"

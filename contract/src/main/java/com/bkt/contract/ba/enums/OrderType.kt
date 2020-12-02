@@ -8,7 +8,7 @@ import java.io.Serializable
  * @Author: XGod
  * @CreateDate: 2020/12/1 20:30
  */
-enum class OrderTypes(val value: String) : Serializable {
+enum class OrderType(val value: String) : Serializable {
 
     /**
      * 限价单

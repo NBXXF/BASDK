@@ -1,4 +1,4 @@
-package com.bkt.contract.ba.model
+package com.bkt.contract.ba.model.dto
 
 /**
  * @Description: 交易规则和交易对
@@ -6,5 +6,5 @@ package com.bkt.contract.ba.model
  * @CreateDate: 2020/12/2 11:00
  */
 class ExchangeInfoDto {
-    val symbols: List<TradingPairDto>? = null
+    val symbols: List<PairConfigDto>? = null
 }

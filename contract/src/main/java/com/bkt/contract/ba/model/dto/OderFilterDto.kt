@@ -1,4 +1,4 @@
-package com.bkt.contract.ba.model
+package com.bkt.contract.ba.model.dto
 
 import com.bkt.contract.ba.enums.OderFilterType
 import com.google.gson.*

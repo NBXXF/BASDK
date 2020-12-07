@@ -1,14 +1,15 @@
-package com.bkt.contract.ba.model
+package com.bkt.contract.ba.model.dto
 
 import com.bkt.contract.ba.enums.OrderType
 import com.bkt.contract.ba.enums.TimeInForce
+import com.bkt.contract.ba.model.dto.OderFilterDto
 
 /**
- * @Description: 交易对
+ * @Description: 交易对配置
  * @Author: XGod
  * @CreateDate: 2020/12/2 11:03
  */
-class TradingPairDto {
+class PairConfigDto {
     /**
      * eg.BLZUSDT 交易对
      */

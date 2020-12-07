@@ -1,4 +1,4 @@
-package com.bkt.contract.ba.model
+package com.bkt.contract.ba.model.dto
 
 import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal

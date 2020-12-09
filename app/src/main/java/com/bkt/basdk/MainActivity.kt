@@ -3,12 +3,10 @@ package com.bkt.basdk
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.bkt.basdk.api.UsdtContractApiService
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.service.PairService
 import com.xxf.arch.XXF
-import okhttp3.HttpUrl
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,9 +20,12 @@ class MainActivity : AppCompatActivity() {
                     XXF.getLogger().d("============>yes:"+it.size);
                 }
 
- /*      XXF.getApiService(UsdtContractApiService::class.java)
-               .testApi()
-               .subscribe();*/
+        BaClient.instance.getService(PairService::class.java).subPairs("BTCUSDT","BTCUSDT")
+                .subscribe();
+
+        /*      XXF.getApiService(UsdtContractApiService::class.java)
+                      .testApi()
+                      .subscribe();*/
     }
 
     @SuppressLint("CheckResult")

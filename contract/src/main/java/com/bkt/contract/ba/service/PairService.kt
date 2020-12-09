@@ -12,7 +12,6 @@ import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
 import retrofit2.CacheType
-import kotlin.reflect.KParameter
 
 
 /**
@@ -25,7 +24,7 @@ interface PairService : ExportService {
      * 获取所有交易对
      */
     fun getPairs(): Observable<List<PairInfoPo>> {
-        return PairDbService.INSTANCE.queryPairs()
+        return PairDbService.INSTANCE.queryAll()
                 .flatMap(object : Function<List<PairInfoPo>, ObservableSource<List<PairInfoPo>>> {
                     override fun apply(p: List<PairInfoPo>): ObservableSource<List<PairInfoPo>> {
                         if (p.isEmpty()) {
@@ -38,6 +37,9 @@ interface PairService : ExportService {
                 .onErrorResumeNext(syncPair());
     }
 
+    /**
+     * 同步交易对
+     */
     private fun syncPair(): Observable<List<PairInfoPo>> {
         val usdtApiService = BaClient.instance.initializer!!.getApiService(ContractType.USDT);
         val currencyApiService = BaClient.instance.initializer!!.getApiService(ContractType.USD);
@@ -126,6 +128,46 @@ interface PairService : ExportService {
                         return Observable.empty();
                     }
                 });
+    }
+
+    /**
+     * 订阅所有交易对变化
+     * ！！！下游要安全处理,否则会中断订阅
+     */
+    fun subPairs(): Observable<List<PairInfoPo>> {
+        return PairDbService.INSTANCE.subChange();
+    }
+
+    /**
+     * 订阅指定类型交易对
+     * ！！！下游要安全处理,否则会中断订阅
+     */
+    fun subPairs(type: ContractType): Observable<List<PairInfoPo>> {
+        return getPairs(type)
+                .flatMap(object : Function<List<PairInfoPo>, Observable<List<PairInfoPo>>> {
+                    override fun apply(t: List<PairInfoPo>): Observable<List<PairInfoPo>> {
+                        val pairNameList: MutableList<String> = mutableListOf();
+                        for (item: PairInfoPo in t) {
+                            item.symbol?.let { pairNameList.add(it) };
+                        }
+                        if (pairNameList.isEmpty()) {
+                            return Observable.empty();
+                        }
+                        val toTypedArray = pairNameList.toTypedArray();
+                        return PairDbService.INSTANCE.subChange(*toTypedArray);
+                    }
+                });
+    }
+
+    /**
+     * 订阅指定交易对的交易对变化
+     * ！！！下游要安全处理,否则会中断订阅
+     */
+    fun subPairs(vararg pairs: String): Observable<List<PairInfoPo>> {
+        if (pairs == null || pairs.isEmpty()) {
+            return Observable.empty();
+        }
+        return PairDbService.INSTANCE.subChange(*pairs);
     }
 }
 

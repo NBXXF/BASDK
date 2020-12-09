@@ -1,9 +1,11 @@
 package com.bkt.contract.ba.service.inner
 
 import com.bkt.contract.ba.common.PairInfoPoListMergeFunction
+import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.po.PairInfoPo
 import com.bkt.contract.ba.model.po.PairInfoPo_
 import com.bkt.contract.ba.sdk.ObjectBoxFactory
+import com.xxf.arch.XXF
 import com.xxf.database.xxf.objectbox.RxQuery
 import com.xxf.database.xxf.objectbox.XXFObjectBoxUtils
 import io.objectbox.query.Query
@@ -23,10 +25,16 @@ internal class PairDbService private constructor() {
         }
     }
 
+    /**
+     * 无缝插入更新
+     */
     fun insertOrUpdate(pairInfo: PairInfoPo): Observable<PairInfoPo> {
         return this.insertOrUpdate(listOf(pairInfo)).map { pairInfo };
     }
 
+    /**
+     * 无缝插入更新
+     */
     fun insertOrUpdate(list: List<PairInfoPo>): Observable<List<PairInfoPo>> {
         return Observable
                 .fromCallable(object : Callable<List<PairInfoPo>> {
@@ -40,18 +48,38 @@ internal class PairDbService private constructor() {
     /**
      * 查询所有交易对
      */
-    fun queryPairs(): Observable<List<PairInfoPo>> {
+    fun queryAll(): Observable<List<PairInfoPo>> {
         return Observable
                 .fromCallable(object : Callable<List<PairInfoPo>> {
                     override fun call(): List<PairInfoPo> {
-                        return ObjectBoxFactory.getBoxStore().boxFor(PairInfoPo::class.java).all;
+                        return ObjectBoxFactory.getBoxStore()
+                                .boxFor(PairInfoPo::class.java)
+                                .query()
+                                .order(PairInfoPo_.index)
+                                .build().find();
                     }
                 }).subscribeOn(Schedulers.io());
     }
 
-    fun subPairsChange(): Observable<List<PairInfoPo>> {
+
+    /**
+     * 订阅所有交易对变化
+     */
+    fun subChange(): Observable<List<PairInfoPo>> {
         val build: Query<PairInfoPo> = ObjectBoxFactory.getBoxStore().boxFor(PairInfoPo::class.java)
                 .query()
+                .order(PairInfoPo_.index)
+                .build()
+        return RxQuery.observableChange<PairInfoPo>(build);
+    }
+
+    /**
+     * 订阅指定交易对变化
+     */
+    fun subChange(vararg pairs: String): Observable<List<PairInfoPo>> {
+        val build: Query<PairInfoPo> = ObjectBoxFactory.getBoxStore().boxFor(PairInfoPo::class.java)
+                .query()
+                .`in`(PairInfoPo_.symbol, pairs)
                 .order(PairInfoPo_.index)
                 .build()
         return RxQuery.observableChange<PairInfoPo>(build);

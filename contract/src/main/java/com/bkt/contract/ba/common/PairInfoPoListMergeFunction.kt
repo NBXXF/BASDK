@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.common
 
+import android.text.TextUtils
 import com.bkt.contract.ba.model.po.PairInfoPo
 import com.xxf.database.xxf.objectbox.ListMergeFunction
 
@@ -22,6 +23,9 @@ class PairInfoPoListMergeFunction : ListMergeFunction<PairInfoPo> {
                     }
                     if (insertItem.index <= 0 && insertedItem.index > 0) {
                         insertItem.index = insertedItem.index;
+                    }
+                    if (TextUtils.isEmpty(insertItem.contractType) && !TextUtils.isEmpty(insertedItem.contractType)) {
+                        insertItem.contractType = insertedItem.contractType;
                     }
                 }
             }

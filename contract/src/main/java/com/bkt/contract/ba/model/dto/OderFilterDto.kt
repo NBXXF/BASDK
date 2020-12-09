@@ -16,7 +16,7 @@ import java.math.BigDecimal
 open class OderFilterDto : Serializable {
     inner class SerializerDeserializer : JsonSerializer<OderFilterDto>, JsonDeserializer<OderFilterDto> {
         override fun serialize(src: OderFilterDto?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
-            return context!!.serialize(src, typeOfSrc);
+            return context!!.serialize(src);
         }
 
         override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): OderFilterDto {

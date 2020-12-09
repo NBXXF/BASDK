@@ -1,25 +1,26 @@
-package com.bkt.contract.ba.service
+package com.bkt.contract.ba.service.inner
 
 import com.bkt.contract.ba.common.PairInfoPoListMergeFunction
 import com.bkt.contract.ba.model.po.PairInfoPo
 import com.bkt.contract.ba.model.po.PairInfoPo_
+import com.bkt.contract.ba.sdk.ObjectBoxFactory
 import com.xxf.database.xxf.objectbox.RxQuery
 import com.xxf.database.xxf.objectbox.XXFObjectBoxUtils
-import io.objectbox.BoxStore
 import io.objectbox.query.Query
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.Callable
 
 /**
- * @Description: contract db service
+ * @Description: 交易对db service
  * @Author: XGod
- * @CreateDate: 2020/12/7 10:23
+ * @CreateDate: 2020/12/9 15:14
  */
-interface ContractDbService {
-
-    fun getBoxStore(): BoxStore? {
-        return null;
+internal class PairDbService private constructor() {
+    companion object {
+        val INSTANCE: PairDbService by lazy {
+            PairDbService();
+        }
     }
 
     fun insertOrUpdate(pairInfo: PairInfoPo): Observable<PairInfoPo> {
@@ -30,24 +31,29 @@ interface ContractDbService {
         return Observable
                 .fromCallable(object : Callable<List<PairInfoPo>> {
                     override fun call(): List<PairInfoPo> {
-                        XXFObjectBoxUtils.put(getBoxStore()!!.boxFor(PairInfoPo::class.java), list, PairInfoPoListMergeFunction());
+                        XXFObjectBoxUtils.put(ObjectBoxFactory.getBoxStore().boxFor(PairInfoPo::class.java), list, PairInfoPoListMergeFunction());
                         return list;
                     }
                 }).subscribeOn(Schedulers.io());
     }
 
+    /**
+     * 查询所有交易对
+     */
+    fun queryPairs(): Observable<List<PairInfoPo>> {
+        return Observable
+                .fromCallable(object : Callable<List<PairInfoPo>> {
+                    override fun call(): List<PairInfoPo> {
+                        return ObjectBoxFactory.getBoxStore().boxFor(PairInfoPo::class.java).all;
+                    }
+                }).subscribeOn(Schedulers.io());
+    }
+
     fun subPairsChange(): Observable<List<PairInfoPo>> {
-        val build: Query<PairInfoPo> = getBoxStore()!!.boxFor(PairInfoPo::class.java)
+        val build: Query<PairInfoPo> = ObjectBoxFactory.getBoxStore().boxFor(PairInfoPo::class.java)
                 .query()
                 .order(PairInfoPo_.index)
                 .build()
         return RxQuery.observableChange<PairInfoPo>(build);
-    }
-
-    fun getPairs(): Observable<List<PairInfoPo>> {
-        return Observable
-                .fromCallable(Callable {
-                    getBoxStore()!!.boxFor(PairInfoPo::class.java).query().build().find();
-                }).subscribeOn(Schedulers.io());
     }
 }

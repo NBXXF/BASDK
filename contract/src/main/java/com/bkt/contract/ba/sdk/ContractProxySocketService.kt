@@ -1,4 +1,4 @@
-package com.bkt.contract.ba.service
+package com.bkt.contract.ba.sdk
 
 import com.bkt.contract.ba.enums.SocketEvent
 import com.bkt.contract.ba.model.dto.DepthEventDto

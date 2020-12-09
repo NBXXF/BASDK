@@ -26,6 +26,7 @@ public class MyLoggerInterceptor2 extends com.xxf.arch.http.interceptor.HttpLogg
 
     @Override
     public Response intercept(Chain chain) throws IOException {
+        XXF.getLogger().d("=============>http url:" + chain.request().url());
         return super.intercept(chain);
     }
 }

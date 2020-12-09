@@ -1,6 +1,7 @@
 package com.bkt.contract.ba.model.po
 
 import android.text.TextUtils
+import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.dto.TickerEventDto
 import com.bkt.contract.ba.model.dto.PairConfigDto
 import com.xxf.arch.json.JsonUtils
@@ -16,21 +17,42 @@ import io.objectbox.converter.PropertyConverter
 @Entity
 class PairInfoPo {
 
+    /**
+     * 主键
+     */
     @Id(assignable = true)
     var _id: Long = 0
         get() = IdUtils.generateId(symbol);
 
+    /**
+     * 合约顺序索引
+     */
     @Index(type = IndexType.VALUE)
-    var index: Long = 0
+    var index: Int = 0
 
 
+    /**
+     * 交易对名称
+     */
     var symbol: String? = null;
 
 
+    /**
+     * 配置
+     */
     @Convert(converter = CoinConfigPoConverter::class, dbType = String::class)
     var config: PairConfigDto? = null;
 
 
+    /**
+     * 合约类型
+     */
+    var contractType: String = ContractType.USDT.value;
+
+
+    /**
+     * 实时价格
+     */
     @Convert(converter = TickerPoConverter::class, dbType = String::class)
     var ticker: TickerEventDto? = null;
 
@@ -61,5 +83,9 @@ class PairInfoPo {
         override fun convertToDatabaseValue(entityProperty: TickerEventDto?): String? {
             return JsonUtils.toJsonString(entityProperty)
         }
+    }
+
+    override fun toString(): String {
+        return "PairInfoPo(index=$index, symbol=$symbol, config=$config, contractType='$contractType', ticker=$ticker)"
     }
 }

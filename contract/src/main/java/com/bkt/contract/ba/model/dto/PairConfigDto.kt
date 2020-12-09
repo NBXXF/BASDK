@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.model.dto
 
+import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.enums.OrderType
 import com.bkt.contract.ba.enums.TimeInForce
 import com.bkt.contract.ba.model.dto.OderFilterDto
@@ -102,7 +103,8 @@ class PairConfigDto {
 
 
     override fun toString(): String {
-        return "TradingPairDto(symbol=$symbol, status=$status, maintMarginPercent=$maintMarginPercent, requiredMarginPercent=$requiredMarginPercent, baseAsset=$baseAsset, quoteAsset=$quoteAsset, marginAsset=$marginAsset, pricePrecision=$pricePrecision, quantityPrecision=$quantityPrecision, baseAssetPrecision=$baseAssetPrecision, quotePrecision=$quotePrecision, underlyingType=$underlyingType, settlePlan=$settlePlan, triggerProtect=$triggerProtect, underlyingSubType=$underlyingSubType, filters=$filters, orderType=$orderType, timeInForce=$timeInForce)"
+        return "PairConfigDto(symbol=$symbol, status=$status, maintMarginPercent=$maintMarginPercent, requiredMarginPercent=$requiredMarginPercent, baseAsset=$baseAsset, quoteAsset=$quoteAsset, marginAsset=$marginAsset, pricePrecision=$pricePrecision, quantityPrecision=$quantityPrecision, baseAssetPrecision=$baseAssetPrecision, quotePrecision=$quotePrecision, underlyingType=$underlyingType, settlePlan=$settlePlan, triggerProtect=$triggerProtect, underlyingSubType=$underlyingSubType, filters=$filters, orderType=$orderType, timeInForce=$timeInForce)"
     }
+
 
 }

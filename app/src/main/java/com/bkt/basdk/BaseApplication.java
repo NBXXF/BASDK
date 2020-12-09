@@ -7,11 +7,19 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
 
+import com.bkt.basdk.api.UsdContractApiService;
+import com.bkt.basdk.api.UsdtContractApiService;
+import com.bkt.contract.ba.enums.ContractType;
+import com.bkt.contract.ba.sdk.BaClient;
+import com.bkt.contract.ba.sdk.ContractProxyApiService;
+import com.bkt.contract.ba.sdk.ContractProxySocketService;
 import com.xxf.arch.XXF;
 import com.xxf.arch.utils.ToastUtils;
 import com.xxf.arch.widget.progresshud.ProgressHUD;
 import com.xxf.arch.widget.progresshud.ProgressHUDFactory;
 import com.xxf.view.loading.DefaultProgressHUDImpl;
+
+import org.jetbrains.annotations.NotNull;
 
 import io.reactivex.functions.Consumer;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -54,5 +62,22 @@ public class BaseApplication extends Application {
                 ToastUtils.showToast("error:" + throwable, ToastUtils.ToastType.ERROR);
             }
         }));
+        BaClient.Companion.getInstance().init(new BaClient.Initializer() {
+            @NotNull
+            @Override
+            public ContractProxyApiService getApiService(@NotNull ContractType type) {
+                if (type == ContractType.USD) {
+                    return XXF.getApiService(UsdContractApiService.class);
+                } else {
+                    return XXF.getApiService(UsdtContractApiService.class);
+                }
+            }
+
+            @NotNull
+            @Override
+            public ContractProxySocketService getSocketService(@NotNull ContractType type) {
+                return null;
+            }
+        });
     }
 }

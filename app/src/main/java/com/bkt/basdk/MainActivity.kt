@@ -13,14 +13,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         BaClient.instance.getService(PairService::class.java).getPairs(ContractType.USDT)
-                .doOnError{
-                    XXF.getLogger().d("============>yes no:"+it);
+                .doOnError {
+                    XXF.getLogger().d("============>yes no:" + it);
                 }
-                .subscribe{
-                    XXF.getLogger().d("============>yes:"+it.size);
+                .subscribe {
+                    XXF.getLogger().d("============>yes:" + it.size);
                 }
 
-        BaClient.instance.getService(PairService::class.java).subPairs("BTCUSDT","BTCUSDT")
+        BaClient.instance.getService(PairService::class.java).getPairs("BTCUSDT")
+                .doOnError {
+                    XXF.getLogger().d("============>yes no2:" + it);
+                }
+                .subscribe {
+                    XXF.getLogger().d("============>yes2:" + it);
+                }
+
+        BaClient.instance.getService(PairService::class.java).subPairs("BTCUSDT", "BTCUSDT")
                 .subscribe();
 
         /*      XXF.getApiService(UsdtContractApiService::class.java)

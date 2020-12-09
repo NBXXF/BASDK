@@ -111,6 +111,27 @@ interface PairService : ExportService {
                 })
     }
 
+    /**
+     * 获取指定交易名称名称的交易对信息列表
+     */
+    fun getPairs(vararg pairs: String): Observable<List<PairInfoPo>> {
+        if (pairs == null || pairs.isEmpty()) {
+            return Observable.empty();
+        }
+        return getPairs()
+                .map(object : Function<List<PairInfoPo>, List<PairInfoPo>> {
+                    override fun apply(t: List<PairInfoPo>): List<PairInfoPo> {
+                        val pairPosList: MutableList<PairInfoPo> = mutableListOf<PairInfoPo>();
+                        for (item: PairInfoPo in t) {
+                            if (pairs.contains(item.symbol)) {
+                                pairPosList.add(item);
+                            }
+                        }
+                        return pairPosList;
+                    }
+                })
+    }
+
 
     /**
      * 获取指定交易对
@@ -135,6 +156,8 @@ interface PairService : ExportService {
      * ！！！下游要安全处理,否则会中断订阅
      */
     fun subPairs(): Observable<List<PairInfoPo>> {
+        val usdtSocketService = BaClient.instance.initializer!!.getSocketService(ContractType.USDT);
+        val usdSocketService = BaClient.instance.initializer!!.getSocketService(ContractType.USD);
         return PairDbService.INSTANCE.subChange();
     }
 

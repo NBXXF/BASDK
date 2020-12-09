@@ -8,7 +8,9 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.bkt.basdk.api.UsdContractApiService;
+import com.bkt.basdk.api.UsdContractSocketService;
 import com.bkt.basdk.api.UsdtContractApiService;
+import com.bkt.basdk.api.UsdtContractSocketService;
 import com.bkt.contract.ba.enums.ContractType;
 import com.bkt.contract.ba.sdk.BaClient;
 import com.bkt.contract.ba.sdk.ContractProxyApiService;
@@ -76,7 +78,11 @@ public class BaseApplication extends Application {
             @NotNull
             @Override
             public ContractProxySocketService getSocketService(@NotNull ContractType type) {
-                return null;
+                if (type == ContractType.USD) {
+                    return UsdContractSocketService.Companion.getInstance();
+                } else {
+                    return UsdtContractSocketService.Companion.getInstance();
+                }
             }
         });
     }

@@ -9,10 +9,13 @@ import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.websocket.WsManager
 import com.xxf.arch.websocket.listener.WsStatusListener
 import io.reactivex.Observable
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import okhttp3.Response
 import okio.ByteString
+import java.util.concurrent.Callable
 import kotlin.collections.LinkedHashMap
 
 /**
@@ -56,7 +59,7 @@ abstract class ContractProxySocketService : WsStatusListener {
     /**
      * 订阅ticker事件
      */
-    fun subTicker(): Observable<TickerEventDto> {
+    fun subTicker(vararg pairs: String): Observable<TickerEventDto> {
         return bus.ofType(TickerEventDto::class.java)
                 .doOnSubscribe {
                     subEvent(SocketEvent.MiniTicker24hr, null)
@@ -108,18 +111,26 @@ abstract class ContractProxySocketService : WsStatusListener {
 
 
     override fun onMessage(text: String?) {
-        val baseResEvent = JsonUtils.toBean(text, BaseSEvent::class.java);
-        if (baseResEvent != null) {
-            val result = when (baseResEvent.e) {
-                SocketEvent.MiniTicker24hr -> JsonUtils.toBean(text, TickerEventDto::class.java);
-                SocketEvent.KLine -> JsonUtils.toBean(text, KLineSEvent::class.java);
-                SocketEvent.DepthUpdate -> JsonUtils.toBean(text, DepthEventDto::class.java);
-                else -> throw  RuntimeException("not support event:" + baseResEvent.e);
-            }
-            if (result != null) {
-                bus.onNext(result);
-            }
-        }
+        Observable
+                .fromCallable(object : Callable<BaseSEvent> {
+                    override fun call(): BaseSEvent {
+                        val baseResEvent = JsonUtils.toBean(text, BaseSEvent::class.java);
+                        if (baseResEvent != null) {
+                            val result = when (baseResEvent.e) {
+                                SocketEvent.MiniTicker24hr -> JsonUtils.toBean(text, TickerEventDto::class.java);
+                                SocketEvent.KLine -> JsonUtils.toBean(text, KLineSEvent::class.java);
+                                SocketEvent.DepthUpdate -> JsonUtils.toBean(text, DepthEventDto::class.java);
+                                else -> throw  RuntimeException("not support event:" + baseResEvent.e);
+                            }
+                            if (result != null) {
+                                bus.onNext(result);
+                            }
+                        }
+                        return baseResEvent;
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe();
     }
 
     override fun onMessage(bytes: ByteString?) {

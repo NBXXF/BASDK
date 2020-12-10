@@ -1,0 +1,37 @@
+package com.bkt.contract.ba.model.event
+
+import com.bkt.contract.ba.enums.Method
+
+/**
+ * @Description: 请求体
+ * @Author: XGod
+ * @CreateDate: 2020/12/10 10:50
+ */
+class SocketRequestBody {
+    companion object {
+
+        fun subscribeBody(params: List<String>): SocketRequestBody {
+            return SocketRequestBody(Method.SUBSCRIBE, params);
+        }
+
+        fun unSubscribeBody(params: List<String>): SocketRequestBody {
+            return SocketRequestBody(Method.UNSUBSCRIBE, params);
+        }
+    }
+
+    val method: Method;
+    val params: List<String>;
+    val id: Long;
+
+    private constructor(method: Method, params: List<String>, id: Long) {
+        this.method = method
+        this.params = params
+        this.id = id
+    }
+
+    private constructor(method: Method, params: List<String>) {
+        this.method = method
+        this.params = params
+        this.id = System.currentTimeMillis();
+    }
+}

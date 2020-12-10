@@ -1,24 +1,23 @@
 package com.bkt.contract.ba.sdk
 
+import android.util.Log
 import com.bkt.contract.ba.enums.SocketEvent
 import com.bkt.contract.ba.model.dto.DepthEventDto
 import com.bkt.contract.ba.model.dto.TickerEventDto
 import com.bkt.contract.ba.model.event.BaseSEvent
 import com.bkt.contract.ba.model.event.KLineSEvent
-import com.bkt.contract.ba.model.po.PairInfoPo
-import com.bkt.contract.ba.service.inner.PairDbService
+import com.bkt.contract.ba.model.event.SocketRequestBody
+import com.xxf.arch.XXF
 import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.websocket.WsManager
 import com.xxf.arch.websocket.listener.WsStatusListener
 import io.reactivex.Observable
-import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import okhttp3.Response
 import okio.ByteString
 import java.util.concurrent.Callable
-import kotlin.collections.LinkedHashMap
 
 /**
  * @Description: ba Proxy socket api
@@ -27,8 +26,9 @@ import kotlin.collections.LinkedHashMap
  */
 abstract class ContractProxySocketService : WsStatusListener {
     private val bus: Subject<Any> = PublishSubject.create<Any>().toSerialized();
-    private val buffer: LinkedHashMap<SocketEvent, Any?> = linkedMapOf();
+    private val buffer: LinkedHashMap<SocketEvent, SocketRequestBody> = linkedMapOf();
 
+    class TickerEventWrapper(val list: List<TickerEventDto>);
 
     /**
      * 获取web socket manger对象
@@ -38,35 +38,36 @@ abstract class ContractProxySocketService : WsStatusListener {
     /**
      * 订阅socket event
      */
-    fun subEvent(event: SocketEvent, stream: Any?) {
+    private fun subEvent(event: SocketEvent, body: SocketRequestBody) {
         /**
          * 订阅事件一定要buffer 便于框架重连
          */
-        buffer.put(event, stream);
+        buffer.put(event, body);
         if (this.getWsManager() != null && this.getWsManager().isWsConnected) {
-            //TODO 发送事件
+            this.getWsManager().sendMessage(JsonUtils.toJsonString(body))
         }
     }
 
     /**
      * 取消订阅socket
      */
-    fun unSubEvent(event: SocketEvent) {
+    private fun unSubEvent(event: SocketEvent, body: SocketRequestBody) {
         buffer.remove(event);
         if (this.getWsManager() != null && this.getWsManager().isWsConnected) {
-            //TODO 发送事件
+            this.getWsManager().sendMessage(JsonUtils.toJsonString(body))
         }
     }
 
     /**
      * 订阅ticker事件
      */
-    fun subTicker(vararg pairs: String): Observable<TickerEventDto> {
-        return bus.ofType(TickerEventDto::class.java)
+    fun subTicker(): Observable<List<TickerEventDto>> {
+        return bus.ofType(TickerEventWrapper::class.java)
+                .map { it.list }
                 .doOnSubscribe {
-                    subEvent(SocketEvent.MiniTicker24hr, null)
+                    subEvent(SocketEvent.MiniTicker24hr, SocketRequestBody.subscribeBody(listOf("!miniTicker@arr")))
                 }.doOnDispose {
-                    unSubEvent(SocketEvent.MiniTicker24hr)
+                    unSubEvent(SocketEvent.MiniTicker24hr, SocketRequestBody.unSubscribeBody(listOf("!miniTicker@arr")))
                 };
     }
 
@@ -93,9 +94,9 @@ abstract class ContractProxySocketService : WsStatusListener {
     fun subKLine(symbol: String, interval: String): Observable<KLineSEvent> {
         return bus.ofType(KLineSEvent::class.java)
                 .doOnSubscribe {
-                    subEvent(SocketEvent.KLine, null)
+                    // subEvent(SocketEvent.KLine, null)
                 }.doOnDispose {
-                    unSubEvent(SocketEvent.KLine)
+                    // unSubEvent(SocketEvent.KLine)
                 };
     }
 
@@ -105,21 +106,22 @@ abstract class ContractProxySocketService : WsStatusListener {
     fun subDepth(symbol: String): Observable<DepthEventDto> {
         return bus.ofType(DepthEventDto::class.java)
                 .doOnSubscribe {
-                    subEvent(SocketEvent.DepthUpdate, null)
+                    //subEvent(SocketEvent.DepthUpdate, null)
                 }.doOnDispose {
-                    unSubEvent(SocketEvent.DepthUpdate)
+                    //  unSubEvent(SocketEvent.DepthUpdate)
                 };
     }
 
 
     override fun onMessage(text: String?) {
+        log("onMessage:$text")
         Observable
                 .fromCallable(object : Callable<BaseSEvent> {
                     override fun call(): BaseSEvent {
                         val baseResEvent = JsonUtils.toBean(text, BaseSEvent::class.java);
                         if (baseResEvent != null) {
                             val result = when (baseResEvent.e) {
-                                SocketEvent.MiniTicker24hr -> JsonUtils.toBean(text, TickerEventDto::class.java);
+                                SocketEvent.MiniTicker24hr -> TickerEventWrapper(JsonUtils.toBeanList(text, TickerEventDto::class.java));
                                 SocketEvent.KLine -> JsonUtils.toBean(text, KLineSEvent::class.java);
                                 SocketEvent.DepthUpdate -> JsonUtils.toBean(text, DepthEventDto::class.java);
                                 else -> throw  RuntimeException("not support event:" + baseResEvent.e);
@@ -135,20 +137,26 @@ abstract class ContractProxySocketService : WsStatusListener {
                 .subscribe();
     }
 
+    private fun log(log: String) {
+        XXF.getLogger().d("==========>WebSocket" + log)
+    }
+
     override fun onMessage(bytes: ByteString?) {
-        TODO("Not yet implemented")
+        log("onMessage:bytes:" + (bytes?.size
+                ?: " null"))
     }
 
     override fun onClosed(code: Int, reason: String?) {
-        TODO("Not yet implemented")
+        log("onClosed:code:$code reason:$reason")
     }
 
     override fun onOpen(response: Response?) {
+        log("onOpen:" + response!!.request.url + " code:" + response.code + " msg:" + response.message)
         try {
             /**
              * 网络连接好后 需要重新将事件发出去
              */
-            val temp: LinkedHashMap<SocketEvent, Any?> = linkedMapOf();
+            val temp: LinkedHashMap<SocketEvent, SocketRequestBody> = linkedMapOf();
             temp.putAll(buffer);
             temp.forEach {
                 subEvent(it.key, it.value);
@@ -159,14 +167,14 @@ abstract class ContractProxySocketService : WsStatusListener {
     }
 
     override fun onFailure(t: Throwable?, response: Response?) {
-        TODO("Not yet implemented")
+        log("onFailure:" + "throwable:" + Log.getStackTraceString(t))
     }
 
     override fun onReconnect() {
-        TODO("Not yet implemented")
+        log("onReconnect:")
     }
 
     override fun onClosing(code: Int, reason: String?) {
-        TODO("Not yet implemented")
+        log("onClosing:code:$code reason:$reason")
     }
 }

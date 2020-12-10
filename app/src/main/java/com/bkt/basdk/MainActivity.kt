@@ -3,6 +3,7 @@ package com.bkt.basdk
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.service.PairService
@@ -28,8 +29,6 @@ class MainActivity : AppCompatActivity() {
                     XXF.getLogger().d("============>yes2:" + it);
                 }
 
-        BaClient.instance.getService(PairService::class.java).subPairs("BTCUSDT", "BTCUSDT")
-                .subscribe();
 
         /*      XXF.getApiService(UsdtContractApiService::class.java)
                       .testApi()
@@ -39,6 +38,13 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("CheckResult")
     override fun onResume() {
         super.onResume()
+
+        BaClient.instance.getService(PairService::class.java)
+                .subPairs()
+                .subscribe {
+                    it.get(0).copy();
+                    XXF.getLogger().d("==============>it:" + it)
+                };
     }
 
 

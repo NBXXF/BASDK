@@ -74,6 +74,18 @@ internal class PairDbService private constructor() {
     }
 
     /**
+     * 订阅指定类型的交易对变化
+     */
+    fun subChange(type: ContractType): Observable<List<PairInfoPo>> {
+        val build: Query<PairInfoPo> = ObjectBoxFactory.getBoxStore().boxFor(PairInfoPo::class.java)
+                .query()
+                .equal(PairInfoPo_.contractType, type.value)
+                .order(PairInfoPo_.index)
+                .build()
+        return RxQuery.observableChange<PairInfoPo>(build);
+    }
+
+    /**
      * 订阅指定交易对变化
      */
     fun subChange(vararg pairs: String): Observable<List<PairInfoPo>> {

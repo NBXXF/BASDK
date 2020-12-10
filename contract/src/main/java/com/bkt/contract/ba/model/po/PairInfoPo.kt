@@ -15,7 +15,7 @@ import io.objectbox.converter.PropertyConverter
  * @CreateDate: 2020/12/3 19:37
  */
 @Entity
-class PairInfoPo {
+open class PairInfoPo {
 
     /**
      * 主键
@@ -60,6 +60,17 @@ class PairInfoPo {
         this.symbol = symbol
     }
 
+    constructor(index: Int, symbol: String?, config: PairConfigDto?, contractType: String, ticker: TickerEventDto?) {
+        this.index = index
+        this.symbol = symbol
+        this.config = config
+        this.contractType = contractType
+        this.ticker = ticker
+    }
+
+    fun copy(): PairInfoPo {
+        return PairInfoPo(this.index, this.symbol, this.config, this.contractType, this.ticker);
+    }
 
     class CoinConfigPoConverter : PropertyConverter<PairConfigDto?, String?> {
         override fun convertToEntityProperty(databaseValue: String?): PairConfigDto? {

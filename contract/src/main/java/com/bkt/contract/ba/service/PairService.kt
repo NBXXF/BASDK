@@ -99,6 +99,9 @@ interface PairService : ExportService {
      * 获取分类交易对
      */
     fun getPairs(type: ContractType): Observable<List<PairInfoPo>> {
+        if (type == null) {
+            return Observable.empty();
+        }
         return getPairs()
                 .map(object : Function<List<PairInfoPo>, List<PairInfoPo>> {
                     override fun apply(t: List<PairInfoPo>): List<PairInfoPo> {
@@ -158,36 +161,31 @@ interface PairService : ExportService {
      * ！！！下游要安全处理,否则会中断订阅
      */
     fun subPairs(): Observable<List<PairInfoPo>> {
-        /*   return Observable.concat(
-                   getPairs(ContractType.USDT)
-                           .map(PairInfoToPairNameListFunction())
-                           .flatMap(object : Function<List<String>, Observable<List<PairInfoPo>>> {
-                               override fun apply(t: List<String>): Observable<List<PairInfoPo>> {
-                                   return BaClient.instance.initializer!!.getSocketService(ContractType.USDT).subTicker(*t.toTypedArray())
-                                           .flatMap(object:Function<List<TickerEventDto>,ObservableSource<List<PairInfoPo>>>{
-                                               override fun apply(t: List<TickerEventDto>): ObservableSource<List<PairInfoPo>> {
-                                                   return cacheTicker(t);
-                                               }
-                                           });
-                               }
-                           }).flatMap(object : Function<List<PairInfoPo>, Observable<List<PairInfoPo>>> {
-                               override fun apply(t: List<PairInfoPo>): Observable<List<PairInfoPo>> {
-                                   return Observable.empty();
-                               }
-                           }),
-                   getPairs(ContractType.USD)
-                           .map(PairInfoToPairNameListFunction())
-                           .flatMap(object : Function<List<String>, Observable<List<PairInfoPo>>> {
-                               override fun apply(t: List<String>): Observable<List<PairInfoPo>> {
-                                   return BaClient.instance.initializer!!.getSocketService(ContractType.USD).subTicker(*t);
-                               }
-                           }).flatMap(object : Function<List<PairInfoPo>, Observable<List<PairInfoPo>>> {
-                               override fun apply(t: List<PairInfoPo>): Observable<List<PairInfoPo>> {
-                                   return Observable.empty();
-                               }
-                           }),
-                   PairDbService.INSTANCE.subChange());*/
-        return Observable.empty();
+        return Observable.concat(
+                BaClient.instance.initializer!!.getSocketService(ContractType.USDT).subTicker()
+                        .flatMap(object : Function<List<TickerEventDto>, ObservableSource<List<PairInfoPo>>> {
+                            override fun apply(t: List<TickerEventDto>): ObservableSource<List<PairInfoPo>> {
+                                return cacheTicker(t);
+                            }
+                        })
+                        .flatMap(object : Function<List<PairInfoPo>, Observable<List<PairInfoPo>>> {
+                            override fun apply(t: List<PairInfoPo>): Observable<List<PairInfoPo>> {
+                                return Observable.empty();
+                            }
+                        }),
+
+                BaClient.instance.initializer!!.getSocketService(ContractType.USD).subTicker()
+                        .flatMap(object : Function<List<TickerEventDto>, ObservableSource<List<PairInfoPo>>> {
+                            override fun apply(t: List<TickerEventDto>): ObservableSource<List<PairInfoPo>> {
+                                return cacheTicker(t);
+                            }
+                        })
+                        .flatMap(object : Function<List<PairInfoPo>, Observable<List<PairInfoPo>>> {
+                            override fun apply(t: List<PairInfoPo>): Observable<List<PairInfoPo>> {
+                                return Observable.empty();
+                            }
+                        }),
+                PairDbService.INSTANCE.subChange());
     }
 
     /**
@@ -195,34 +193,64 @@ interface PairService : ExportService {
      * ！！！下游要安全处理,否则会中断订阅
      */
     fun subPairs(type: ContractType): Observable<List<PairInfoPo>> {
-        return getPairs(type)
-                .flatMap(object : Function<List<PairInfoPo>, Observable<List<PairInfoPo>>> {
-                    override fun apply(t: List<PairInfoPo>): Observable<List<PairInfoPo>> {
-                        val pairNameList: MutableList<String> = mutableListOf();
-                        for (item: PairInfoPo in t) {
-                            item.symbol?.let { pairNameList.add(it) };
-                        }
-                        if (pairNameList.isEmpty()) {
-                            return Observable.empty();
-                        }
-                        val toTypedArray = pairNameList.toTypedArray();
-                        return PairDbService.INSTANCE.subChange(*toTypedArray);
-                    }
-                });
+        if (type == null) {
+            return Observable.empty();
+        }
+        return Observable.concat(
+                BaClient.instance.initializer!!.getSocketService(type).subTicker()
+                        .flatMap(object : Function<List<TickerEventDto>, ObservableSource<List<PairInfoPo>>> {
+                            override fun apply(t: List<TickerEventDto>): ObservableSource<List<PairInfoPo>> {
+                                return cacheTicker(t);
+                            }
+                        })
+                        .flatMap(object : Function<List<PairInfoPo>, Observable<List<PairInfoPo>>> {
+                            override fun apply(t: List<PairInfoPo>): Observable<List<PairInfoPo>> {
+                                return Observable.empty();
+                            }
+                        }),
+                PairDbService.INSTANCE.subChange(type));
     }
 
     /**
      * 订阅指定交易对的交易对变化
      * ！！！下游要安全处理,否则会中断订阅
+     * 可能包含usdt 和usd
      */
     fun subPairs(vararg pairs: String): Observable<List<PairInfoPo>> {
         if (pairs == null || pairs.isEmpty()) {
             return Observable.empty();
         }
-        return PairDbService.INSTANCE.subChange(*pairs);
+        return Observable.concat(
+                BaClient.instance.initializer!!.getSocketService(ContractType.USDT).subTicker()
+                        .flatMap(object : Function<List<TickerEventDto>, ObservableSource<List<PairInfoPo>>> {
+                            override fun apply(t: List<TickerEventDto>): ObservableSource<List<PairInfoPo>> {
+                                return cacheTicker(t);
+                            }
+                        })
+                        .flatMap(object : Function<List<PairInfoPo>, Observable<List<PairInfoPo>>> {
+                            override fun apply(t: List<PairInfoPo>): Observable<List<PairInfoPo>> {
+                                return Observable.empty();
+                            }
+                        }),
+
+                BaClient.instance.initializer!!.getSocketService(ContractType.USD).subTicker()
+                        .flatMap(object : Function<List<TickerEventDto>, ObservableSource<List<PairInfoPo>>> {
+                            override fun apply(t: List<TickerEventDto>): ObservableSource<List<PairInfoPo>> {
+                                return cacheTicker(t);
+                            }
+                        })
+                        .flatMap(object : Function<List<PairInfoPo>, Observable<List<PairInfoPo>>> {
+                            override fun apply(t: List<PairInfoPo>): Observable<List<PairInfoPo>> {
+                                return Observable.empty();
+                            }
+                        }),
+                PairDbService.INSTANCE.subChange(*pairs));
     }
 
 
+    /**
+     * 缓存
+     */
     private fun cacheTicker(tickers: List<TickerEventDto>): Observable<List<PairInfoPo>> {
         if (tickers == null || tickers.isEmpty()) {
             return Observable.empty();

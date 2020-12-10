@@ -47,6 +47,12 @@ interface DepthService : ExportService {
      *  @param symbol 交易对名称
      */
     fun subDepth(symbol: String): Observable<DepthEventDto> {
-        return Observable.empty();
+        return PairService.INSTANCE
+                .getPairType(symbol)
+                .flatMap(object : Function<ContractType, ObservableSource<DepthEventDto>> {
+                    override fun apply(t: ContractType): ObservableSource<DepthEventDto> {
+                        return BaClient.instance.initializer!!.getSocketService(t).subDepth(symbol);
+                    }
+                });
     }
 }

@@ -40,6 +40,12 @@ open class DepthEventDto {
     class BookItemTypeAdapter : JsonSerializer<List<BookItem>>, JsonDeserializer<List<BookItem>> {
         override fun serialize(src: List<BookItem>?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
             if (src != null) {
+                /**
+                 * [
+                "4.00000000",     // 价格
+                "431.00000000"    // 数量
+                ]
+                 */
                 var jsonArray: JsonArray = JsonArray();
                 for (item in src) {
                     var itemJson: JsonArray = JsonArray();
@@ -55,6 +61,12 @@ open class DepthEventDto {
         override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): List<BookItem> {
             val list = mutableListOf<BookItem>()
             try {
+                /**
+                 * [
+                "4.00000000",     // 价格
+                "431.00000000"    // 数量
+                ]
+                 */
                 if (json!!.isJsonArray) {
                     json.asJsonArray.forEach {
                         list.add(BookItem(BigDecimal(it.asJsonArray.get(0).asString), BigDecimal(it.asJsonArray.get(1).asString)));

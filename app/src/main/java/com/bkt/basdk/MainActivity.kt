@@ -49,11 +49,11 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("CheckResult")
     override fun onResume() {
         super.onResume()
-        BaClient.instance.getService(PairService::class.java)
+      /*  BaClient.instance.getService(PairService::class.java)
                 .subPairs()
                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                 .subscribe {
-                    XXF.getLogger().d("==============>it:" + it.size)
+                    XXF.getLogger().d("==============>it:" + it)
                 };
         BaClient.instance.getService(PairService::class.java)
                 .subPairs(ContractType.USDT)
@@ -67,6 +67,13 @@ class MainActivity : AppCompatActivity() {
                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                 .subscribe {
                     XXF.getLogger().d("==============>it3:" + it.size)
+                };*/
+
+        BaClient.instance.getService(DepthService::class.java)
+                .subDepth("BTCUSDT")
+                .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
+                .subscribe {
+                    XXF.getLogger().d("==============>depth socket:" + it)
                 };
     }
 

@@ -52,6 +52,7 @@ abstract class ContractProxySocketService : WsStatusListener {
          * 订阅事件一定要buffer 便于框架重连
          */
         buffer.put(event, body);
+        log(" send msg:" + body);
         if (this.getWsManager() != null && this.getWsManager().isWsConnected) {
             this.getWsManager().sendMessage(JsonUtils.toJsonString(body))
         }
@@ -111,13 +112,15 @@ abstract class ContractProxySocketService : WsStatusListener {
 
     /**
      * 订阅深度
+     * @param symbol
+     * @param updateTime 更新间隔ms
      */
-    fun subDepth(symbol: String): Observable<DepthEventDto> {
+    fun subDepth(symbol: String, updateTime: Long = 100): Observable<DepthEventDto> {
         return bus.ofType(DepthEventDto::class.java)
                 .doOnSubscribe {
-                    //subEvent(SocketEvent.DepthUpdate, null)
+                    subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@depth@%sms", symbol.toLowerCase(), updateTime))));
                 }.doOnDispose {
-                    //  unSubEvent(SocketEvent.DepthUpdate)
+                    unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@depth@%sms", symbol.toLowerCase(), updateTime))));
                 };
     }
 
@@ -140,10 +143,14 @@ abstract class ContractProxySocketService : WsStatusListener {
                                 val event = firstElement.getString("e");
                                 when (event) {
                                     SocketEvent.MiniTicker24hr.value -> {
-                                        cacheMiniTicker24hr(JsonUtils.toBeanList(jsonArray.toString(), TickerEventDto::class.java));
-                                    };
+                                        val toBeanList = JsonUtils.toBeanList(jsonArray.toString(), TickerEventDto::class.java);
+                                        cacheMiniTicker24hr(toBeanList);
+                                        bus.onNext(TickerEventWrapper(toBeanList));
+                                    }
+                                    SocketEvent.DepthUpdate.value -> {
+                                        bus.onNext(JsonUtils.toBeanList(text, DepthEventDto::class.java).get(0));
+                                    }
                                     SocketEvent.KLine.value -> JsonUtils.toBean(text, KLineSEvent::class.java);
-                                    SocketEvent.DepthUpdate.value -> JsonUtils.toBean(text, DepthEventDto::class.java);
                                     else -> throw  RuntimeException("not support event:" + event);
                                 }
                             }
@@ -151,10 +158,14 @@ abstract class ContractProxySocketService : WsStatusListener {
                             val event = jsonObject.getString("e");
                             when (event) {
                                 SocketEvent.MiniTicker24hr.value -> {
-                                    cacheMiniTicker24hr(listOf(JsonUtils.toBean(jsonObject.toString(), TickerEventDto::class.java)));
+                                    val listOf = listOf(JsonUtils.toBean(jsonObject.toString(), TickerEventDto::class.java));
+                                    cacheMiniTicker24hr(listOf);
+                                    bus.onNext(TickerEventWrapper(listOf));
                                 };
+                                SocketEvent.DepthUpdate.value -> {
+                                    bus.onNext(JsonUtils.toBean(text, DepthEventDto::class.java));
+                                }
                                 SocketEvent.KLine.value -> JsonUtils.toBean(text, KLineSEvent::class.java);
-                                SocketEvent.DepthUpdate.value -> JsonUtils.toBean(text, DepthEventDto::class.java);
                                 else -> throw  RuntimeException("not support event:" + event);
                             }
                         }
@@ -173,9 +184,6 @@ abstract class ContractProxySocketService : WsStatusListener {
      */
     private fun cacheMiniTicker24hr(list: List<TickerEventDto>) {
         Observable.just(list)
-                .doOnNext {
-                    bus.onNext(TickerEventWrapper(it));
-                }
                 .map(TickerDtoToPairInfoPoListFunction())
                 .flatMap(object : Function<List<PairInfoPo>, ObservableSource<List<PairInfoPo>>> {
                     override fun apply(t: List<PairInfoPo>): ObservableSource<List<PairInfoPo>> {

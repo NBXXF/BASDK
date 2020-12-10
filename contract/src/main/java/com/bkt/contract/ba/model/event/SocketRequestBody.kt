@@ -34,4 +34,10 @@ class SocketRequestBody {
         this.params = params
         this.id = System.currentTimeMillis();
     }
+
+    override fun toString(): String {
+        return "SocketRequestBody(method=$method, params=$params, id=$id)"
+    }
+
+
 }

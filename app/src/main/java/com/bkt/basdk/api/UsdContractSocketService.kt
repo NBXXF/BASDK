@@ -24,13 +24,14 @@ class UsdContractSocketService private constructor() : ContractProxySocketServic
             /**
              * 动态设置 支持域名切换
              */
-            return "wss://dstream.binancefuture.com"
+            return "wss://dstream.binancefuture.com/ws"
         };
     var mWsManager: WsManager? = null;
     override fun getWsManager(): WsManager {
         if (mWsManager == null || !TextUtils.equals(mWsManager?.tag(), wssUrl)) {
             mWsManager = WsManager.Builder(XXF.getApplication())
                     .wsUrl(wssUrl)
+                    .tag(wssUrl)
                     .needReconnect(true)
                     .client(OkHttpClientBuilder()
                             //  .addInterceptor(BhHttpHeaderInterceptor())

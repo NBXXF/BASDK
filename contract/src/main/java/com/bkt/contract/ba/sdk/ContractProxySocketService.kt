@@ -1,22 +1,31 @@
 package com.bkt.contract.ba.sdk
 
 import android.util.Log
+import com.bkt.contract.ba.common.TickerDtoToPairInfoPoListFunction
 import com.bkt.contract.ba.enums.SocketEvent
 import com.bkt.contract.ba.model.dto.DepthEventDto
 import com.bkt.contract.ba.model.dto.TickerEventDto
 import com.bkt.contract.ba.model.event.BaseSEvent
 import com.bkt.contract.ba.model.event.KLineSEvent
 import com.bkt.contract.ba.model.event.SocketRequestBody
+import com.bkt.contract.ba.model.po.PairInfoPo
+import com.bkt.contract.ba.service.inner.PairDbService
+import com.google.gson.JsonElement
+import com.google.gson.JsonPrimitive
 import com.xxf.arch.XXF
 import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.websocket.WsManager
 import com.xxf.arch.websocket.listener.WsStatusListener
 import io.reactivex.Observable
+import io.reactivex.ObservableSource
+import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import okhttp3.Response
 import okio.ByteString
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.concurrent.Callable
 
 /**
@@ -116,25 +125,63 @@ abstract class ContractProxySocketService : WsStatusListener {
     override fun onMessage(text: String?) {
         log("onMessage:$text")
         Observable
-                .fromCallable(object : Callable<BaseSEvent> {
-                    override fun call(): BaseSEvent {
-                        val baseResEvent = JsonUtils.toBean(text, BaseSEvent::class.java);
-                        if (baseResEvent != null) {
-                            val result = when (baseResEvent.e) {
-                                SocketEvent.MiniTicker24hr -> TickerEventWrapper(JsonUtils.toBeanList(text, TickerEventDto::class.java));
-                                SocketEvent.KLine -> JsonUtils.toBean(text, KLineSEvent::class.java);
-                                SocketEvent.DepthUpdate -> JsonUtils.toBean(text, DepthEventDto::class.java);
-                                else -> throw  RuntimeException("not support event:" + baseResEvent.e);
+                .fromCallable(object : Callable<Boolean> {
+                    override fun call(): Boolean {
+                        var jsonObject: JSONObject? = null;
+                        try {
+                            jsonObject = JSONObject(text);
+                        } catch (e: Throwable) {
+                            e.printStackTrace()
+                        }
+                        if (jsonObject == null) {
+                            val jsonArray = JSONArray(text);
+                            val firstElement: JSONObject = jsonArray.getJSONObject(0);
+                            if (firstElement.has("e")) {
+                                val event = firstElement.getString("e");
+                                when (event) {
+                                    SocketEvent.MiniTicker24hr.value -> {
+                                        cacheMiniTicker24hr(JsonUtils.toBeanList(jsonArray.toString(), TickerEventDto::class.java));
+                                    };
+                                    SocketEvent.KLine.value -> JsonUtils.toBean(text, KLineSEvent::class.java);
+                                    SocketEvent.DepthUpdate.value -> JsonUtils.toBean(text, DepthEventDto::class.java);
+                                    else -> throw  RuntimeException("not support event:" + event);
+                                }
                             }
-                            if (result != null) {
-                                bus.onNext(result);
+                        } else if (jsonObject.has("e")) {
+                            val event = jsonObject.getString("e");
+                            when (event) {
+                                SocketEvent.MiniTicker24hr.value -> {
+                                    cacheMiniTicker24hr(listOf(JsonUtils.toBean(jsonObject.toString(), TickerEventDto::class.java)));
+                                };
+                                SocketEvent.KLine.value -> JsonUtils.toBean(text, KLineSEvent::class.java);
+                                SocketEvent.DepthUpdate.value -> JsonUtils.toBean(text, DepthEventDto::class.java);
+                                else -> throw  RuntimeException("not support event:" + event);
                             }
                         }
-                        return baseResEvent;
+                        return true;
                     }
                 })
                 .subscribeOn(Schedulers.io())
+                .doOnError {
+                    log("parse ex:" + it);
+                }
                 .subscribe();
+    }
+
+    /**
+     * 缓存
+     */
+    private fun cacheMiniTicker24hr(list: List<TickerEventDto>) {
+        Observable.just(list)
+                .doOnNext {
+                    bus.onNext(TickerEventWrapper(it));
+                }
+                .map(TickerDtoToPairInfoPoListFunction())
+                .flatMap(object : Function<List<PairInfoPo>, ObservableSource<List<PairInfoPo>>> {
+                    override fun apply(t: List<PairInfoPo>): ObservableSource<List<PairInfoPo>> {
+                        return PairDbService.INSTANCE.insertOrUpdate(t);
+                    }
+                }).blockingFirst();
     }
 
     private fun log(log: String) {

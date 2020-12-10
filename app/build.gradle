@@ -1,6 +1,11 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+
+Properties properties = new Properties()
+InputStream inputStream = project.rootProject.file('local.properties').newDataInputStream();
+properties.load(inputStream)
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.1"
@@ -16,8 +21,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            minifyEnabled false
+            buildConfigField "String", "X_MBX_APIKEY", "\"" + properties.getProperty('X_MBX_APIKEY') + "\""
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
         release {
             minifyEnabled false
+            buildConfigField "String", "X_MBX_APIKEY", "\"" + properties.getProperty('X_MBX_APIKEY') + "\""
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -40,5 +51,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     implementation 'com.github.NBXXF:xxf_android:3.2.1.2'
     implementation 'com.github.NBXXF.xxf_database:xxf_objectbox:1.0.6'
+    implementation 'com.uber.autodispose:autodispose-android-archcomponents:1.4.0'
 
 }

@@ -12,24 +12,26 @@ import java.util.concurrent.TimeUnit
  * @Author: XGod
  * @CreateDate: 2020/12/9 19:36
  */
-class UsdtContractSocketService private constructor(): ContractProxySocketService() {
-    companion object{
-        val instance:UsdtContractSocketService by lazy {
+class UsdtContractSocketService private constructor() : ContractProxySocketService() {
+    companion object {
+        val instance: UsdtContractSocketService by lazy {
             UsdtContractSocketService();
         }
     }
+
     val wssUrl: String
         get() {
             /**
              * 动态设置 支持域名切换
              */
-            return "wss://stream.binancefuture.com"
+            return "wss://stream.binancefuture.com/ws"
         };
     var mWsManager: WsManager? = null;
     override fun getWsManager(): WsManager {
         if (mWsManager == null || !TextUtils.equals(mWsManager?.tag(), wssUrl)) {
             mWsManager = WsManager.Builder(XXF.getApplication())
                     .wsUrl(wssUrl)
+                    .tag(wssUrl)
                     .needReconnect(true)
                     .client(OkHttpClientBuilder()
                             //  .addInterceptor(BhHttpHeaderInterceptor())

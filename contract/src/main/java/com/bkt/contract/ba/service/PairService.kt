@@ -1,6 +1,8 @@
 package com.bkt.contract.ba.service
 
 import android.text.TextUtils
+import com.bkt.contract.ba.common.PairInfoToPairNameListFunction
+import com.bkt.contract.ba.common.TickerDtoToPairInfoPoListFunction
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.dto.ExchangeInfoDto
 import com.bkt.contract.ba.model.dto.PairConfigDto
@@ -156,9 +158,36 @@ interface PairService : ExportService {
      * ！！！下游要安全处理,否则会中断订阅
      */
     fun subPairs(): Observable<List<PairInfoPo>> {
-        val usdtSocketService = BaClient.instance.initializer!!.getSocketService(ContractType.USDT);
-        val usdSocketService = BaClient.instance.initializer!!.getSocketService(ContractType.USD);
-        return PairDbService.INSTANCE.subChange();
+        /*   return Observable.concat(
+                   getPairs(ContractType.USDT)
+                           .map(PairInfoToPairNameListFunction())
+                           .flatMap(object : Function<List<String>, Observable<List<PairInfoPo>>> {
+                               override fun apply(t: List<String>): Observable<List<PairInfoPo>> {
+                                   return BaClient.instance.initializer!!.getSocketService(ContractType.USDT).subTicker(*t.toTypedArray())
+                                           .flatMap(object:Function<List<TickerEventDto>,ObservableSource<List<PairInfoPo>>>{
+                                               override fun apply(t: List<TickerEventDto>): ObservableSource<List<PairInfoPo>> {
+                                                   return cacheTicker(t);
+                                               }
+                                           });
+                               }
+                           }).flatMap(object : Function<List<PairInfoPo>, Observable<List<PairInfoPo>>> {
+                               override fun apply(t: List<PairInfoPo>): Observable<List<PairInfoPo>> {
+                                   return Observable.empty();
+                               }
+                           }),
+                   getPairs(ContractType.USD)
+                           .map(PairInfoToPairNameListFunction())
+                           .flatMap(object : Function<List<String>, Observable<List<PairInfoPo>>> {
+                               override fun apply(t: List<String>): Observable<List<PairInfoPo>> {
+                                   return BaClient.instance.initializer!!.getSocketService(ContractType.USD).subTicker(*t);
+                               }
+                           }).flatMap(object : Function<List<PairInfoPo>, Observable<List<PairInfoPo>>> {
+                               override fun apply(t: List<PairInfoPo>): Observable<List<PairInfoPo>> {
+                                   return Observable.empty();
+                               }
+                           }),
+                   PairDbService.INSTANCE.subChange());*/
+        return Observable.empty();
     }
 
     /**
@@ -191,6 +220,20 @@ interface PairService : ExportService {
             return Observable.empty();
         }
         return PairDbService.INSTANCE.subChange(*pairs);
+    }
+
+
+    private fun cacheTicker(tickers: List<TickerEventDto>): Observable<List<PairInfoPo>> {
+        if (tickers == null || tickers.isEmpty()) {
+            return Observable.empty();
+        }
+        return Observable.just(tickers)
+                .map(TickerDtoToPairInfoPoListFunction())
+                .flatMap(object : Function<List<PairInfoPo>, ObservableSource<List<PairInfoPo>>> {
+                    override fun apply(t: List<PairInfoPo>): ObservableSource<List<PairInfoPo>> {
+                        return PairDbService.INSTANCE.insertOrUpdate(t);
+                    }
+                });
     }
 }
 

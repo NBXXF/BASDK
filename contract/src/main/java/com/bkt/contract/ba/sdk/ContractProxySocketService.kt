@@ -5,6 +5,8 @@ import com.bkt.contract.ba.model.dto.DepthEventDto
 import com.bkt.contract.ba.model.dto.TickerEventDto
 import com.bkt.contract.ba.model.event.BaseSEvent
 import com.bkt.contract.ba.model.event.KLineSEvent
+import com.bkt.contract.ba.model.po.PairInfoPo
+import com.bkt.contract.ba.service.inner.PairDbService
 import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.websocket.WsManager
 import com.xxf.arch.websocket.listener.WsStatusListener

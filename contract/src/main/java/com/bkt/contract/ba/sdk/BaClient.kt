@@ -26,6 +26,7 @@ class BaClient private constructor() {
     }
 
     companion object {
+        @JvmStatic
         val instance: BaClient by lazy {
             BaClient();
         }
@@ -51,7 +52,7 @@ class BaClient private constructor() {
         this.initializer = initializer;
     }
 
-    fun <T:ExportService> getService(clazz: Class<T>): T {
+    fun <T : ExportService> getService(clazz: Class<T>): T {
         if (clazz is PairService) {
             return pairService as T;
         }

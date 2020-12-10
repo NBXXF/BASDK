@@ -1,6 +1,7 @@
 package com.bkt.contract.ba.model.dto
 
 import com.google.gson.*
+import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 import java.lang.reflect.Type
 import java.math.BigDecimal
@@ -10,13 +11,14 @@ import java.math.BigDecimal
  * @Author: XGod
  * @CreateDate: 2020/12/3 17:13
  */
-class DepthEventDto {
+open class DepthEventDto {
 
     /**
      *  买单
      */
     @SerializedName("bids", alternate = ["b"])
-    val bids: List<BookItem>? = null;
+    @JsonAdapter(BookItemTypeAdapter::class)
+    val bids: List<BookItem>;
 
     /**
      *  卖单
@@ -27,7 +29,13 @@ class DepthEventDto {
     转换json  {@link BookItem} 方便业务层调用
      */
     @SerializedName("asks", alternate = ["a"])
-    val asks: List<BookItem>? = null;
+    @JsonAdapter(BookItemTypeAdapter::class)
+    val asks: List<BookItem>;
+
+    constructor(bids: List<BookItem>, asks: List<BookItem>) {
+        this.bids = bids
+        this.asks = asks
+    }
 
     class BookItemTypeAdapter : JsonSerializer<List<BookItem>>, JsonDeserializer<List<BookItem>> {
         override fun serialize(src: List<BookItem>?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
@@ -48,8 +56,9 @@ class DepthEventDto {
             val list = mutableListOf<BookItem>()
             try {
                 if (json!!.isJsonArray) {
-                    val itemJson: JsonArray = json.asJsonArray;
-                    list.add(BookItem(BigDecimal(itemJson.get(0).asString), BigDecimal(itemJson.get(1).asString)));
+                    json.asJsonArray.forEach {
+                        list.add(BookItem(BigDecimal(it.asJsonArray.get(0).asString), BigDecimal(it.asJsonArray.get(1).asString)));
+                    }
                 }
             } catch (e: Throwable) {
                 throw JsonParseException(e);
@@ -65,6 +74,13 @@ class DepthEventDto {
     "431.00000000"    // 数量
     ]
      */
-    class BookItem(val price: BigDecimal, val amount: BigDecimal) {
+    open class BookItem(val price: BigDecimal, val amount: BigDecimal) {
+        override fun toString(): String {
+            return "BookItem(price=$price, amount=$amount)"
+        }
     }
+
+    override fun toString(): String {
+        return "DepthEventDto(bids=$bids, asks=$asks)"
+    };
 }

@@ -23,6 +23,13 @@ import retrofit2.CacheType
  * @CreateDate: 2020/12/9 14:52
  */
 interface PairService : ExportService {
+    companion object {
+        internal val INSTANCE: PairService by lazy {
+            object : PairService {
+            }
+        }
+    }
+
     /**
      * 获取所有交易对
      */
@@ -148,13 +155,23 @@ interface PairService : ExportService {
                 .flatMap(object : Function<List<PairInfoPo>, ObservableSource<PairInfoPo>> {
                     override fun apply(t: List<PairInfoPo>): ObservableSource<PairInfoPo> {
                         for (item: PairInfoPo in t) {
-                            if (TextUtils.equals(item.contractType, symbol)) {
+                            if (TextUtils.equals(item.symbol, symbol)) {
                                 return Observable.just(item);
                             }
                         }
                         return Observable.empty();
                     }
                 });
+    }
+
+    /**
+     * 获取交易对类型
+     */
+    fun getPairType(symbol: String): Observable<ContractType> {
+        return getPair(symbol)
+                .map {
+                    ContractType.from(it.contractType);
+                }
     }
 
     /**

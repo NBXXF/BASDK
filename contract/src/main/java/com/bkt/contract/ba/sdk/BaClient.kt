@@ -7,6 +7,7 @@ import com.bkt.contract.ba.model.dto.ExchangeInfoDto
 import com.bkt.contract.ba.model.dto.PairConfigDto
 import com.bkt.contract.ba.model.dto.TickerEventDto
 import com.bkt.contract.ba.model.po.PairInfoPo
+import com.bkt.contract.ba.service.DepthService
 import com.bkt.contract.ba.service.ExportService
 import com.bkt.contract.ba.service.PairService
 import io.reactivex.Observable
@@ -21,9 +22,6 @@ import java.lang.RuntimeException
  * @CreateDate: 2020/12/3 20:47
  */
 class BaClient private constructor() {
-    private val pairService by lazy {
-        PairServiceImpl();
-    }
 
     companion object {
         @JvmStatic
@@ -53,13 +51,13 @@ class BaClient private constructor() {
     }
 
     fun <T : ExportService> getService(clazz: Class<T>): T {
-        if (clazz is PairService) {
-            return pairService as T;
+        if (clazz == PairService::class.java) {
+            return PairService.INSTANCE as T;
         }
-        return pairService as T;
+        if (clazz == DepthService::class.java) {
+            return DepthService.INSTANCE as T;
+        }
+        return PairService.INSTANCE as T;
     }
 
-    internal class PairServiceImpl : PairService {
-
-    }
 }

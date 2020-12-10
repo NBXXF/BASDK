@@ -9,6 +9,7 @@ import io.reactivex.Observable
 import retrofit2.CacheType
 import retrofit2.http.Cache
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Query
 
 /**
@@ -16,7 +17,7 @@ import retrofit2.http.Query
  * @Author: XGod
  * @CreateDate: 2020/12/1 20:10
  */
-interface ContractProxyApiService{
+interface ContractProxyApiService {
     /**
      * 测试api
      *
@@ -74,6 +75,7 @@ interface ContractProxyApiService{
      */
     @GET("v1/depth")
     fun getDepth(@Cache type: CacheType,
+                 @Header("cache") cacheTime: Long,
                  @Query("symbol") symbol: String,
                  @Query("limit") limit: Int): Observable<DepthEventDto>;
 

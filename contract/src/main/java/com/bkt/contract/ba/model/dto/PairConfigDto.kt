@@ -4,13 +4,14 @@ import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.enums.OrderType
 import com.bkt.contract.ba.enums.TimeInForce
 import com.bkt.contract.ba.model.dto.OderFilterDto
+import java.io.Serializable
 
 /**
  * @Description: 交易对配置
  * @Author: XGod
  * @CreateDate: 2020/12/2 11:03
  */
-class PairConfigDto {
+class PairConfigDto : Serializable {
     /**
      * eg.BLZUSDT 交易对
      */

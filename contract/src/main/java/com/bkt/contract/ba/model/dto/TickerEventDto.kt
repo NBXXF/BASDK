@@ -1,6 +1,7 @@
 package com.bkt.contract.ba.model.dto
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 import java.math.BigDecimal
 
 /**
@@ -8,7 +9,7 @@ import java.math.BigDecimal
  * @Author: XGod
  * @CreateDate: 2020/12/2 16:52
  */
-class TickerEventDto {
+class TickerEventDto : Serializable {
     /**
      * {
     "symbol": "BTCUSDT",

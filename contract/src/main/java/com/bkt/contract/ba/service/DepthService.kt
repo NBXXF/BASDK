@@ -1,9 +1,9 @@
 package com.bkt.contract.ba.service
 
 import com.bkt.contract.ba.enums.ContractType
-import com.bkt.contract.ba.model.dto.DepthEventDto
+import com.bkt.contract.ba.model.po.DepthEventDtoPo
 import com.bkt.contract.ba.sdk.BaClient
-import com.xxf.arch.XXF
+import com.bkt.contract.ba.service.inner.DepthDbService
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
@@ -32,11 +32,11 @@ interface DepthService : ExportService {
      */
     fun getDepth(symbol: String,
                  cacheType: CacheType = CacheType.firstCache,
-                 cacheTime: Long = TimeUnit.MINUTES.toMillis(5)): Observable<DepthEventDto> {
+                 cacheTime: Long = TimeUnit.MINUTES.toMillis(5)): Observable<DepthEventDtoPo> {
         return PairService.INSTANCE
                 .getPairType(symbol)
-                .flatMap(object : Function<ContractType, ObservableSource<DepthEventDto>> {
-                    override fun apply(t: ContractType): ObservableSource<DepthEventDto> {
+                .flatMap(object : Function<ContractType, ObservableSource<DepthEventDtoPo>> {
+                    override fun apply(t: ContractType): ObservableSource<DepthEventDtoPo> {
                         return BaClient.instance.initializer!!.getApiService(t).getDepth(cacheType, cacheTime, symbol, 50);
                     }
                 });
@@ -46,13 +46,19 @@ interface DepthService : ExportService {
      * 订阅深度变化
      *  @param symbol 交易对名称
      */
-    fun subDepth(symbol: String): Observable<DepthEventDto> {
-        return PairService.INSTANCE
-                .getPairType(symbol)
-                .flatMap(object : Function<ContractType, ObservableSource<DepthEventDto>> {
-                    override fun apply(t: ContractType): ObservableSource<DepthEventDto> {
-                        return BaClient.instance.initializer!!.getSocketService(t).subDepth(symbol);
-                    }
-                });
+    fun subDepth(symbol: String): Observable<DepthEventDtoPo> {
+        return Observable.merge(
+                PairService.INSTANCE
+                        .getPairType(symbol)
+                        .flatMap(object : Function<ContractType, ObservableSource<DepthEventDtoPo>> {
+                            override fun apply(t: ContractType): ObservableSource<DepthEventDtoPo> {
+                                return BaClient.instance.initializer!!.getSocketService(t).subDepth(symbol);
+                            }
+                        }).flatMap(object : Function<DepthEventDtoPo, ObservableSource<DepthEventDtoPo>> {
+                            override fun apply(t: DepthEventDtoPo): ObservableSource<DepthEventDtoPo> {
+                                return Observable.empty();
+                            }
+                        }),
+                DepthDbService.subChange(symbol));
     }
 }

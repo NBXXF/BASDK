@@ -1,17 +1,16 @@
 package com.bkt.contract.ba.sdk
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.bkt.contract.ba.common.TickerDtoToPairInfoPoListFunction
 import com.bkt.contract.ba.enums.SocketEvent
-import com.bkt.contract.ba.model.dto.DepthEventDto
+import com.bkt.contract.ba.model.po.DepthEventDtoPo
 import com.bkt.contract.ba.model.dto.TickerEventDto
-import com.bkt.contract.ba.model.event.BaseSEvent
 import com.bkt.contract.ba.model.event.KLineSEvent
 import com.bkt.contract.ba.model.event.SocketRequestBody
 import com.bkt.contract.ba.model.po.PairInfoPo
+import com.bkt.contract.ba.service.inner.DepthDbService
 import com.bkt.contract.ba.service.inner.PairDbService
-import com.google.gson.JsonElement
-import com.google.gson.JsonPrimitive
 import com.xxf.arch.XXF
 import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.websocket.WsManager
@@ -115,8 +114,8 @@ abstract class ContractProxySocketService : WsStatusListener {
      * @param symbol
      * @param updateTime 更新间隔ms
      */
-    fun subDepth(symbol: String, updateTime: Long = 100): Observable<DepthEventDto> {
-        return bus.ofType(DepthEventDto::class.java)
+    fun subDepth(symbol: String, updateTime: Long = 100): Observable<DepthEventDtoPo> {
+        return bus.ofType(DepthEventDtoPo::class.java)
                 .doOnSubscribe {
                     subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@depth@%sms", symbol.toLowerCase(), updateTime))));
                 }.doOnDispose {
@@ -148,7 +147,9 @@ abstract class ContractProxySocketService : WsStatusListener {
                                         bus.onNext(TickerEventWrapper(toBeanList));
                                     }
                                     SocketEvent.DepthUpdate.value -> {
-                                        bus.onNext(JsonUtils.toBeanList(text, DepthEventDto::class.java).get(0));
+                                        val toBean = JsonUtils.toBeanList(text, DepthEventDtoPo::class.java).get(0);
+                                        cacheDepth(toBean)
+                                        bus.onNext(toBean);
                                     }
                                     SocketEvent.KLine.value -> JsonUtils.toBean(text, KLineSEvent::class.java);
                                     else -> throw  RuntimeException("not support event:" + event);
@@ -163,7 +164,9 @@ abstract class ContractProxySocketService : WsStatusListener {
                                     bus.onNext(TickerEventWrapper(listOf));
                                 };
                                 SocketEvent.DepthUpdate.value -> {
-                                    bus.onNext(JsonUtils.toBean(text, DepthEventDto::class.java));
+                                    val toBean = JsonUtils.toBean(text, DepthEventDtoPo::class.java);
+                                    cacheDepth(toBean)
+                                    bus.onNext(toBean);
                                 }
                                 SocketEvent.KLine.value -> JsonUtils.toBean(text, KLineSEvent::class.java);
                                 else -> throw  RuntimeException("not support event:" + event);
@@ -179,17 +182,21 @@ abstract class ContractProxySocketService : WsStatusListener {
                 .subscribe();
     }
 
-    /**
-     * 缓存
-     */
+    @SuppressLint("CheckResult")
     private fun cacheMiniTicker24hr(list: List<TickerEventDto>) {
         Observable.just(list)
                 .map(TickerDtoToPairInfoPoListFunction())
                 .flatMap(object : Function<List<PairInfoPo>, ObservableSource<List<PairInfoPo>>> {
                     override fun apply(t: List<PairInfoPo>): ObservableSource<List<PairInfoPo>> {
-                        return PairDbService.INSTANCE.insertOrUpdate(t);
+                        return PairDbService.insertOrUpdate(t);
                     }
                 }).blockingFirst();
+    }
+
+    @SuppressLint("CheckResult")
+    private fun cacheDepth(depth: DepthEventDtoPo) {
+        DepthDbService.insertOrUpdate(depth)
+                .blockingFirst();
     }
 
     private fun log(log: String) {

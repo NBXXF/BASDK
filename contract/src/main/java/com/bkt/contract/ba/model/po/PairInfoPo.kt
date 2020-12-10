@@ -8,6 +8,7 @@ import com.xxf.arch.json.JsonUtils
 import com.xxf.database.xxf.objectbox.id.IdUtils
 import io.objectbox.annotation.*
 import io.objectbox.converter.PropertyConverter
+import java.io.Serializable
 
 /**
  * @Description: 交易对 信息(配置+价格涨幅信息)
@@ -15,7 +16,7 @@ import io.objectbox.converter.PropertyConverter
  * @CreateDate: 2020/12/3 19:37
  */
 @Entity
-open class PairInfoPo {
+open class PairInfoPo : Serializable {
 
     /**
      * 主键
@@ -72,7 +73,7 @@ open class PairInfoPo {
         return PairInfoPo(this.index, this.symbol, this.config, this.contractType, this.ticker);
     }
 
-    class CoinConfigPoConverter : PropertyConverter<PairConfigDto?, String?> {
+    internal class CoinConfigPoConverter : PropertyConverter<PairConfigDto?, String?> {
         override fun convertToEntityProperty(databaseValue: String?): PairConfigDto? {
             return if (TextUtils.isEmpty(databaseValue)) {
                 null
@@ -84,7 +85,7 @@ open class PairInfoPo {
         }
     }
 
-    class TickerPoConverter : PropertyConverter<TickerEventDto?, String?> {
+    internal class TickerPoConverter : PropertyConverter<TickerEventDto?, String?> {
         override fun convertToEntityProperty(databaseValue: String?): TickerEventDto? {
             return if (TextUtils.isEmpty(databaseValue)) {
                 null

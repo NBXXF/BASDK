@@ -8,7 +8,7 @@ import io.reactivex.functions.Function
  * @Author: XGod
  * @CreateDate: 2020/12/10 9:43
  */
-class PairInfoToPairNameListFunction : Function<List<PairInfoPo>, List<String>> {
+internal class PairInfoToPairNameListFunction : Function<List<PairInfoPo>, List<String>> {
     override fun apply(t: List<PairInfoPo>): List<String> {
         val list: MutableList<String> = mutableListOf();
         t.forEach {

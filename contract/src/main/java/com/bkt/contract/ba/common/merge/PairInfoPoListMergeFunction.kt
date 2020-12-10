@@ -1,4 +1,4 @@
-package com.bkt.contract.ba.common
+package com.bkt.contract.ba.common.merge
 
 import android.text.TextUtils
 import com.bkt.contract.ba.model.po.PairInfoPo
@@ -9,7 +9,7 @@ import com.xxf.database.xxf.objectbox.ListMergeFunction
  * @Author: XGod
  * @CreateDate: 2020/12/7 10:46
  */
-class PairInfoPoListMergeFunction : ListMergeFunction<PairInfoPo> {
+internal class PairInfoPoListMergeFunction : ListMergeFunction<PairInfoPo> {
     override fun apply(insert: MutableList<PairInfoPo>, inserted: MutableMap<Long, PairInfoPo>): MutableList<PairInfoPo> {
         for (insertItem: PairInfoPo in insert) {
             if (insertItem != null) {

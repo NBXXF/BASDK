@@ -1,8 +1,6 @@
 package com.bkt.contract.ba.service
 
 import android.text.TextUtils
-import com.bkt.contract.ba.common.PairInfoToPairNameListFunction
-import com.bkt.contract.ba.common.TickerDtoToPairInfoPoListFunction
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.dto.ExchangeInfoDto
 import com.bkt.contract.ba.model.dto.PairConfigDto
@@ -10,11 +8,11 @@ import com.bkt.contract.ba.model.dto.TickerEventDto
 import com.bkt.contract.ba.model.po.PairInfoPo
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.service.inner.PairDbService
-import com.xxf.arch.XXF
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
 import retrofit2.CacheType
+import kotlin.reflect.KParameter
 
 
 /**
@@ -34,7 +32,7 @@ interface PairService : ExportService {
      * 获取所有交易对
      */
     fun getPairs(): Observable<List<PairInfoPo>> {
-        return PairDbService.INSTANCE.queryAll()
+        return PairDbService.queryAll()
                 .flatMap(object : Function<List<PairInfoPo>, ObservableSource<List<PairInfoPo>>> {
                     override fun apply(p: List<PairInfoPo>): ObservableSource<List<PairInfoPo>> {
                         if (p.isEmpty()) {
@@ -97,7 +95,7 @@ interface PairService : ExportService {
                 )
                 .flatMap(object : Function<List<PairInfoPo>, ObservableSource<List<PairInfoPo>>> {
                     override fun apply(t: List<PairInfoPo>): ObservableSource<List<PairInfoPo>> {
-                        return PairDbService.INSTANCE.insertOrUpdate(t);
+                        return PairDbService.insertOrUpdate(t);
                     }
                 });
     }
@@ -192,7 +190,7 @@ interface PairService : ExportService {
                                 return Observable.empty();
                             }
                         }),
-                PairDbService.INSTANCE.subChange());
+                PairDbService.subChange());
     }
 
     /**
@@ -210,7 +208,7 @@ interface PairService : ExportService {
                                 return Observable.empty();
                             }
                         }),
-                PairDbService.INSTANCE.subChange(type));
+                PairDbService.subChange(type));
     }
 
     /**
@@ -235,7 +233,7 @@ interface PairService : ExportService {
                                 return Observable.empty();
                             }
                         }),
-                PairDbService.INSTANCE.subChange(*pairs)
+                PairDbService.subChange(*pairs)
         );
     }
 }

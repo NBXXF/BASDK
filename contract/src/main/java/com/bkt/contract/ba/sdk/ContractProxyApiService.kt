@@ -1,6 +1,6 @@
 package com.bkt.contract.ba.sdk
 
-import com.bkt.contract.ba.model.dto.DepthEventDto
+import com.bkt.contract.ba.model.po.DepthEventDtoPo
 import com.bkt.contract.ba.model.dto.ExchangeInfoDto
 import com.bkt.contract.ba.model.dto.KLineEventDto
 import com.bkt.contract.ba.model.dto.TickerEventDto
@@ -77,7 +77,7 @@ interface ContractProxyApiService {
     fun getDepth(@Cache type: CacheType,
                  @Header("cache") cacheTime: Long,
                  @Query("symbol") symbol: String,
-                 @Query("limit") limit: Int): Observable<DepthEventDto>;
+                 @Query("limit") limit: Int): Observable<DepthEventDtoPo>;
 
 
 }

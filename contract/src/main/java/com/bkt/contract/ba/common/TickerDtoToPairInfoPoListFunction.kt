@@ -9,7 +9,7 @@ import io.reactivex.functions.Function
  * @Author: XGod
  * @CreateDate: 2020/12/10 10:01
  */
-class TickerDtoToPairInfoPoListFunction : Function<List<TickerEventDto>, List<PairInfoPo>> {
+internal class TickerDtoToPairInfoPoListFunction : Function<List<TickerEventDto>, List<PairInfoPo>> {
     override fun apply(t: List<TickerEventDto>): List<PairInfoPo> {
         val list: MutableList<PairInfoPo> = mutableListOf();
         for (item: TickerEventDto in t) {

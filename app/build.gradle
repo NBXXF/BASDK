@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "com.bkt.basdk"
-        minSdkVersion 22
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"

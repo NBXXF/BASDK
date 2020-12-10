@@ -1,11 +1,10 @@
 package com.bkt.contract.ba.service.inner
 
-import com.bkt.contract.ba.common.PairInfoPoListMergeFunction
+import com.bkt.contract.ba.common.merge.PairInfoPoListMergeFunction
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.po.PairInfoPo
 import com.bkt.contract.ba.model.po.PairInfoPo_
 import com.bkt.contract.ba.sdk.ObjectBoxFactory
-import com.xxf.arch.XXF
 import com.xxf.database.xxf.objectbox.RxQuery
 import com.xxf.database.xxf.objectbox.XXFObjectBoxUtils
 import io.objectbox.query.Query
@@ -18,13 +17,7 @@ import java.util.concurrent.Callable
  * @Author: XGod
  * @CreateDate: 2020/12/9 15:14
  */
-internal class PairDbService private constructor() {
-    companion object {
-        val INSTANCE: PairDbService by lazy {
-            PairDbService();
-        }
-    }
-
+internal object PairDbService  {
     /**
      * 无缝插入更新
      */

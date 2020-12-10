@@ -1,8 +1,15 @@
-package com.bkt.contract.ba.model.dto
+package com.bkt.contract.ba.model.po
 
 import com.google.gson.*
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
+import com.xxf.arch.json.JsonUtils
+import com.xxf.database.xxf.objectbox.id.IdUtils
+import io.objectbox.annotation.Convert
+import io.objectbox.annotation.Entity
+import io.objectbox.annotation.Id
+import io.objectbox.converter.PropertyConverter
+import java.io.Serializable
 import java.lang.reflect.Type
 import java.math.BigDecimal
 
@@ -11,13 +18,24 @@ import java.math.BigDecimal
  * @Author: XGod
  * @CreateDate: 2020/12/3 17:13
  */
-open class DepthEventDto {
+@Entity
+open class DepthEventDtoPo:Serializable {
+    /**
+     * 主键
+     */
+    @Id(assignable = true)
+    var _id: Long = 0
+        get() = IdUtils.generateId(symbol);
+
+    @SerializedName("symbol", alternate = ["s"])
+    var symbol: String;
 
     /**
      *  买单
      */
     @SerializedName("bids", alternate = ["b"])
-    @JsonAdapter(BookItemTypeAdapter::class)
+    @JsonAdapter(BookItemJsonTypeAdapter::class)
+    @Convert(converter = BookItemCacheConverter::class, dbType = String::class)
     val bids: List<BookItem>;
 
     /**
@@ -29,15 +47,27 @@ open class DepthEventDto {
     转换json  {@link BookItem} 方便业务层调用
      */
     @SerializedName("asks", alternate = ["a"])
-    @JsonAdapter(BookItemTypeAdapter::class)
+    @JsonAdapter(BookItemJsonTypeAdapter::class)
+    @Convert(converter = BookItemCacheConverter::class, dbType = String::class)
     val asks: List<BookItem>;
 
-    constructor(bids: List<BookItem>, asks: List<BookItem>) {
+    constructor(symbol: String, bids: List<BookItem>, asks: List<BookItem>) {
+        this.symbol = symbol
         this.bids = bids
         this.asks = asks
     }
 
-    class BookItemTypeAdapter : JsonSerializer<List<BookItem>>, JsonDeserializer<List<BookItem>> {
+    internal class BookItemCacheConverter : PropertyConverter<List<BookItem>, String> {
+        override fun convertToDatabaseValue(entityProperty: List<BookItem>?): String {
+            return JsonUtils.toJsonString(entityProperty);
+        }
+
+        override fun convertToEntityProperty(databaseValue: String?): List<BookItem> {
+            return JsonUtils.toBeanList(databaseValue, BookItem::class.java)
+        }
+    }
+
+    internal class BookItemJsonTypeAdapter : JsonSerializer<List<BookItem>>, JsonDeserializer<List<BookItem>> {
         override fun serialize(src: List<BookItem>?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
             if (src != null) {
                 /**
@@ -93,6 +123,8 @@ open class DepthEventDto {
     }
 
     override fun toString(): String {
-        return "DepthEventDto(bids=$bids, asks=$asks)"
-    };
+        return "DepthEventDtoPo(symbol='$symbol', bids=$bids, asks=$asks)"
+    }
+
+
 }

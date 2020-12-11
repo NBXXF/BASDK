@@ -1,10 +1,11 @@
 package com.bkt.contract.ba.model.dto
 
-import com.bkt.contract.ba.enums.ContractType
+import android.text.TextUtils
+import com.bkt.contract.ba.enums.OderFilterType
 import com.bkt.contract.ba.enums.OrderType
 import com.bkt.contract.ba.enums.TimeInForce
-import com.bkt.contract.ba.model.dto.OderFilterDto
 import java.io.Serializable
+import java.lang.Exception
 
 /**
  * @Description: 交易对配置
@@ -16,6 +17,17 @@ class PairConfigDto : Serializable {
      * eg.BLZUSDT 交易对
      */
     val symbol: String? = null
+
+    /**
+     *  标的交易对
+     */
+    val pair: String? = null
+        get() {
+            if (TextUtils.isEmpty(field)) {
+                return baseAsset + quoteAsset
+            }
+            return field;
+        };
 
     /**
      * eg.TRADING 交易对状态
@@ -104,8 +116,19 @@ class PairConfigDto : Serializable {
 
 
     override fun toString(): String {
-        return "PairConfigDto(symbol=$symbol, status=$status, maintMarginPercent=$maintMarginPercent, requiredMarginPercent=$requiredMarginPercent, baseAsset=$baseAsset, quoteAsset=$quoteAsset, marginAsset=$marginAsset, pricePrecision=$pricePrecision, quantityPrecision=$quantityPrecision, baseAssetPrecision=$baseAssetPrecision, quotePrecision=$quotePrecision, underlyingType=$underlyingType, settlePlan=$settlePlan, triggerProtect=$triggerProtect, underlyingSubType=$underlyingSubType, filters=$filters, orderType=$orderType, timeInForce=$timeInForce)"
+        return "PairConfigDto(symbol=$symbol,pair=$pair, status=$status, maintMarginPercent=$maintMarginPercent, requiredMarginPercent=$requiredMarginPercent, baseAsset=$baseAsset, quoteAsset=$quoteAsset, marginAsset=$marginAsset, pricePrecision=$pricePrecision, quantityPrecision=$quantityPrecision, baseAssetPrecision=$baseAssetPrecision, quotePrecision=$quotePrecision, underlyingType=$underlyingType, settlePlan=$settlePlan, triggerProtect=$triggerProtect, underlyingSubType=$underlyingSubType, filters=$filters, orderType=$orderType, timeInForce=$timeInForce)"
     }
 
 
+    /**
+     * 获取下单配置
+     */
+    fun getFilter(filterType: OderFilterType): OderFilterDto? {
+        try {
+            return filters?.first { it.filterType == filterType }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null;
+    }
 }

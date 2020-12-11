@@ -93,4 +93,7 @@ interface ContractProxyApiService {
                   @Query("limit") limit: Long?
     ): Observable<List<TradeEventDto>>;
 
+
+    fun getPremiumIndex()
+
 }

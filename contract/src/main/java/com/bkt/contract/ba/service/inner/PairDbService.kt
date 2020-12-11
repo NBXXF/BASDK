@@ -81,10 +81,10 @@ internal object PairDbService  {
     /**
      * 订阅指定交易对变化
      */
-    fun subChange(vararg pairs: String): Observable<List<PairInfoPo>> {
+    fun subChange(vararg symbols: String): Observable<List<PairInfoPo>> {
         val build: Query<PairInfoPo> = ObjectBoxFactory.getBoxStore().boxFor(PairInfoPo::class.java)
                 .query()
-                .`in`(PairInfoPo_.symbol, pairs)
+                .`in`(PairInfoPo_.symbol, symbols)
                 .order(PairInfoPo_.index)
                 .build()
         return RxQuery.observableChange<PairInfoPo>(build);

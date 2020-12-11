@@ -125,8 +125,8 @@ interface PairService : ExportService {
     /**
      * 获取指定交易名称名称的交易对信息列表
      */
-    fun getPairs(vararg pairs: String): Observable<List<PairInfoPo>> {
-        if (pairs == null || pairs.isEmpty()) {
+    fun getPairs(vararg symbols: String): Observable<List<PairInfoPo>> {
+        if (symbols == null || symbols.isEmpty()) {
             return Observable.empty();
         }
         return getPairs()
@@ -134,7 +134,7 @@ interface PairService : ExportService {
                     override fun apply(t: List<PairInfoPo>): List<PairInfoPo> {
                         val pairPosList: MutableList<PairInfoPo> = mutableListOf<PairInfoPo>();
                         for (item: PairInfoPo in t) {
-                            if (pairs.contains(item.symbol)) {
+                            if (symbols.contains(item.symbol)) {
                                 pairPosList.add(item);
                             }
                         }
@@ -216,8 +216,8 @@ interface PairService : ExportService {
      * ！！！下游要安全处理,否则会中断订阅
      * 可能包含usdt 和usd
      */
-    fun subPairs(vararg pairs: String): Observable<List<PairInfoPo>> {
-        if (pairs == null || pairs.isEmpty()) {
+    fun subPairs(vararg symbols: String): Observable<List<PairInfoPo>> {
+        if (symbols == null || symbols.isEmpty()) {
             return Observable.empty();
         }
         return Observable.merge(
@@ -233,7 +233,7 @@ interface PairService : ExportService {
                                 return Observable.empty();
                             }
                         }),
-                PairDbService.subChange(*pairs)
+                PairDbService.subChange(*symbols)
         );
     }
 }

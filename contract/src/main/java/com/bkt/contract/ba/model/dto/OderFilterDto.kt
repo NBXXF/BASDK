@@ -28,13 +28,13 @@ open class OderFilterDto : Serializable {
                 OderFilterType.MAX_NUM_ORDERS -> context!!.deserialize<OderPriceFilterDto>(json, OderMaxNumFilterDto::class.java);
                 OderFilterType.MAX_NUM_ALGO_ORDERS -> context!!.deserialize<OderPriceFilterDto>(json, OderMaxNumAlgoFilterDto::class.java);
                 OderFilterType.PERCENT_PRICE -> context!!.deserialize<OderPriceFilterDto>(json, OderPercentPriceFilterDto::class.java);
-                else -> throw JsonParseException("no support type" + deserialize.filterType);
+                else -> deserialize;
             }
             return typeFilter!!;
         }
     }
 
-    final inner class TypeFilter : OderFilterDto() {
+    open class TypeFilter : OderFilterDto() {
     }
     /**
      * 所有类型对应的所有属性

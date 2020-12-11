@@ -37,13 +37,22 @@ interface DepthService : ExportService {
                 .getPairType(symbol)
                 .flatMap(object : Function<ContractType, ObservableSource<DepthEventDtoPo>> {
                     override fun apply(t: ContractType): ObservableSource<DepthEventDtoPo> {
-                        return BaClient.instance.initializer!!.getApiService(t).getDepth(cacheType, cacheTime, symbol, 20);
+                        return BaClient.instance.initializer!!.getApiService(t).getDepth(cacheType, cacheTime, symbol, 20)
+                                .map(object : Function<DepthEventDtoPo, DepthEventDtoPo> {
+                                    override fun apply(t: DepthEventDtoPo): DepthEventDtoPo {
+                                        /**
+                                         * 接口返回没有这个字段 这里装载一下
+                                         */
+                                        t.symbol = symbol;
+                                        return t;
+                                    }
+                                });
                     }
                 });
     }
 
     /**
-     * 订阅深度变化
+     * 订阅深度变化  全量
      *  @param symbol 交易对名称
      */
     fun subDepth(symbol: String): Observable<DepthEventDtoPo> {

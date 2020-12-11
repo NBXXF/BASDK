@@ -4,6 +4,7 @@ import com.bkt.contract.ba.model.po.DepthEventDtoPo
 import com.bkt.contract.ba.model.dto.ExchangeInfoDto
 import com.bkt.contract.ba.model.dto.KLineEventDto
 import com.bkt.contract.ba.model.dto.TickerEventDto
+import com.bkt.contract.ba.model.dto.TradeEventDto
 import com.google.gson.JsonObject
 import io.reactivex.Observable
 import retrofit2.CacheType
@@ -79,5 +80,17 @@ interface ContractProxyApiService {
                  @Query("symbol") symbol: String,
                  @Query("limit") limit: Int): Observable<DepthEventDtoPo>;
 
+    /**
+     * 获取成交
+     * https://binance-docs.github.io/apidocs/futures/cn/#c59e471e81
+     */
+    @GET("v1/aggTrades")
+    fun getTrades(@Cache type: CacheType,
+                  @Header("cache") cacheTime: Long,
+                  @Query("symbol") symbol: String,
+                  @Query("startTime") startTime: Long?,
+                  @Query("endTime") endTime: Long?,
+                  @Query("limit") limit: Long?
+    ): Observable<List<TradeEventDto>>;
 
 }

@@ -4,6 +4,7 @@ import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.service.DepthService
 import com.bkt.contract.ba.service.ExportService
 import com.bkt.contract.ba.service.PairService
+import com.bkt.contract.ba.service.TradeService
 import java.lang.RuntimeException
 
 /**
@@ -46,6 +47,9 @@ class BaClient private constructor() {
         }
         if (clazz == DepthService::class.java) {
             return DepthService.INSTANCE as T;
+        }
+        if (clazz == TradeService::class.java) {
+            return TradeService.INSTANCE as T;
         }
         return PairService.INSTANCE as T;
     }

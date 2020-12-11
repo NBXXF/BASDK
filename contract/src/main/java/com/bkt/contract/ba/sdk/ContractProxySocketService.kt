@@ -110,16 +110,17 @@ abstract class ContractProxySocketService : WsStatusListener {
     }
 
     /**
-     * 订阅深度
+     * 订阅深度 全量
      * @param symbol
+     * @param levels
      * @param updateTime 更新间隔ms
      */
-    fun subDepth(symbol: String, updateTime: Long = 100): Observable<DepthEventDtoPo> {
+    fun subDepth(symbol: String, levels: Int = 20, updateTime: Long = 100): Observable<DepthEventDtoPo> {
         return bus.ofType(DepthEventDtoPo::class.java)
                 .doOnSubscribe {
-                    subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@depth@%sms", symbol.toLowerCase(), updateTime))));
+                    subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@depth%s@%sms", symbol.toLowerCase(), levels, updateTime))));
                 }.doOnDispose {
-                    unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@depth@%sms", symbol.toLowerCase(), updateTime))));
+                    unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@depth%s@%sms", symbol.toLowerCase(), levels, updateTime))));
                 };
     }
 

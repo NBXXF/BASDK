@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe{
-                        XXF.getLogger().d("============>depth:" + it);
+                        XXF.getLogger().d("============>depth:" + it.asks.size+"  "+it.bids.size);
                     }
         }
    /*     BaClient.instance.getService(PairService::class.java).getPairs(ContractType.USDT)
@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
                 .subDepth("BTCUSDT")
                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                 .subscribe {
-                    XXF.getLogger().d("==============>depth socket:" + it)
+                    XXF.getLogger().d("==============>depth socket:" + it.asks.size)
                 };
     }
 

@@ -2,6 +2,7 @@ package com.bkt.contract.ba.common.merge
 
 import com.bkt.contract.ba.model.po.DepthEventDtoPo
 import com.xxf.arch.XXF
+import com.xxf.arch.utils.NumberUtils
 import com.xxf.database.xxf.objectbox.MergeFunction
 
 /**
@@ -10,7 +11,10 @@ import com.xxf.database.xxf.objectbox.MergeFunction
  * @CreateDate: 2020/12/10 18:48
  */
 internal class DepthEventDtoPoMergeFunction : MergeFunction<DepthEventDtoPo> {
-    private val max: Int = 50;
+    /**
+     * 最多20条
+     */
+    private val max: Int = 20;
     override fun apply(insert: DepthEventDtoPo, inserted: DepthEventDtoPo?): DepthEventDtoPo {
         /**
          * 合并 socket来的是增量
@@ -20,17 +24,22 @@ internal class DepthEventDtoPoMergeFunction : MergeFunction<DepthEventDtoPo> {
 
     fun merge(olds: List<DepthEventDtoPo.BookItem>?, news: List<DepthEventDtoPo.BookItem>?): List<DepthEventDtoPo.BookItem> {
         val mergeList: MutableList<DepthEventDtoPo.BookItem> = mutableListOf();
-        if (olds != null) {
-            mergeList.addAll(olds)
-        };
         if (news != null) {
             mergeList.addAll(news)
         }
 
+        if (mergeList.size < max && olds != null) {
+            mergeList.addAll(olds)
+        }
 
         val mergeMap: MutableMap<String, DepthEventDtoPo.BookItem> = mutableMapOf();
         for (bookItem in mergeList) {
-            mergeMap.put(bookItem.price.toPlainString(), bookItem);
+            /**
+             * 过滤价格小于0 或者数量小于0
+             */
+            if (bookItem.price.toDouble() > 0.0 && bookItem.amount.toDouble() > 0.0) {
+                mergeMap.put(bookItem.price.toPlainString(), bookItem);
+            }
         }
         val sortedByDescending = mergeMap.values.sortedByDescending { it.price };
         if (sortedByDescending.size > max) {

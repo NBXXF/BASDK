@@ -37,6 +37,9 @@ open class TradeEventDto {
     }
      */
 
+    @SerializedName("symbol", alternate = ["s"])
+    var symbol: String;
+
     /**
      * 成交价格
      */
@@ -63,8 +66,8 @@ open class TradeEventDto {
     @SerializedName("isBuyerMaker", alternate = ["m"])
     var isBuyerMaker: Boolean = false
 
-
-    constructor(price: BigDecimal, qty: BigDecimal, time: TimeFormatObject, isBuyerMaker: Boolean) {
+    constructor(symbol: String, price: BigDecimal, qty: BigDecimal, time: TimeFormatObject, isBuyerMaker: Boolean) {
+        this.symbol = symbol
         this.price = price
         this.qty = qty
         this.time = time
@@ -72,7 +75,6 @@ open class TradeEventDto {
     }
 
     override fun toString(): String {
-        return "TradeEventDto(price=$price, qty=$qty, time=$time, isBuyerMaker=$isBuyerMaker)"
+        return "TradeEventDto(symbol='$symbol', price=$price, qty=$qty, time=$time, isBuyerMaker=$isBuyerMaker)"
     }
-
 }

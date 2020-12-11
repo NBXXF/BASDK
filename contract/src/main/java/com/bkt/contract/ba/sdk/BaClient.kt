@@ -1,10 +1,14 @@
 package com.bkt.contract.ba.sdk
 
 import com.bkt.contract.ba.enums.ContractType
+import com.bkt.contract.ba.model.dto.TradeEventDto
 import com.bkt.contract.ba.service.DepthService
 import com.bkt.contract.ba.service.ExportService
 import com.bkt.contract.ba.service.PairService
 import com.bkt.contract.ba.service.TradeService
+import io.reactivex.Observable
+import io.reactivex.ObservableSource
+import io.reactivex.functions.Function
 import java.lang.RuntimeException
 
 /**
@@ -52,6 +56,32 @@ class BaClient private constructor() {
             return TradeService.INSTANCE as T;
         }
         return PairService.INSTANCE as T;
+    }
+
+    /**
+     * 获取api service
+     */
+    internal fun getApiService(symbol: String): Observable<ContractProxyApiService> {
+        return getService(PairService::class.java)
+                .getPairType(symbol)
+                .map(object : Function<ContractType, ContractProxyApiService> {
+                    override fun apply(t: ContractType): ContractProxyApiService {
+                        return BaClient.instance.initializer!!.getApiService(t);
+                    }
+                });
+    }
+
+    /**
+     * 获取socket service
+     */
+    internal fun getSocketService(symbol: String): Observable<ContractProxySocketService> {
+        return getService(PairService::class.java)
+                .getPairType(symbol)
+                .map(object : Function<ContractType, ContractProxySocketService> {
+                    override fun apply(t: ContractType): ContractProxySocketService {
+                        return BaClient.instance.initializer!!.getSocketService(t);
+                    }
+                });
     }
 
 }

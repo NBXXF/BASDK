@@ -70,15 +70,20 @@ class MainActivity : AppCompatActivity() {
                       XXF.getLogger().d("==============>it3:" + it.size)
                   };*/
 
-        BaClient.instance.getService(DepthService::class.java)
-                .subDepth("BTCUSDT")
+        /*  BaClient.instance.getService(DepthService::class.java)
+                  .subDepth("BTCUSDT")
+                  .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
+                  .subscribe {
+                      XXF.getLogger().d("==============>depth socket:" + it.asks.size)
+                  };*/
+
+        BaClient.instance.getService(TradeService::class.java)
+                .subTrades("BTCUSDT")
                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                 .subscribe {
-                    XXF.getLogger().d("==============>depth socket:" + it.asks.size)
+                    XXF.getLogger().d("==============>trade socket:" + it);
                 };
 
-        val list: MutableList<Int> = mutableListOf(1, 4, 65, 6, 7);
-        XXF.getLogger().d("==============>yes:" + list.filter { it % 2 == 0 })
     }
 
 

@@ -1,16 +1,20 @@
 package com.bkt.contract.ba.sdk
 
 import android.annotation.SuppressLint
+import android.text.TextUtils
 import android.util.Log
 import com.bkt.contract.ba.common.TickerDtoToPairInfoPoListFunction
 import com.bkt.contract.ba.enums.SocketEvent
 import com.bkt.contract.ba.model.po.DepthEventDtoPo
 import com.bkt.contract.ba.model.dto.TickerEventDto
+import com.bkt.contract.ba.model.dto.TradeEventDto
 import com.bkt.contract.ba.model.event.KLineSEvent
 import com.bkt.contract.ba.model.event.SocketRequestBody
 import com.bkt.contract.ba.model.po.PairInfoPo
+import com.bkt.contract.ba.model.po.PairTradePo
 import com.bkt.contract.ba.service.inner.DepthDbService
 import com.bkt.contract.ba.service.inner.PairDbService
+import com.bkt.contract.ba.service.inner.TradeDbService
 import com.xxf.arch.XXF
 import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.websocket.WsManager
@@ -120,8 +124,20 @@ abstract class ContractProxySocketService : WsStatusListener {
                 .doOnSubscribe {
                     subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@depth%s@%sms", symbol.toLowerCase(), levels, updateTime))));
                 }.doOnDispose {
-                    unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@depth%s@%sms", symbol.toLowerCase(), levels, updateTime))));
-                };
+                    unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@depth%s@%sms", symbol.toLowerCase(), levels, updateTime))));
+                }.filter { TextUtils.equals(it.symbol, symbol)};
+    }
+
+    /**
+     * 订阅成交  增量
+     */
+    fun subTrade(symbol: String): Observable<TradeEventDto> {
+        return bus.ofType(TradeEventDto::class.java)
+                .doOnSubscribe {
+                    subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@aggTrade", symbol.toLowerCase()))));
+                }.doOnDispose {
+                    unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@aggTrade", symbol.toLowerCase()))));
+                }.filter { TextUtils.equals(it.symbol, symbol)};
     }
 
 
@@ -152,6 +168,11 @@ abstract class ContractProxySocketService : WsStatusListener {
                                         cacheDepth(toBean)
                                         bus.onNext(toBean);
                                     }
+                                    SocketEvent.AggTrade.value -> {
+                                        val toBean = JsonUtils.toBeanList(text, TradeEventDto::class.java).get(0);
+                                        cacheTrade(toBean);
+                                        bus.onNext(toBean);
+                                    }
                                     SocketEvent.KLine.value -> JsonUtils.toBean(text, KLineSEvent::class.java);
                                     else -> throw  RuntimeException("not support event:" + event);
                                 }
@@ -167,6 +188,11 @@ abstract class ContractProxySocketService : WsStatusListener {
                                 SocketEvent.DepthUpdate.value -> {
                                     val toBean = JsonUtils.toBean(text, DepthEventDtoPo::class.java);
                                     cacheDepth(toBean)
+                                    bus.onNext(toBean);
+                                }
+                                SocketEvent.AggTrade.value -> {
+                                    val toBean = JsonUtils.toBean(text, TradeEventDto::class.java);
+                                    cacheTrade(toBean)
                                     bus.onNext(toBean);
                                 }
                                 SocketEvent.KLine.value -> JsonUtils.toBean(text, KLineSEvent::class.java);
@@ -198,6 +224,20 @@ abstract class ContractProxySocketService : WsStatusListener {
     private fun cacheDepth(depth: DepthEventDtoPo) {
         DepthDbService.insertOrUpdate(depth)
                 .blockingFirst();
+    }
+
+    @SuppressLint("CheckResult")
+    private fun cacheTrade(trade: TradeEventDto) {
+        Observable.just(trade)
+                .map(object : Function<TradeEventDto, PairTradePo> {
+                    override fun apply(t: TradeEventDto): PairTradePo {
+                        return PairTradePo(t.symbol, listOf(t));
+                    }
+                }).flatMap(object : Function<PairTradePo, ObservableSource<PairTradePo>> {
+                    override fun apply(t: PairTradePo): ObservableSource<PairTradePo> {
+                        return TradeDbService.insertOrUpdate(t);
+                    }
+                }).blockingFirst();
     }
 
     private fun log(log: String) {

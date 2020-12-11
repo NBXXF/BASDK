@@ -31,5 +31,11 @@ enum class SocketEvent(val value: String) {
      * 深度
      */
     @SerializedName("depthUpdate")
-    DepthUpdate("depthUpdate")
+    DepthUpdate("depthUpdate"),
+
+    /**
+     * 成交
+     */
+    @SerializedName("aggTrade")
+    AggTrade("aggTrade");
 }

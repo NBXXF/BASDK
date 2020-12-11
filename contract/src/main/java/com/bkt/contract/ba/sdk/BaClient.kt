@@ -45,6 +45,9 @@ class BaClient private constructor() {
         this.initializer = initializer;
     }
 
+    /**
+     * 对外暴露服务
+     */
     fun <T : ExportService> getService(clazz: Class<T>): T {
         if (clazz == PairService::class.java) {
             return PairService.INSTANCE as T;

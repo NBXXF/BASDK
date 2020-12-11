@@ -29,7 +29,7 @@ interface TradeService : ExportService {
 
     /**
      * 获取近期成交
-     * 默认50条
+     *  max item=20
      */
     fun getTrades(symbol: String,
                   cacheType: CacheType = CacheType.firstCache,
@@ -38,7 +38,7 @@ interface TradeService : ExportService {
                 .getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<List<TradeEventDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<List<TradeEventDto>> {
-                        return t.getTrades(cacheType, cacheTime, symbol, null, null, 50)
+                        return t.getTrades(cacheType, cacheTime, symbol, null, null, 20)
                                 .map(object : Function<List<TradeEventDto>, List<TradeEventDto>> {
                                     override fun apply(t: List<TradeEventDto>): List<TradeEventDto> {
                                         return t.filter {
@@ -51,7 +51,7 @@ interface TradeService : ExportService {
     }
 
     /**
-     * 订阅成交  全量
+     * 订阅成交  全量 max item=20
      */
     fun subTrades(symbol: String): Observable<List<TradeEventDto>> {
         return Observable.merge(BaClient.instance

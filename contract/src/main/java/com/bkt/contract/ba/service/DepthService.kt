@@ -25,7 +25,7 @@ interface DepthService : ExportService {
     }
 
     /**
-     *  获取深度
+     *  获取深度   max item=20
      *  @param symbol 交易对名称
      *  @param cacheType 缓存类型
      *  @param cacheTime 缓存时间
@@ -53,6 +53,7 @@ interface DepthService : ExportService {
 
     /**
      * 订阅深度变化  全量
+     *  max item=20
      *  @param symbol 交易对名称
      */
     fun subDepth(symbol: String): Observable<DepthEventDtoPo> {

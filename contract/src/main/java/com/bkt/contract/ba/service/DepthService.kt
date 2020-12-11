@@ -37,7 +37,7 @@ interface DepthService : ExportService {
                 .getPairType(symbol)
                 .flatMap(object : Function<ContractType, ObservableSource<DepthEventDtoPo>> {
                     override fun apply(t: ContractType): ObservableSource<DepthEventDtoPo> {
-                        return BaClient.instance.initializer!!.getApiService(t).getDepth(cacheType, cacheTime, symbol, 50);
+                        return BaClient.instance.initializer!!.getApiService(t).getDepth(cacheType, cacheTime, symbol, 20);
                     }
                 });
     }

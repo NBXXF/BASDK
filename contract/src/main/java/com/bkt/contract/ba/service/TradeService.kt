@@ -41,9 +41,7 @@ interface TradeService : ExportService {
                         return t.getTrades(cacheType, cacheTime, symbol, null, null, 20)
                                 .map(object : Function<List<TradeEventDto>, List<TradeEventDto>> {
                                     override fun apply(t: List<TradeEventDto>): List<TradeEventDto> {
-                                        return t.filter {
-                                            it.price.toDouble() > 0 && it.qty.toDouble() > 0;
-                                        };
+                                        return t.sortedByDescending { it.time.origin };
                                     }
                                 });
                     }

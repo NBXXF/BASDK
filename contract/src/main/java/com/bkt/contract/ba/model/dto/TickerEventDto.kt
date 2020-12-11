@@ -10,6 +10,7 @@ import com.google.gson.stream.JsonWriter
 import com.xxf.arch.XXF
 import com.xxf.arch.json.typeadapter.format.NumberObjectFormatTypeAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
+import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_Signed_FormatTypeAdapter
 import com.xxf.arch.utils.NumberUtils
 import java.io.Serializable
@@ -64,25 +65,29 @@ class TickerEventDto : Serializable {
      * 最近一次成交价
      */
     @SerializedName("lastPrice", alternate = ["c"])
-    val closePrice: BigDecimal? = null;
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    val closePrice: NumberFormatObject? = null;
 
     /**
      * 24小时内第一次成交的价格
      */
     @SerializedName("openPrice", alternate = ["o"])
-    val openPrice: BigDecimal? = null;
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    val openPrice: NumberFormatObject? = null;
 
     /**
      * 24小时最高价
      */
     @SerializedName("highPrice", alternate = ["h"])
-    val highPrice: BigDecimal? = null;
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    val highPrice: NumberFormatObject? = null;
 
     /**
      * 24小时最低价
      */
     @SerializedName("lowPrice", alternate = ["l"])
-    val lowPrice: BigDecimal? = null;
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    val lowPrice: NumberFormatObject? = null;
 
     /**
      * 24小时成交量
@@ -95,7 +100,8 @@ class TickerEventDto : Serializable {
      * 24小时成交额
      */
     @SerializedName("quoteVolume", alternate = ["q"])
-    val quoteVolume: BigDecimal? = null;
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    val quoteVolume: NumberFormatObject? = null;
 
 
     /**
@@ -115,7 +121,7 @@ class TickerEventDto : Serializable {
             } else if (origin.toDouble() > 1000) {
                 NumberUtils.formatRoundDown(NumberUtils.divide(origin, 1000), 2, 2) + "K"
             } else {
-                return NumberUtils.formatRoundDown(origin, 2, 2);
+                return origin.toPlainString();
             }
         }
     }

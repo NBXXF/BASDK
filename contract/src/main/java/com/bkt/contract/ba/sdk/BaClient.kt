@@ -2,10 +2,8 @@ package com.bkt.contract.ba.sdk
 
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.dto.TradeEventDto
-import com.bkt.contract.ba.service.DepthService
-import com.bkt.contract.ba.service.ExportService
-import com.bkt.contract.ba.service.PairService
-import com.bkt.contract.ba.service.TradeService
+import com.bkt.contract.ba.service.*
+import com.bkt.contract.ba.service.PriceService
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
@@ -57,6 +55,9 @@ class BaClient private constructor() {
         }
         if (clazz == TradeService::class.java) {
             return TradeService.INSTANCE as T;
+        }
+        if (clazz == PriceService::class.java) {
+            return PriceService.INSTANCE as T;
         }
         return PairService.INSTANCE as T;
     }

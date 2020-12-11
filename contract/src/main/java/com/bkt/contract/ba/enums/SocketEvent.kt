@@ -37,5 +37,19 @@ enum class SocketEvent(val value: String) {
      * 成交
      */
     @SerializedName("aggTrade")
-    AggTrade("aggTrade");
+    AggTrade("aggTrade"),
+
+
+    /**
+     * 市价变化
+     */
+    @SerializedName("markPriceUpdate")
+    MarkPriceUpdate("markPriceUpdate"),
+
+
+    /**
+     * 指数价变化
+     */
+    @SerializedName("indexPriceUpdate")
+    IndexPriceUpdate("indexPriceUpdate")
 }

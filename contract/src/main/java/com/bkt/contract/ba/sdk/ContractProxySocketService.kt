@@ -5,9 +5,11 @@ import android.text.TextUtils
 import android.util.Log
 import com.bkt.contract.ba.common.TickerDtoToPairInfoPoListFunction
 import com.bkt.contract.ba.enums.SocketEvent
+import com.bkt.contract.ba.model.dto.PremiumIndexPriceDto
 import com.bkt.contract.ba.model.po.DepthEventDtoPo
 import com.bkt.contract.ba.model.dto.TickerEventDto
 import com.bkt.contract.ba.model.dto.TradeEventDto
+import com.bkt.contract.ba.model.event.IndexPriceEvent
 import com.bkt.contract.ba.model.event.KLineSEvent
 import com.bkt.contract.ba.model.event.SocketRequestBody
 import com.bkt.contract.ba.model.po.PairInfoPo
@@ -125,7 +127,7 @@ abstract class ContractProxySocketService : WsStatusListener {
                     subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@depth%s@%sms", symbol.toLowerCase(), levels, updateTime))));
                 }.doOnDispose {
                     unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@depth%s@%sms", symbol.toLowerCase(), levels, updateTime))));
-                }.filter { TextUtils.equals(it.symbol, symbol)};
+                }.filter { TextUtils.equals(it.symbol, symbol) };
     }
 
     /**
@@ -137,7 +139,31 @@ abstract class ContractProxySocketService : WsStatusListener {
                     subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@aggTrade", symbol.toLowerCase()))));
                 }.doOnDispose {
                     unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@aggTrade", symbol.toLowerCase()))));
-                }.filter { TextUtils.equals(it.symbol, symbol)};
+                }.filter { TextUtils.equals(it.symbol, symbol) };
+    }
+
+    /**
+     * 订阅市价 和汇率结算
+     */
+    fun subMarkPrice(symbol: String): Observable<PremiumIndexPriceDto> {
+        return bus.ofType(PremiumIndexPriceDto::class.java)
+                .doOnSubscribe {
+                    subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@markPrice", symbol.toLowerCase()))));
+                }.doOnDispose {
+                    unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@markPrice", symbol.toLowerCase()))));
+                }.filter { TextUtils.equals(it.symbol, symbol) };
+    }
+
+    /**
+     * 订阅指数价
+     */
+    fun subIndexPrice(symbol: String): Observable<IndexPriceEvent> {
+        return bus.ofType(IndexPriceEvent::class.java)
+                .doOnSubscribe {
+                    subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@indexPrice", symbol.toLowerCase()))));
+                }.doOnDispose {
+                    unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@indexPrice", symbol.toLowerCase()))));
+                }.filter { TextUtils.equals(it.symbol, symbol) };
     }
 
 
@@ -173,6 +199,14 @@ abstract class ContractProxySocketService : WsStatusListener {
                                         cacheTrade(toBean);
                                         bus.onNext(toBean);
                                     }
+                                    SocketEvent.MarkPriceUpdate.value -> {
+                                        val toBean = JsonUtils.toBeanList(text, PremiumIndexPriceDto::class.java).get(0);
+                                        bus.onNext(toBean);
+                                    }
+                                    SocketEvent.IndexPriceUpdate.value -> {
+                                        val toBean = JsonUtils.toBeanList(text, IndexPriceEvent::class.java).get(0);
+                                        bus.onNext(toBean);
+                                    }
                                     SocketEvent.KLine.value -> JsonUtils.toBean(text, KLineSEvent::class.java);
                                     else -> throw  RuntimeException("not support event:" + event);
                                 }
@@ -193,6 +227,14 @@ abstract class ContractProxySocketService : WsStatusListener {
                                 SocketEvent.AggTrade.value -> {
                                     val toBean = JsonUtils.toBean(text, TradeEventDto::class.java);
                                     cacheTrade(toBean)
+                                    bus.onNext(toBean);
+                                }
+                                SocketEvent.MarkPriceUpdate.value -> {
+                                    val toBean = JsonUtils.toBean(text, PremiumIndexPriceDto::class.java);
+                                    bus.onNext(toBean);
+                                }
+                                SocketEvent.IndexPriceUpdate.value -> {
+                                    val toBean = JsonUtils.toBean(text, IndexPriceEvent::class.java);
                                     bus.onNext(toBean);
                                 }
                                 SocketEvent.KLine.value -> JsonUtils.toBean(text, KLineSEvent::class.java);

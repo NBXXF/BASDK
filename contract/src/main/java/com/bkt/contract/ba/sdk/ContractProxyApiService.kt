@@ -1,10 +1,7 @@
 package com.bkt.contract.ba.sdk
 
+import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.po.DepthEventDtoPo
-import com.bkt.contract.ba.model.dto.ExchangeInfoDto
-import com.bkt.contract.ba.model.dto.KLineEventDto
-import com.bkt.contract.ba.model.dto.TickerEventDto
-import com.bkt.contract.ba.model.dto.TradeEventDto
 import com.google.gson.JsonObject
 import io.reactivex.Observable
 import retrofit2.CacheType
@@ -94,6 +91,13 @@ interface ContractProxyApiService {
     ): Observable<List<TradeEventDto>>;
 
 
-    fun getPremiumIndex()
+    /**
+     * 获取指数价
+     */
+    fun getPremiumIndex(@Cache type: CacheType,
+                        @Header("cache") cacheTime: Long,
+                        @Query("symbol") symbol: String,
+                        @Query("pair") pair: String?
+    ): Observable<PremiumIndexPriceDto>;
 
 }

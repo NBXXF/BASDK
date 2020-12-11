@@ -6,11 +6,13 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import com.bkt.contract.ba.enums.ContractType
+import com.bkt.contract.ba.model.po.PairInfoPo
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.service.DepthService
 import com.bkt.contract.ba.service.PairService
 import com.bkt.contract.ba.service.TradeService
 import com.xxf.arch.XXF
+import io.reactivex.android.schedulers.AndroidSchedulers
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,9 +29,10 @@ class MainActivity : AppCompatActivity() {
                            XXF.getLogger().d("============>depth:" + it);
                        }*/
             BaClient.instance.getService(PairService::class.java).getPairs()
+                    .observeOn(AndroidSchedulers.mainThread())
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
-                        XXF.getLogger().d("============>yes:" + it);
+                        XXF.getLogger().d("============>yes......."+it);
                     }
         }
         /*     BaClient.instance.getService(PairService::class.java).getPairs(ContractType.USDT)
@@ -55,12 +58,12 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("CheckResult")
     override fun onResume() {
         super.onResume()
-        BaClient.instance.getService(PairService::class.java)
+    /*    BaClient.instance.getService(PairService::class.java)
                 .subPairs(ContractType.USD)
                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                 .subscribe {
                     XXF.getLogger().d("==============>it:" + it)
-                };
+                };*/
         /*  BaClient.instance.getService(PairService::class.java)
                   .subPairs()
                   .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))

@@ -1,6 +1,17 @@
 package com.bkt.contract.ba.model.dto
 
+import com.google.gson.JsonSerializer
+import com.google.gson.TypeAdapter
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
+import com.xxf.arch.XXF
+import com.xxf.arch.json.typeadapter.format.NumberObjectFormatTypeAdapter
+import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
+import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_Signed_FormatTypeAdapter
+import com.xxf.arch.utils.NumberUtils
 import java.io.Serializable
 import java.math.BigDecimal
 
@@ -77,7 +88,8 @@ class TickerEventDto : Serializable {
      * 24小时成交量
      */
     @SerializedName("volume", alternate = ["v"])
-    val volume: BigDecimal? = null;
+    @JsonAdapter(AmountKMFormatTypeAdapter::class)
+    val volume: NumberFormatObject? = null;
 
     /**
      * 24小时成交额
@@ -86,8 +98,31 @@ class TickerEventDto : Serializable {
     val quoteVolume: BigDecimal? = null;
 
 
-    override fun toString(): String {
-        return "TickerEventDto(symbol=$symbol, closePrice=$closePrice, openPrice=$openPrice, highPrice=$highPrice, lowPrice=$lowPrice, volume=$volume, quoteVolume=$quoteVolume)"
+    /**
+     * 涨幅 本地字段 http和socket没有
+     */
+    var riseFallAmount: NumberFormatObject? = null;
+
+
+    /**
+     *  转换大数 至k,M单位
+     */
+    class AmountKMFormatTypeAdapter : NumberObjectFormatTypeAdapter() {
+        @Throws(Exception::class)
+        override fun format(origin: BigDecimal): String {
+            return if (origin.toDouble() > 1000000) {
+                NumberUtils.formatRoundDown(NumberUtils.divide(origin, 1000000), 2, 2) + "M"
+            } else if (origin.toDouble() > 1000) {
+                NumberUtils.formatRoundDown(NumberUtils.divide(origin, 1000), 2, 2) + "K"
+            } else {
+                return NumberUtils.formatRoundDown(origin, 2, 2);
+            }
+        }
     }
+
+    override fun toString(): String {
+        return "TickerEventDto(symbol=$symbol, closePrice=$closePrice, openPrice=$openPrice, highPrice=$highPrice, lowPrice=$lowPrice, volume=$volume, quoteVolume=$quoteVolume, riseFallAmount=$riseFallAmount)"
+    }
+
 
 }

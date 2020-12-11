@@ -10,6 +10,7 @@ import com.xxf.database.xxf.objectbox.MergeFunction
  * @CreateDate: 2020/12/10 18:48
  */
 internal class DepthEventDtoPoMergeFunction : MergeFunction<DepthEventDtoPo> {
+    private val max: Int = 50;
     override fun apply(insert: DepthEventDtoPo, inserted: DepthEventDtoPo?): DepthEventDtoPo {
         /**
          * 合并 socket来的是增量
@@ -31,6 +32,10 @@ internal class DepthEventDtoPoMergeFunction : MergeFunction<DepthEventDtoPo> {
         for (bookItem in mergeList) {
             mergeMap.put(bookItem.price.toPlainString(), bookItem);
         }
-        return mergeMap.values.sortedByDescending { it.price };
+        val sortedByDescending = mergeMap.values.sortedByDescending { it.price };
+        if (sortedByDescending.size > max) {
+            return sortedByDescending.subList(0, max);
+        }
+        return sortedByDescending;
     }
 }

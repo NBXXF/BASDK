@@ -101,25 +101,25 @@ class MainActivity : AppCompatActivity() {
                              XXF.getLogger().d("==============>depth socket:" + it.asks.size)
                          };*/
 
-        BaClient.instance.getService(PairService::class.java)
-                .subPairs("BTCUSDT")
-                .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
-                .subscribe {
-                    XXF.getLogger().d("==============>it3:" + it.size)
-                };
-     /*   BaClient.instance.getService(TradeService::class.java)
+        /*    BaClient.instance.getService(PairService::class.java)
+                    .subPairs("BTCUSDT", applyDispose = false)
+                    .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
+                    .subscribe {
+                        XXF.getLogger().d("==============>it3:" + it)
+                    };*/
+        BaClient.instance.getService(TradeService::class.java)
                 .subTrades("BTCUSDT")
                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                 .subscribe {
                     XXF.getLogger().d("==============>trade socket:" + it);
                 }
-
-        BehaviorSubject.create<Long>()
-                .doOnDispose {
-                    XXF.getLogger().d("==============>yes doOnDispose");
-                }
-                .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
-                .subscribe();*/
+        /*
+                  BehaviorSubject.create<Long>()
+                          .doOnDispose {
+                              XXF.getLogger().d("==============>yes doOnDispose");
+                          }
+                          .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
+                          .subscribe();*/
     }
 
 

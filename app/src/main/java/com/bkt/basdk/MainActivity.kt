@@ -20,20 +20,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val view: View = findViewById(R.id.test);
         view.setOnClickListener {
-            /*   BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT")
+               BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT")
                        .doOnError {
                            XXF.getLogger().d("============>depth err:" + it);
                        }
                        .`as`(XXF.bindLifecycle(this))
                        .subscribe {
                            XXF.getLogger().d("============>depth:" + it);
-                       }*/
-            BaClient.instance.getService(PairService::class.java).getPairs()
+                       }
+           /* BaClient.instance.getService(PairService::class.java).getPairs()
                     .observeOn(AndroidSchedulers.mainThread())
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
                         XXF.getLogger().d("============>yes......."+it);
-                    }
+                    }*/
         }
         /*     BaClient.instance.getService(PairService::class.java).getPairs(ContractType.USDT)
                      .`as`(XXF.bindLifecycle(this))
@@ -84,12 +84,12 @@ class MainActivity : AppCompatActivity() {
                       XXF.getLogger().d("==============>it3:" + it.size)
                   };*/
 
-        /*  BaClient.instance.getService(DepthService::class.java)
+          BaClient.instance.getService(DepthService::class.java)
                   .subDepth("BTCUSDT")
                   .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                   .subscribe {
                       XXF.getLogger().d("==============>depth socket:" + it.asks.size)
-                  };*/
+                  };
 
         /*  BaClient.instance.getService(TradeService::class.java)
                   .subTrades("BTCUSDT")

@@ -37,11 +37,11 @@ internal class DepthEventDtoPoMergeFunction : MergeFunction<DepthEventDtoPo> {
             /**
              * 过滤价格小于0 或者数量小于0
              */
-            if (bookItem.price.toDouble() > 0.0 && bookItem.amount.toDouble() > 0.0) {
-                mergeMap.put(bookItem.price.toPlainString(), bookItem);
+            if (bookItem.price.origin.toDouble() > 0.0 && bookItem.amount.origin.toDouble() > 0.0) {
+                mergeMap.put(bookItem.price.format, bookItem);
             }
         }
-        val sortedByDescending = mergeMap.values.sortedByDescending { it.price };
+        val sortedByDescending = mergeMap.values.sortedByDescending { it.price.origin };
         if (sortedByDescending.size > max) {
             return sortedByDescending.subList(0, max);
         }

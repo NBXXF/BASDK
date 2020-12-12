@@ -7,7 +7,12 @@ import com.bkt.contract.ba.model.dto.KLineEventDto
  * @Author: XGod
  * @CreateDate: 2020/12/3 16:34
  */
-class KLineSEvent : BaseSEvent() {
-    val s: String? = null;
-    val k: KLineEventDto? = null;
+class KLineSEvent {
+    val s: String;
+    val k: KLineEventDto;
+
+    constructor(s: String, k: KLineEventDto) : super() {
+        this.s = s
+        this.k = k
+    }
 }

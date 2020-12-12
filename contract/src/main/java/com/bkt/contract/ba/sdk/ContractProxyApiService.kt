@@ -60,6 +60,7 @@ interface ContractProxyApiService {
      */
     @GET("v1/klines")
     fun getKLines(@Cache type: CacheType,
+                  @Header("cache") cacheTime: Long,
                   @Query("symbol") symbol: String,
                   @Query("interval") interval: String,
                   @Query("startTime") startTime: Long?,

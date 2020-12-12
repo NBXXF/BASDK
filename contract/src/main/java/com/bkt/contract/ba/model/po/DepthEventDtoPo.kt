@@ -4,6 +4,7 @@ import com.google.gson.*
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 import com.xxf.arch.json.JsonUtils
+import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.database.xxf.objectbox.id.IdUtils
 import io.objectbox.annotation.Convert
 import io.objectbox.annotation.Entity
@@ -19,7 +20,7 @@ import java.math.BigDecimal
  * @CreateDate: 2020/12/3 17:13
  */
 @Entity
-open class DepthEventDtoPo:Serializable {
+open class DepthEventDtoPo : Serializable {
     /**
      * 主键
      */
@@ -79,8 +80,8 @@ open class DepthEventDtoPo:Serializable {
                 var jsonArray: JsonArray = JsonArray();
                 for (item in src) {
                     var itemJson: JsonArray = JsonArray();
-                    itemJson.add(item.price)
-                    itemJson.add(item.amount)
+                    itemJson.add(item.price.origin)
+                    itemJson.add(item.amount.origin)
                     jsonArray.add(itemJson);
                 }
                 return context!!.serialize(jsonArray);
@@ -99,7 +100,13 @@ open class DepthEventDtoPo:Serializable {
                  */
                 if (json!!.isJsonArray) {
                     json.asJsonArray.forEach {
-                        list.add(BookItem(BigDecimal(it.asJsonArray.get(0).asString), BigDecimal(it.asJsonArray.get(1).asString)));
+                        val priceBigDecimal = BigDecimal(it.asJsonArray.get(0).asString);
+                        val numberBigDecimal = BigDecimal(it.asJsonArray.get(1).asString);
+                        list.add(
+                                BookItem(
+                                        NumberFormatObject(priceBigDecimal, priceBigDecimal.toPlainString()),
+                                        NumberFormatObject(numberBigDecimal, numberBigDecimal.toPlainString())
+                                ));
                     }
                 }
             } catch (e: Throwable) {
@@ -116,7 +123,7 @@ open class DepthEventDtoPo:Serializable {
     "431.00000000"    // 数量
     ]
      */
-    open class BookItem(val price: BigDecimal, val amount: BigDecimal) {
+    open class BookItem(val price: NumberFormatObject, val amount: NumberFormatObject) {
         override fun toString(): String {
             return "BookItem(price=$price, amount=$amount)"
         }

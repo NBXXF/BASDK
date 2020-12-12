@@ -59,6 +59,9 @@ class BaClient private constructor() {
         if (clazz == PriceService::class.java) {
             return PriceService.INSTANCE as T;
         }
+        if (clazz == KLineService::class.java) {
+            return KLineService.INSTANCE as T;
+        }
         return PairService.INSTANCE as T;
     }
 

@@ -11,7 +11,7 @@ import kotlin.math.max
  * @Author: XGod
  * @CreateDate: 2020/12/12 16:37
  */
-internal interface CommonService : ExportService {
+interface CommonService : ExportService {
 
     companion object {
         internal val INSTANCE: CommonService by lazy {

@@ -31,7 +31,7 @@ interface DepthService : ExportService {
      *  @param cacheTime 缓存时间
      */
     fun getDepth(symbol: String,
-                 cacheType: CacheType = CacheType.firstCache,
+                 cacheType: CacheType = CacheType.ifCache,
                  cacheTime: Long = TimeUnit.MINUTES.toMillis(5)): Observable<DepthEventDtoPo> {
         return PairService.INSTANCE
                 .getPairType(symbol)

@@ -15,6 +15,7 @@ import com.bkt.contract.ba.service.TradeService
 import com.xxf.arch.XXF
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.BehaviorSubject
+import retrofit2.CacheType
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val view: View = findViewById(R.id.test);
         view.setOnClickListener {
-            BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT")
+            BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT",CacheType.firstCache,TimeUnit.MINUTES.toMillis(5))
                     .doOnError {
                         XXF.getLogger().d("============>depth err:" + it);
                     }

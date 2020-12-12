@@ -12,7 +12,6 @@ import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
 import retrofit2.CacheType
-import kotlin.reflect.KParameter
 
 
 /**
@@ -24,7 +23,68 @@ interface PairService : ExportService {
     companion object {
         internal val INSTANCE: PairService by lazy {
             object : PairService {
+                init {
+                    /**
+                     * 同步一下 交易对配置
+                     */
+                    innerSyncPair().retry(3).subscribe();
+                }
             }
+        }
+
+        /**
+         * 同步交易对
+         */
+        internal fun innerSyncPair(): Observable<List<PairInfoPo>> {
+            val usdtApiService = BaClient.instance.initializer!!.getApiService(ContractType.USDT);
+            val currencyApiService = BaClient.instance.initializer!!.getApiService(ContractType.USD);
+            return Observable
+                    .zip(
+                            usdtApiService.getExchangeInfo(CacheType.onlyRemote),
+                            usdtApiService.getTicker24hr(CacheType.onlyRemote),
+                            currencyApiService.getExchangeInfo(CacheType.onlyRemote),
+                            currencyApiService.getTicker24hr(CacheType.onlyRemote),
+                            object : io.reactivex.functions.Function4<ExchangeInfoDto, List<TickerEventDto>, ExchangeInfoDto, List<TickerEventDto>, List<PairInfoPo>> {
+                                override fun apply(t1: ExchangeInfoDto, t2: List<TickerEventDto>, t3: ExchangeInfoDto, t4: List<TickerEventDto>): List<PairInfoPo> {
+                                    val pairConfigList: MutableList<PairConfigDto> = mutableListOf<PairConfigDto>();
+                                    t1.symbols?.let { pairConfigList.addAll(it) };
+                                    t3.symbols?.let { pairConfigList.addAll(it) };
+
+                                    val tickerMap: MutableMap<String, TickerEventDto> = mutableMapOf();
+                                    for (ticker in t2) {
+                                        ticker.symbol?.let { tickerMap.put(it, ticker) };
+                                    }
+                                    for (ticker in t4) {
+                                        ticker.symbol?.let { tickerMap.put(it, ticker) };
+                                    }
+
+                                    val pairPosList: MutableList<PairInfoPo> = mutableListOf<PairInfoPo>();
+                                    for (value: PairConfigDto in t1.symbols!!) {
+                                        val pairInfoPo = PairInfoPo(value.symbol);
+                                        pairInfoPo.config = value;
+                                        pairInfoPo.index = pairPosList.size;
+                                        pairInfoPo.contractType = ContractType.USDT.value;
+                                        pairInfoPo.ticker = tickerMap.get(value.symbol);
+                                        pairPosList.add(pairInfoPo);
+                                    }
+
+                                    for (value: PairConfigDto in t3.symbols!!) {
+                                        val pairInfoPo = PairInfoPo(value.symbol);
+                                        pairInfoPo.config = value;
+                                        pairInfoPo.index = pairPosList.size;
+                                        pairInfoPo.contractType = ContractType.USD.value;
+                                        pairInfoPo.ticker = tickerMap.get(value.symbol);
+                                        pairPosList.add(pairInfoPo);
+                                    }
+                                    return pairPosList;
+                                }
+                            }
+                    )
+                    .flatMap(object : Function<List<PairInfoPo>, ObservableSource<List<PairInfoPo>>> {
+                        override fun apply(t: List<PairInfoPo>): ObservableSource<List<PairInfoPo>> {
+                            return PairDbService.insertOrUpdate(t);
+                        }
+                    });
         }
     }
 
@@ -36,68 +96,13 @@ interface PairService : ExportService {
                 .flatMap(object : Function<List<PairInfoPo>, ObservableSource<List<PairInfoPo>>> {
                     override fun apply(p: List<PairInfoPo>): ObservableSource<List<PairInfoPo>> {
                         if (p.isEmpty()) {
-                            return syncPair();
+                            return innerSyncPair();
                         }
                         return Observable.just(p);
                     }
                 })
-                .switchIfEmpty(syncPair())
-                .onErrorResumeNext(syncPair());
-    }
-
-    /**
-     * 同步交易对
-     */
-    private fun syncPair(): Observable<List<PairInfoPo>> {
-        val usdtApiService = BaClient.instance.initializer!!.getApiService(ContractType.USDT);
-        val currencyApiService = BaClient.instance.initializer!!.getApiService(ContractType.USD);
-        return Observable
-                .zip(
-                        usdtApiService.getExchangeInfo(CacheType.onlyRemote),
-                        usdtApiService.getTicker24hr(CacheType.onlyRemote),
-                        currencyApiService.getExchangeInfo(CacheType.onlyRemote),
-                        currencyApiService.getTicker24hr(CacheType.onlyRemote),
-                        object : io.reactivex.functions.Function4<ExchangeInfoDto, List<TickerEventDto>, ExchangeInfoDto, List<TickerEventDto>, List<PairInfoPo>> {
-                            override fun apply(t1: ExchangeInfoDto, t2: List<TickerEventDto>, t3: ExchangeInfoDto, t4: List<TickerEventDto>): List<PairInfoPo> {
-                                val pairConfigList: MutableList<PairConfigDto> = mutableListOf<PairConfigDto>();
-                                t1.symbols?.let { pairConfigList.addAll(it) };
-                                t3.symbols?.let { pairConfigList.addAll(it) };
-
-                                val tickerMap: MutableMap<String, TickerEventDto> = mutableMapOf();
-                                for (ticker in t2) {
-                                    ticker.symbol?.let { tickerMap.put(it, ticker) };
-                                }
-                                for (ticker in t4) {
-                                    ticker.symbol?.let { tickerMap.put(it, ticker) };
-                                }
-
-                                val pairPosList: MutableList<PairInfoPo> = mutableListOf<PairInfoPo>();
-                                for (value: PairConfigDto in t1.symbols!!) {
-                                    val pairInfoPo = PairInfoPo(value.symbol);
-                                    pairInfoPo.config = value;
-                                    pairInfoPo.index = pairPosList.size;
-                                    pairInfoPo.contractType = ContractType.USDT.value;
-                                    pairInfoPo.ticker = tickerMap.get(value.symbol);
-                                    pairPosList.add(pairInfoPo);
-                                }
-
-                                for (value: PairConfigDto in t3.symbols!!) {
-                                    val pairInfoPo = PairInfoPo(value.symbol);
-                                    pairInfoPo.config = value;
-                                    pairInfoPo.index = pairPosList.size;
-                                    pairInfoPo.contractType = ContractType.USD.value;
-                                    pairInfoPo.ticker = tickerMap.get(value.symbol);
-                                    pairPosList.add(pairInfoPo);
-                                }
-                                return pairPosList;
-                            }
-                        }
-                )
-                .flatMap(object : Function<List<PairInfoPo>, ObservableSource<List<PairInfoPo>>> {
-                    override fun apply(t: List<PairInfoPo>): ObservableSource<List<PairInfoPo>> {
-                        return PairDbService.insertOrUpdate(t);
-                    }
-                });
+                .switchIfEmpty(innerSyncPair())
+                .onErrorResumeNext(innerSyncPair());
     }
 
 

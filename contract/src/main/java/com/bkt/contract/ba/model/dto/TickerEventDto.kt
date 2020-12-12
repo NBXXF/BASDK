@@ -1,17 +1,10 @@
 package com.bkt.contract.ba.model.dto
 
-import com.google.gson.JsonSerializer
-import com.google.gson.TypeAdapter
-import com.google.gson.annotations.Expose
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
-import com.xxf.arch.XXF
 import com.xxf.arch.json.typeadapter.format.NumberObjectFormatTypeAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
-import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_Signed_FormatTypeAdapter
 import com.xxf.arch.utils.NumberUtils
 import java.io.Serializable
 import java.math.BigDecimal
@@ -107,7 +100,7 @@ class TickerEventDto : Serializable {
     /**
      * 涨幅 本地字段 http和socket没有
      */
-    var riseFallAmount: NumberFormatObject? = null;
+    var riseFallRange: NumberFormatObject? = null;
 
 
     /**
@@ -127,7 +120,7 @@ class TickerEventDto : Serializable {
     }
 
     override fun toString(): String {
-        return "TickerEventDto(symbol=$symbol, closePrice=$closePrice, openPrice=$openPrice, highPrice=$highPrice, lowPrice=$lowPrice, volume=$volume, quoteVolume=$quoteVolume, riseFallAmount=$riseFallAmount)"
+        return "TickerEventDto(symbol=$symbol, closePrice=$closePrice, openPrice=$openPrice, highPrice=$highPrice, lowPrice=$lowPrice, volume=$volume, quoteVolume=$quoteVolume, riseFallAmount=$riseFallRange)"
     }
 
 

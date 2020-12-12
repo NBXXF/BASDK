@@ -4,10 +4,8 @@ import android.text.TextUtils
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.dto.TickerEventDto
 import com.bkt.contract.ba.model.dto.PairConfigDto
+import com.bkt.contract.ba.service.CommonService
 import com.xxf.arch.json.JsonUtils
-import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
-import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_Signed_FormatTypeAdapter
-import com.xxf.arch.utils.NumberUtils
 import com.xxf.database.xxf.objectbox.id.IdUtils
 import io.objectbox.annotation.*
 import io.objectbox.converter.PropertyConverter
@@ -97,8 +95,10 @@ open class PairInfoPo : Serializable {
 
         override fun convertToDatabaseValue(entityProperty: TickerEventDto?): String? {
             try {
-                val divide = NumberUtils.divide(com.xxf.arch.utils.NumberUtils.subtract(entityProperty?.closePrice?.origin, entityProperty?.openPrice?.origin), entityProperty?.openPrice?.origin, 4);
-                entityProperty?.riseFallAmount = NumberFormatObject(divide, Number_percent_auto_2_2_DOWN_Signed_FormatTypeAdapter().format(divide));
+                /**
+                 * 填充涨跌幅
+                 */
+                entityProperty?.riseFallRange = CommonService.INSTANCE.getRiseFallRangeFormatObject(entityProperty?.closePrice?.origin!!, entityProperty?.openPrice?.origin!!);
             } catch (e: Exception) {
                 e.printStackTrace()
             }

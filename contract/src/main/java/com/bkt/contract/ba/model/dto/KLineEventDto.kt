@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.model.dto
 
+import com.bkt.contract.ba.service.CommonService
 import com.google.gson.*
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
@@ -83,9 +84,20 @@ class KLineEventDto {
                         NumberFormatObject(highPrice, highPrice.toPlainString()),
                         NumberFormatObject(lowPrice, lowPrice.toPlainString()),
                         NumberFormatObject(volume, volume.toPlainString()),
-                        TimeFormatObject(time, Time_yyyy_s_MM_s_dd_HH_c_mm_FormatTypeAdapter().format(time)));
+                        TimeFormatObject(time, Time_yyyy_s_MM_s_dd_HH_c_mm_FormatTypeAdapter().format(time)),
+                        CommonService.INSTANCE.getRiseFallAmountFormatObject(closePrice, openPrice),
+                        CommonService.INSTANCE.getRiseFallRangeFormatObject(closePrice, openPrice)
+                );
             }
-            return context!!.deserialize(json, typeOfT);
+            val k: KLineEventDto = context!!.deserialize(json, typeOfT);
+            if (k != null) {
+                /**
+                 * 手动计算
+                 */
+                k.riseFallAmount = CommonService.INSTANCE.getRiseFallAmountFormatObject(k.closePrice.origin, k.openPrice.origin);
+                k.riseFallRange = CommonService.INSTANCE.getRiseFallRangeFormatObject(k.closePrice.origin, k.openPrice.origin);
+            }
+            return k;
         }
     }
 
@@ -137,7 +149,20 @@ class KLineEventDto {
     @JsonAdapter(Time_yyyy_s_MM_s_dd_HH_c_mm_FormatTypeAdapter::class)
     val time: TimeFormatObject;
 
-    constructor(symbol: String, closePrice: NumberFormatObject, openPrice: NumberFormatObject, highPrice: NumberFormatObject, lowPrice: NumberFormatObject, volume: NumberFormatObject, time: TimeFormatObject) {
+
+    /**
+     * 涨跌量或者涨跌额 本地字段 http和socket没有
+     */
+    var riseFallAmount: NumberFormatObject
+        private set
+
+    /**
+     * 涨幅  本地字段 http和socket没有
+     */
+    var riseFallRange: NumberFormatObject
+        private set
+
+    constructor(symbol: String, closePrice: NumberFormatObject, openPrice: NumberFormatObject, highPrice: NumberFormatObject, lowPrice: NumberFormatObject, volume: NumberFormatObject, time: TimeFormatObject, riseFallAmount: NumberFormatObject, riseFallRange: NumberFormatObject) {
         this.symbol = symbol
         this.closePrice = closePrice
         this.openPrice = openPrice
@@ -145,11 +170,13 @@ class KLineEventDto {
         this.lowPrice = lowPrice
         this.volume = volume
         this.time = time
+        this.riseFallAmount = riseFallAmount
+        this.riseFallRange = riseFallRange
     }
-
 
     override fun toString(): String {
-        return "KLineEventDto(symbol=$symbol, closePrice=$closePrice, openPrice=$openPrice, highPrice=$highPrice, lowPrice=$lowPrice, volume=$volume, time=$time)"
+        return "KLineEventDto(symbol='$symbol', closePrice=$closePrice, openPrice=$openPrice, highPrice=$highPrice, lowPrice=$lowPrice, volume=$volume, time=$time, riseFallAmount=$riseFallAmount, riseFallRange=$riseFallRange)"
     }
+
 
 }

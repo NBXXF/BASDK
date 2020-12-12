@@ -97,8 +97,8 @@ open class PairInfoPo : Serializable {
 
         override fun convertToDatabaseValue(entityProperty: TickerEventDto?): String? {
             try {
-                val divide = NumberUtils.divide(com.xxf.arch.utils.NumberUtils.subtract(entityProperty?.closePrice, entityProperty?.openPrice), entityProperty?.openPrice, 4);
-                entityProperty?.riseFallAmount= NumberFormatObject(divide, Number_percent_auto_2_2_DOWN_Signed_FormatTypeAdapter().format(divide));
+                val divide = NumberUtils.divide(com.xxf.arch.utils.NumberUtils.subtract(entityProperty?.closePrice?.origin, entityProperty?.openPrice?.origin), entityProperty?.openPrice?.origin, 4);
+                entityProperty?.riseFallAmount = NumberFormatObject(divide, Number_percent_auto_2_2_DOWN_Signed_FormatTypeAdapter().format(divide));
             } catch (e: Exception) {
                 e.printStackTrace()
             }

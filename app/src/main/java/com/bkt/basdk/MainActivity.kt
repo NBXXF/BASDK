@@ -74,25 +74,25 @@ class MainActivity : AppCompatActivity() {
                     .subscribe {
                         XXF.getLogger().d("==============>it:" + it)
                     };*/
-        /*  BaClient.instance.getService(PairService::class.java)
+         BaClient.instance.getService(PairService::class.java)
                   .subPairs()
                   .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                   .subscribe {
                       XXF.getLogger().d("==============>it:" + it)
                   };
-          BaClient.instance.getService(PairService::class.java)
-                  .subPairs(ContractType.USDT)
-                  .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
-                  .subscribe {
-                      XXF.getLogger().d("==============>it2:" + it.size)
-                  };
+        /*  BaClient.instance.getService(PairService::class.java)
+                 .subPairs(ContractType.USDT)
+                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
+                 .subscribe {
+                     XXF.getLogger().d("==============>it2:" + it.size)
+                 };
 
-          BaClient.instance.getService(PairService::class.java)
-                  .subPairs("BTCUSDT")
-                  .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
-                  .subscribe {
-                      XXF.getLogger().d("==============>it3:" + it.size)
-                  };*/
+         BaClient.instance.getService(PairService::class.java)
+                 .subPairs("BTCUSDT")
+                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
+                 .subscribe {
+                     XXF.getLogger().d("==============>it3:" + it.size)
+                 };*/
 
         /*         BaClient.instance.getService(DepthService::class.java)
                          .subDepth("BTCUSDT")
@@ -107,12 +107,12 @@ class MainActivity : AppCompatActivity() {
                     .subscribe {
                         XXF.getLogger().d("==============>it3:" + it)
                     };*/
-        BaClient.instance.getService(TradeService::class.java)
+  /*      BaClient.instance.getService(TradeService::class.java)
                 .subTrades("BTCUSDT")
                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                 .subscribe {
                     XXF.getLogger().d("==============>trade socket:" + it);
-                }
+                }*/
         /*
                   BehaviorSubject.create<Long>()
                           .doOnDispose {

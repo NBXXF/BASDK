@@ -117,9 +117,9 @@ class TickerEventDto : Serializable {
         @Throws(Exception::class)
         override fun format(origin: BigDecimal): String {
             return if (origin.toDouble() > 1000000) {
-                NumberUtils.formatRoundDown(NumberUtils.divide(origin, 1000000), 2, 2) + "M"
+                return NumberUtils.formatRoundDown(NumberUtils.divide(origin, 1000000), 2, 2) + "M"
             } else if (origin.toDouble() > 1000) {
-                NumberUtils.formatRoundDown(NumberUtils.divide(origin, 1000), 2, 2) + "K"
+                return NumberUtils.formatRoundDown(NumberUtils.divide(origin, 1000), 2, 2) + "K"
             } else {
                 return origin.toPlainString();
             }

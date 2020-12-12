@@ -2,7 +2,9 @@ package com.bkt.contract.ba.model.dto
 
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
+import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.formatobject.TimeFormatObject
+import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
 import com.xxf.arch.json.typeadapter.format.impl.time.Time_HH_c_mm_c_ss_FormatTypeAdapter
 import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_FormatTypeAdapter
 import java.math.BigDecimal
@@ -44,13 +46,15 @@ open class TradeEventDto {
      * 成交价格
      */
     @SerializedName("price", alternate = ["p"])
-    var price: BigDecimal;
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    var price: NumberFormatObject;
 
     /**
      * 成交量
      */
     @SerializedName("qty", alternate = ["q"])
-    var qty: BigDecimal;
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    var qty: NumberFormatObject;
 
 
     /**
@@ -66,13 +70,15 @@ open class TradeEventDto {
     @SerializedName("isBuyerMaker", alternate = ["m"])
     var isBuyerMaker: Boolean = false
 
-    constructor(symbol: String, price: BigDecimal, qty: BigDecimal, time: TimeFormatObject, isBuyerMaker: Boolean) {
+
+    constructor(symbol: String, price: NumberFormatObject, qty: NumberFormatObject, time: TimeFormatObject, isBuyerMaker: Boolean) {
         this.symbol = symbol
         this.price = price
         this.qty = qty
         this.time = time
         this.isBuyerMaker = isBuyerMaker
     }
+
 
     override fun toString(): String {
         return "TradeEventDto(symbol='$symbol', price=$price, qty=$qty, time=$time, isBuyerMaker=$isBuyerMaker)"

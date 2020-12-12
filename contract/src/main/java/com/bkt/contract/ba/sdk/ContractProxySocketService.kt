@@ -69,6 +69,7 @@ abstract class ContractProxySocketService : WsStatusListener {
      */
     private fun unSubEvent(event: SocketEvent, body: SocketRequestBody) {
         buffer.remove(event);
+        log(" send msg:" + body);
         if (this.getWsManager() != null && this.getWsManager().isWsConnected) {
             this.getWsManager().sendMessage(JsonUtils.toJsonString(body))
         }
@@ -76,14 +77,17 @@ abstract class ContractProxySocketService : WsStatusListener {
 
     /**
      * 订阅ticker事件
+     *  @param applyDispose 是否跟随取消socket
      */
-    fun subTicker(): Observable<List<TickerEventDto>> {
+    fun subTicker(applyDispose: Boolean = true): Observable<List<TickerEventDto>> {
         return bus.ofType(TickerEventWrapper::class.java)
                 .map { it.list }
                 .doOnSubscribe {
                     subEvent(SocketEvent.MiniTicker24hr, SocketRequestBody.subscribeBody(listOf("!miniTicker@arr")))
                 }.doOnDispose {
-                    unSubEvent(SocketEvent.MiniTicker24hr, SocketRequestBody.unSubscribeBody(listOf("!miniTicker@arr")))
+                    if (applyDispose) {
+                        unSubEvent(SocketEvent.MiniTicker24hr, SocketRequestBody.unSubscribeBody(listOf("!miniTicker@arr")))
+                    }
                 };
     }
 

@@ -59,6 +59,16 @@ interface KLineService : ExportService {
                     override fun apply(t: ContractProxyApiService): ObservableSource<List<KLineEventDto>> {
                         return t.getKLines(type, cacheTime, symbol, interval, startTime, endTime, limit);
                     }
+                }).map(object : Function<List<KLineEventDto>, List<KLineEventDto>> {
+                    override fun apply(t: List<KLineEventDto>): List<KLineEventDto> {
+                        /**
+                         * http 过来没有symbol字段
+                         */
+                        t.forEach {
+                            it.symbol = symbol;
+                        }
+                        return t;
+                    }
                 })
     }
 

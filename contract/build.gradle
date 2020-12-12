@@ -34,6 +34,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    compileOnly 'com.github.NBXXF:xxf_android:3.2.1.4'
+    compileOnly 'com.github.NBXXF:xxf_android:3.2.1.5'
     compileOnly 'com.github.NBXXF.xxf_database:xxf_objectbox:1.0.6'
 }

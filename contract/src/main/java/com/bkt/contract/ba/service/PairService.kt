@@ -175,16 +175,17 @@ interface PairService : ExportService {
     /**
      * 订阅所有交易对变化
      * ！！！下游要安全处理,否则会中断订阅
+     *  @param applyDispose 是否跟随取消socket
      */
-    fun subPairs(): Observable<List<PairInfoPo>> {
+    fun subPairs(applyDispose: Boolean = true): Observable<List<PairInfoPo>> {
         return Observable.merge(
-                BaClient.instance.initializer!!.getSocketService(ContractType.USDT).subTicker()
+                BaClient.instance.initializer!!.getSocketService(ContractType.USDT).subTicker(applyDispose)
                         .flatMap(object : Function<List<TickerEventDto>, Observable<List<PairInfoPo>>> {
                             override fun apply(t: List<TickerEventDto>): Observable<List<PairInfoPo>> {
                                 return Observable.empty();
                             }
                         }),
-                BaClient.instance.initializer!!.getSocketService(ContractType.USD).subTicker()
+                BaClient.instance.initializer!!.getSocketService(ContractType.USD).subTicker(applyDispose)
                         .flatMap(object : Function<List<TickerEventDto>, Observable<List<PairInfoPo>>> {
                             override fun apply(t: List<TickerEventDto>): Observable<List<PairInfoPo>> {
                                 return Observable.empty();
@@ -196,13 +197,15 @@ interface PairService : ExportService {
     /**
      * 订阅指定类型交易对
      * ！！！下游要安全处理,否则会中断订阅
+     * @param type 合约类型
+     * @param applyDispose 是否跟随取消socket
      */
-    fun subPairs(type: ContractType): Observable<List<PairInfoPo>> {
+    fun subPairs(type: ContractType, applyDispose: Boolean = true): Observable<List<PairInfoPo>> {
         if (type == null) {
             return Observable.empty();
         }
         return Observable.merge(
-                BaClient.instance.initializer!!.getSocketService(type).subTicker()
+                BaClient.instance.initializer!!.getSocketService(type).subTicker(applyDispose)
                         .flatMap(object : Function<List<TickerEventDto>, Observable<List<PairInfoPo>>> {
                             override fun apply(t: List<TickerEventDto>): Observable<List<PairInfoPo>> {
                                 return Observable.empty();
@@ -215,19 +218,21 @@ interface PairService : ExportService {
      * 订阅指定交易对的交易对变化
      * ！！！下游要安全处理,否则会中断订阅
      * 可能包含usdt 和usd
+     * @param symbols
+     * @param applyDispose 是否跟随取消socket
      */
-    fun subPairs(vararg symbols: String): Observable<List<PairInfoPo>> {
+    fun subPairs(vararg symbols: String, applyDispose: Boolean = true): Observable<List<PairInfoPo>> {
         if (symbols == null || symbols.isEmpty()) {
             return Observable.empty();
         }
         return Observable.merge(
-                BaClient.instance.initializer!!.getSocketService(ContractType.USDT).subTicker()
+                BaClient.instance.initializer!!.getSocketService(ContractType.USDT).subTicker(applyDispose)
                         .flatMap(object : Function<List<TickerEventDto>, Observable<List<PairInfoPo>>> {
                             override fun apply(t: List<TickerEventDto>): Observable<List<PairInfoPo>> {
                                 return Observable.empty();
                             }
                         }),
-                BaClient.instance.initializer!!.getSocketService(ContractType.USD).subTicker()
+                BaClient.instance.initializer!!.getSocketService(ContractType.USD).subTicker(applyDispose)
                         .flatMap(object : Function<List<TickerEventDto>, Observable<List<PairInfoPo>>> {
                             override fun apply(t: List<TickerEventDto>): Observable<List<PairInfoPo>> {
                                 return Observable.empty();

@@ -3,6 +3,11 @@ package com.bkt.contract.ba.model.dto
 import com.google.gson.*
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
+import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
+import com.xxf.arch.json.typeadapter.format.formatobject.TimeFormatObject
+import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
+import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_HH_c_mm_FormatTypeAdapter
+import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_HH_c_mm_c_ss_FormatTypeAdapter
 import java.lang.reflect.Type
 import java.math.BigDecimal
 
@@ -14,28 +19,51 @@ import java.math.BigDecimal
 @JsonAdapter(KLineEventDto.KLineJsonTypeAdapter::class)
 class KLineEventDto {
 
+    /**
+     * <symbol>@kline_<interval>
+     * {
+    "t":1591261500000,      // 这根K线的起始时间
+    "T":1591261559999,      // 这根K线的结束时间
+    "s":"BTCUSD_200626",    // 交易对
+    "i":"1m",               // K线间隔
+    "f":606400,             // 这根K线期间第一笔成交ID
+    "L":606430,             // 这根K线期间末一笔成交ID
+    "o":"9638.9",           // 这根K线期间第一笔成交价
+    "c":"9639.8",           // 这根K线期间末一笔成交价
+    "h":"9639.8",           // 这根K线期间最高成交价
+    "l":"9638.6",           // 这根K线期间最低成交价
+    "v":"156",              // 这根K线期间成交量
+    "n":31,                 // 这根K线期间成交笔数
+    "x":false,              // 这根K线是否完结(是否已经开始下一根K线)
+    "q":"1.61836886",       // 这根K线期间成交额(标的数量)
+    "V":"73",               // 主动买入的成交量
+    "Q":"0.75731156",       // 主动买入的成交额(标的数量)
+    "B":"0"                 // 忽略此参数
+    }
+
+    /dapi/v1/klines
+
+    [
+    1591258320000,      // 开盘时间
+    "9640.7",           // 开盘价
+    "9642.4",           // 最高价
+    "9640.6",           // 最低价
+    "9642.0",           // 收盘价(当前K线未结束的即为最新价)
+    "206",              // 成交量
+    1591258379999,      // 收盘时间
+    "2.13660389",       // 成交额(标的数量)
+    48,                 // 成交笔数
+    "119",              // 主动买入成交量
+    "1.23424865",      // 主动买入成交额(标的数量)
+    "0"                 // 请忽略该参数
+    ]
+     */
     class KLineJsonTypeAdapter : JsonSerializer<KLineEventDto>, JsonDeserializer<KLineEventDto> {
         override fun serialize(src: KLineEventDto?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
             return context!!.serialize(src);
         }
 
         override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): KLineEventDto {
-            /**
-             * [
-            1591258320000,      // 开盘时间
-            "9640.7",           // 开盘价
-            "9642.4",           // 最高价
-            "9640.6",           // 最低价
-            "9642.0",           // 收盘价(当前K线未结束的即为最新价)
-            "206",              // 成交量
-            1591258379999,      // 收盘时间
-            "2.13660389",       // 成交额(标的数量)
-            48,                 // 成交笔数
-            "119",              // 主动买入成交量
-            "1.23424865",      // 主动买入成交额(标的数量)
-            "0"                 // 请忽略该参数
-            ]
-             */
             if (json!!.isJsonArray) {
                 val jsonArray = json!!.asJsonArray;
 
@@ -45,7 +73,17 @@ class KLineEventDto {
                 val lowPrice = BigDecimal(jsonArray.get(3).asString);
                 val closePrice = BigDecimal(jsonArray.get(4).asString);
                 val volume = BigDecimal(jsonArray.get(5).asString);
-                return KLineEventDto("", closePrice, openPrice, highPrice, lowPrice, volume, time);
+
+                /**
+                 * http 过来没有symbol字段
+                 */
+                return KLineEventDto("",
+                        NumberFormatObject(closePrice, closePrice.toPlainString()),
+                        NumberFormatObject(openPrice, openPrice.toPlainString()),
+                        NumberFormatObject(highPrice, highPrice.toPlainString()),
+                        NumberFormatObject(lowPrice, lowPrice.toPlainString()),
+                        NumberFormatObject(volume, volume.toPlainString()),
+                        TimeFormatObject(time, Time_yyyy_s_MM_s_dd_HH_c_mm_FormatTypeAdapter().format(time)));
             }
             return context!!.deserialize(json, typeOfT);
         }
@@ -61,45 +99,45 @@ class KLineEventDto {
      * 最近一次成交价
      */
     @SerializedName("c")
-    val closePrice: BigDecimal;
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    val closePrice: NumberFormatObject;
 
     /**
      * 24小时内第一次成交的价格
      */
     @SerializedName("o")
-    val openPrice: BigDecimal;
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    val openPrice: NumberFormatObject;
 
     /**
      * 24小时最高价
      */
     @SerializedName("h")
-    val highPrice: BigDecimal;
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    val highPrice: NumberFormatObject;
 
     /**
      * 24小时最低价
      */
     @SerializedName("l")
-    val lowPrice: BigDecimal;
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    val lowPrice: NumberFormatObject;
 
     /**
      * 24小时成交量
      */
     @SerializedName("v")
-    val volume: BigDecimal;
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    val volume: NumberFormatObject;
 
     /**
      * 时间
      */
     @SerializedName("t")
-    val time: Long;
+    @JsonAdapter(Time_yyyy_s_MM_s_dd_HH_c_mm_FormatTypeAdapter::class)
+    val time: TimeFormatObject;
 
-    constructor(symbol: String,
-                closePrice: BigDecimal,
-                openPrice: BigDecimal,
-                highPrice: BigDecimal,
-                lowPrice: BigDecimal,
-                volume: BigDecimal,
-                time: Long) {
+    constructor(symbol: String, closePrice: NumberFormatObject, openPrice: NumberFormatObject, highPrice: NumberFormatObject, lowPrice: NumberFormatObject, volume: NumberFormatObject, time: TimeFormatObject) {
         this.symbol = symbol
         this.closePrice = closePrice
         this.openPrice = openPrice
@@ -108,6 +146,7 @@ class KLineEventDto {
         this.volume = volume
         this.time = time
     }
+
 
     override fun toString(): String {
         return "KLineEventDto(symbol=$symbol, closePrice=$closePrice, openPrice=$openPrice, highPrice=$highPrice, lowPrice=$lowPrice, volume=$volume, time=$time)"

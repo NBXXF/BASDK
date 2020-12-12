@@ -120,7 +120,7 @@ class TickerEventDto : Serializable {
     }
 
     override fun toString(): String {
-        return "TickerEventDto(symbol=$symbol, closePrice=$closePrice, openPrice=$openPrice, highPrice=$highPrice, lowPrice=$lowPrice, volume=$volume, quoteVolume=$quoteVolume, riseFallAmount=$riseFallRange)"
+        return "TickerEventDto(symbol=$symbol, closePrice=$closePrice, openPrice=$openPrice, highPrice=$highPrice, lowPrice=$lowPrice, volume=$volume, quoteVolume=$quoteVolume, riseFallRange=$riseFallRange)"
     }
 
 

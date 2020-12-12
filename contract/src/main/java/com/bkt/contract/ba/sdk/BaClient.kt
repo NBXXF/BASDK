@@ -62,6 +62,9 @@ class BaClient private constructor() {
         if (clazz == KLineService::class.java) {
             return KLineService.INSTANCE as T;
         }
+        if (clazz == CommonService::class.java) {
+            return CommonService.INSTANCE as T;
+        }
         return PairService.INSTANCE as T;
     }
 

@@ -95,7 +95,7 @@ interface KLineService : ExportService {
      * 1M
      */
     fun subKLine(symbol: String,
-                 interval: String): ObservableSource<KLineEventDto> {
+                 interval: String): Observable<KLineEventDto> {
         return BaClient.instance.getSocketService(symbol)
                 .flatMap(object : Function<ContractProxySocketService, ObservableSource<KLineEventDto>> {
                     override fun apply(t: ContractProxySocketService): ObservableSource<KLineEventDto> {

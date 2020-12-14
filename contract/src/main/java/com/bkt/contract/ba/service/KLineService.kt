@@ -49,9 +49,9 @@ interface KLineService : ExportService {
      */
     fun getKLine(symbol: String,
                  interval: String,
-                 startTime: Long,
-                 endTime: Long,
-                 limit: Int,
+                 startTime: Long?,
+                 endTime: Long?,
+                 limit: Int?,
                  type: CacheType = CacheType.onlyRemote,
                  cacheTime: Long = TimeUnit.MINUTES.toMillis(5)): Observable<List<KLineEventDto>> {
         return BaClient.instance.getApiService(symbol)

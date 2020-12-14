@@ -95,6 +95,7 @@ interface ContractProxyApiService {
     /**
      * 获取指数价和资金汇率
      */
+    @GET("v1/premiumIndex")
     fun getPremiumIndex(@Cache type: CacheType,
                         @Header("cache") cacheTime: Long,
                         @Query("symbol") symbol: String,

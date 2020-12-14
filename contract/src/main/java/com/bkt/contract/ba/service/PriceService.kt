@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
  * @Author: XGod
  * @CreateDate: 2020/12/11 19:49
  */
-internal interface PriceService : ExportService {
+interface PriceService : ExportService {
     companion object {
         internal val INSTANCE: PriceService by lazy {
             object : PriceService {
@@ -30,7 +30,7 @@ internal interface PriceService : ExportService {
     fun getPremiumIndex(
             symbol: String,
             pair: String?,
-            type: CacheType = CacheType.firstCache,
+            type: CacheType = CacheType.onlyRemote,
             cacheTime: Long = TimeUnit.MINUTES.toMillis(5)
     ): Observable<PremiumIndexPriceDto> {
         return BaClient.instance.getApiService(symbol)
@@ -57,6 +57,7 @@ internal interface PriceService : ExportService {
     /**
      * 订阅指数价
      */
+    @Deprecated("过时  请用subMarkPrice")
     fun subIndexPrice(symbol: String): Observable<IndexPriceEvent> {
         return BaClient.instance.getSocketService(symbol)
                 .flatMap(object : Function<ContractProxySocketService, ObservableSource<IndexPriceEvent>> {

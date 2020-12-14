@@ -1,9 +1,11 @@
 package com.bkt.contract.ba.model.dto
 
+import com.bkt.contract.ba.common.format.Number_percent_auto_0_4_DOWN_FormatTypeAdapter
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
+import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_FormatTypeAdapter
 
 /**
  * @Description: 指数价 http socket 复用一个
@@ -57,6 +59,9 @@ class PremiumIndexPriceDto {
     @JsonAdapter(Number_UNFormatTypeAdapter::class)
     val indexPrice: NumberFormatObject
 
+    /**
+     *  预估结算价,仅在交割开始前最后一小时有意义
+     */
     @SerializedName("estimatedSettlePrice", alternate = ["P"])
     @JsonAdapter(Number_UNFormatTypeAdapter::class)
     val estimatedSettlePrice: NumberFormatObject;
@@ -65,7 +70,7 @@ class PremiumIndexPriceDto {
      * 最近更新的资金费率
      */
     @SerializedName("lastFundingRate", alternate = ["r"])
-    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    @JsonAdapter(Number_percent_auto_0_4_DOWN_FormatTypeAdapter::class)
     val lastFundingRate: NumberFormatObject
 
     /**

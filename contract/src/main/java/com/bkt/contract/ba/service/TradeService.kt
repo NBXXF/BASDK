@@ -36,7 +36,7 @@ interface TradeService : ExportService {
      *  缓存时间:默认5分钟
      */
     fun getTrades(symbol: String,
-                  cacheType: CacheType = CacheType.ifCache,
+                  cacheType: CacheType = CacheType.onlyRemote,
                   cacheTime: Long = TimeUnit.MINUTES.toMillis(5)): Observable<List<TradeEventDto>> {
         return BaClient.instance
                 .getApiService(symbol)

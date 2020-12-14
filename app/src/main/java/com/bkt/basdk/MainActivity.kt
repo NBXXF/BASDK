@@ -8,10 +8,7 @@ import androidx.lifecycle.Lifecycle
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.po.PairInfoPo
 import com.bkt.contract.ba.sdk.BaClient
-import com.bkt.contract.ba.service.DepthService
-import com.bkt.contract.ba.service.KLineService
-import com.bkt.contract.ba.service.PairService
-import com.bkt.contract.ba.service.TradeService
+import com.bkt.contract.ba.service.*
 import com.xxf.arch.XXF
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.BehaviorSubject
@@ -24,14 +21,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val view: View = findViewById(R.id.test);
         view.setOnClickListener {
-            BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT",CacheType.firstCache,TimeUnit.MINUTES.toMillis(5))
+         /*   BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT", CacheType.firstCache, TimeUnit.MINUTES.toMillis(5))
                     .doOnError {
                         XXF.getLogger().d("============>depth err:" + it);
                     }
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
                         XXF.getLogger().d("============>depth:" + it);
-                    }
+                    }*/
             /* BaClient.instance.getService(PairService::class.java).getPairs()
                      .observeOn(AndroidSchedulers.mainThread())
                      .`as`(XXF.bindLifecycle(this))
@@ -45,6 +42,12 @@ class MainActivity : AppCompatActivity() {
                           .subscribe{
                               XXF.getLogger().d("============>Kline http:"+it);
                           }*/
+            BaClient.instance.getService(PriceService::class.java).getPremiumIndex("BTCUSDT", null)
+                    .`as`(XXF.bindLifecycle(this))
+                    .subscribe {
+                        XXF.getLogger().d("============>yes2:" + it);
+                    }
+
         }
         /*     BaClient.instance.getService(PairService::class.java).getPairs(ContractType.USDT)
                      .`as`(XXF.bindLifecycle(this))
@@ -64,6 +67,7 @@ class MainActivity : AppCompatActivity() {
                       .subscribe();*/
 
 
+
     }
 
     @SuppressLint("CheckResult")
@@ -75,12 +79,12 @@ class MainActivity : AppCompatActivity() {
                     .subscribe {
                         XXF.getLogger().d("==============>it:" + it)
                     };*/
-         BaClient.instance.getService(PairService::class.java)
-                  .subPairs()
-                  .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
-                  .subscribe {
-                      XXF.getLogger().d("==============>it:" + it)
-                  };
+  /*      BaClient.instance.getService(PairService::class.java)
+                .subPairs()
+                .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
+                .subscribe {
+                    XXF.getLogger().d("==============>it:" + it)
+                };*/
         /*  BaClient.instance.getService(PairService::class.java)
                  .subPairs(ContractType.USDT)
                  .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
@@ -108,12 +112,12 @@ class MainActivity : AppCompatActivity() {
                     .subscribe {
                         XXF.getLogger().d("==============>it3:" + it)
                     };*/
-  /*      BaClient.instance.getService(TradeService::class.java)
-                .subTrades("BTCUSDT")
-                .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
-                .subscribe {
-                    XXF.getLogger().d("==============>trade socket:" + it);
-                }*/
+        /*      BaClient.instance.getService(TradeService::class.java)
+                      .subTrades("BTCUSDT")
+                      .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
+                      .subscribe {
+                          XXF.getLogger().d("==============>trade socket:" + it);
+                      }*/
         /*
                   BehaviorSubject.create<Long>()
                           .doOnDispose {
@@ -121,6 +125,12 @@ class MainActivity : AppCompatActivity() {
                           }
                           .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                           .subscribe();*/
+
+        BaClient.instance.getService(PriceService::class.java).subMarkPrice("BTCUSDT")
+                .`as`(XXF.bindLifecycle(this))
+                .subscribe {
+                    XXF.getLogger().d("============>IndexPrice:" + it);
+                }
     }
 
 

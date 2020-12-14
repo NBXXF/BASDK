@@ -66,25 +66,25 @@ interface PriceService : ExportService {
                 .flatMap(object : Function<ContractType, ObservableSource<IndexPriceEvent>> {
                     override fun apply(t: ContractType): ObservableSource<IndexPriceEvent> {
                         /**
-                         * usd: indexPrice
-                         * usdt是markPrice
+                         * usdt: socket 是markPrice
+                         * usd socket是IndexPrice
                          */
-                        if (t == ContractType.USDT) {
+                        if (t == ContractType.USD) {
                             return BaClient.instance.getSocketService(symbol, type = t)
-                                    .flatMap(object : Function<ContractProxySocketService, ObservableSource<PremiumIndexPriceDto>> {
-                                        override fun apply(t: ContractProxySocketService): ObservableSource<PremiumIndexPriceDto> {
-                                            return t.subMarkPrice(symbol);
-                                        }
-                                    }).map(object : Function<PremiumIndexPriceDto, IndexPriceEvent> {
-                                        override fun apply(t: PremiumIndexPriceDto): IndexPriceEvent {
-                                            return IndexPriceEvent(t.symbol, t.indexPrice);
+                                    .flatMap(object : Function<ContractProxySocketService, ObservableSource<IndexPriceEvent>> {
+                                        override fun apply(t: ContractProxySocketService): ObservableSource<IndexPriceEvent> {
+                                            return t.subIndexPrice(symbol);
                                         }
                                     });
                         }
                         return BaClient.instance.getSocketService(symbol, type = t)
-                                .flatMap(object : Function<ContractProxySocketService, ObservableSource<IndexPriceEvent>> {
-                                    override fun apply(t: ContractProxySocketService): ObservableSource<IndexPriceEvent> {
-                                        return t.subIndexPrice(symbol);
+                                .flatMap(object : Function<ContractProxySocketService, ObservableSource<PremiumIndexPriceDto>> {
+                                    override fun apply(t: ContractProxySocketService): ObservableSource<PremiumIndexPriceDto> {
+                                        return t.subMarkPrice(symbol);
+                                    }
+                                }).map(object : Function<PremiumIndexPriceDto, IndexPriceEvent> {
+                                    override fun apply(t: PremiumIndexPriceDto): IndexPriceEvent {
+                                        return IndexPriceEvent(t.symbol, t.indexPrice);
                                     }
                                 });
                     }

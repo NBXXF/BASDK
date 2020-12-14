@@ -5,11 +5,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.po.PairInfoPo
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.service.*
 import com.xxf.arch.XXF
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.BehaviorSubject
 import retrofit2.CacheType
@@ -22,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         val view: View = findViewById(R.id.test);
         view.setOnClickListener {
             val s: Boolean = true;
-            var str:String=s.toString();
+            var str: String = s.toString();
             XXF.getLogger().d("================>s:" + str)
             val s2: Boolean = true;
             XXF.getLogger().d("================>s:" + s2.toString())
@@ -48,13 +50,13 @@ class MainActivity : AppCompatActivity() {
                           .subscribe{
                               XXF.getLogger().d("============>Kline http:"+it);
                           }*/
-          /*  BaClient.instance.getService(PriceService::class.java).getPremiumIndex("BTCUSDT", null)
-                    .`as`(XXF.bindLifecycle(this))
-                    .subscribe {
-                        XXF.getLogger().d("============>yes2:" + it);
-                    }*/
+            /*  BaClient.instance.getService(PriceService::class.java).getPremiumIndex("BTCUSDT", null)
+                      .`as`(XXF.bindLifecycle(this))
+                      .subscribe {
+                          XXF.getLogger().d("============>yes2:" + it);
+                      }*/
 
-            BaClient.instance.getService(PriceService::class.java).getPremiumIndex("BTCUSDT",null)
+            BaClient.instance.getService(PriceService::class.java).getPremiumIndex("BTCUSDT", null)
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
                         XXF.getLogger().d("============>IndexPrice:" + it);
@@ -138,6 +140,11 @@ class MainActivity : AppCompatActivity() {
                           .subscribe();*/
 
 
+        BehaviorSubject.create<Long>().switchIfEmpty(Observable.just(1))
+                .`as`(XXF.bindLifecycle(this))
+                .subscribe {
+                    XXF.getLogger().d("==============>yes:" + it);
+                }
     }
 
 

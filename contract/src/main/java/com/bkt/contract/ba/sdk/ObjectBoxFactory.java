@@ -73,7 +73,8 @@ public class ObjectBoxFactory {
      * @throws io.objectbox.exception.DbException
      */
     private static synchronized BoxStore buildBox(@NonNull File objectStoreDirectory) throws io.objectbox.exception.DbException {
-        return MyObjectBox.builder().directory(objectStoreDirectory).build();
+        return MyObjectBox.builder().directory(objectStoreDirectory)
+                .build();
     }
 
 

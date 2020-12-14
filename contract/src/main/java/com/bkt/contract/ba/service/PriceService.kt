@@ -37,7 +37,9 @@ interface PriceService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<PremiumIndexPriceDto>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<PremiumIndexPriceDto> {
-                        return t.getPremiumIndex(type, cacheTime, symbol, pair);
+                        return t.getPremiumIndex(type, cacheTime, symbol, pair).map {
+                            it.get(0)
+                        };
                     }
                 })
     }

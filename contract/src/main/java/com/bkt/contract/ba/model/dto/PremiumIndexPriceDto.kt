@@ -1,39 +1,47 @@
 package com.bkt.contract.ba.model.dto
 
 import com.bkt.contract.ba.common.jsontypeadapter.Number_percent_auto_0_4_DOWN_FormatTypeAdapter
+import com.bkt.contract.ba.service.PairService
 import com.google.gson.*
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
-import com.xxf.arch.XXF
-import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
+import com.xxf.arch.utils.NumberUtils
 import java.lang.reflect.Type
 
 /**
  * @Description: 指数价 http socket 复用一个
- *  /dapi/v1/premiumIndex 和 /fapi/v1/premiumIndex 一个返回是数组 一个返回是对象
  * @Author: XGod
  * @CreateDate: 2020/12/11 17:16
  */
-@JsonAdapter(PremiumIndexPriceDto.PremiumIndexPriceTypeAdapter::class)
+@JsonAdapter(PremiumIndexPriceDto.PremiumIndexPriceFormatTypeAdapter::class)
 open class PremiumIndexPriceDto {
 
-    /**
-     * /dapi/v1/premiumIndex 和 /fapi/v1/premiumIndex 一个返回是数组 一个返回是对象
-     */
-    internal class PremiumIndexPriceTypeAdapter : JsonSerializer<PremiumIndexPriceDto>, JsonDeserializer<PremiumIndexPriceDto> {
-        override fun serialize(src: PremiumIndexPriceDto?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
-            return context!!.serialize(src);
-        }
+    internal class PremiumIndexPriceFormatTypeAdapter : JsonDeserializer<PremiumIndexPriceDto> {
 
         override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): PremiumIndexPriceDto {
-            if (json!!.isJsonArray) {
-                val firstElement = json.asJsonArray.get(0);
-                return context!!.deserialize(firstElement, PremiumIndexPriceWithoutJsonAdapterDto::class.java);
-            } else {
-                return context!!.deserialize(json, PremiumIndexPriceWithoutJsonAdapterDto::class.java);
+            val pre: PremiumIndexPriceDto = context!!.deserialize(json, PremiumIndexPriceWithoutJsonAdapterDto::class.java);
+            try {
+                val config = PairService.INSTANCE.getPairConfig().get(pre.symbol);
+                /**
+                 * 接口并没有格式化
+                 */
+                if (config != null) {
+                    if (pre.indexPrice != null) {
+                        pre.indexPrice = NumberFormatObject(pre.indexPrice.origin, NumberUtils.formatRoundDown(pre.indexPrice.origin, 0, config.pricePrecision))
+                    }
+                    if (pre.markPrice != null) {
+                        pre.markPrice = NumberFormatObject(pre.markPrice.origin, NumberUtils.formatRoundDown(pre.markPrice.origin, 0, config.pricePrecision))
+                    }
+                    if (pre.estimatedSettlePrice != null) {
+                        pre.estimatedSettlePrice = NumberFormatObject(pre.estimatedSettlePrice.origin, NumberUtils.formatRoundDown(pre.estimatedSettlePrice.origin, 0, config.pricePrecision))
+                    }
+                };
+            } catch (e: Throwable) {
+                e.printStackTrace()
             }
+            return pre;
         }
     }
 
@@ -93,7 +101,7 @@ open class PremiumIndexPriceDto {
      */
     @SerializedName("markPrice", alternate = ["p"])
     @JsonAdapter(Number_UNFormatTypeAdapter::class)
-    val markPrice: NumberFormatObject
+    var markPrice: NumberFormatObject
 
     /**
      * 指数价格,
@@ -102,14 +110,14 @@ open class PremiumIndexPriceDto {
      */
     @SerializedName("indexPrice", alternate = ["i"])
     @JsonAdapter(Number_UNFormatTypeAdapter::class)
-    val indexPrice: NumberFormatObject
+    var indexPrice: NumberFormatObject
 
     /**
      *  预估结算价,仅在交割开始前最后一小时有意义
      */
     @SerializedName("estimatedSettlePrice", alternate = ["P"])
     @JsonAdapter(Number_UNFormatTypeAdapter::class)
-    val estimatedSettlePrice: NumberFormatObject;
+    var estimatedSettlePrice: NumberFormatObject;
 
     /**
      * 最近更新的资金费率

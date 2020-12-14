@@ -3,6 +3,7 @@ package com.bkt.contract.ba.sdk
 import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.po.DepthEventDtoPo
 import com.google.gson.JsonObject
+import com.xxf.arch.json.datastructure.ListOrSingle
 import io.reactivex.Observable
 import retrofit2.CacheType
 import retrofit2.http.*
@@ -99,7 +100,7 @@ interface ContractProxyApiService {
                         @Header("cache") cacheTime: Long,
                         @Query("symbol") symbol: String,
                         @Query("pair") pair: String?
-    ): Observable<PremiumIndexPriceDto>;
+    ): Observable<ListOrSingle<PremiumIndexPriceDto>>;
 
 
     /**

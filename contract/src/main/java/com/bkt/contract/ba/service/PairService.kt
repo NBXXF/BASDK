@@ -178,6 +178,18 @@ interface PairService : ExportService {
     }
 
     /**
+     * 获取交易对配置 有内存缓存加速
+     */
+    fun getPairConfig(): Map<String, PairConfigDto> {
+        try {
+            return PairDbService.getPairConfig().blockingFirst();
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
+        return mutableMapOf();
+    }
+
+    /**
      * 订阅所有交易对变化
      * ！！！下游要安全处理,否则会中断订阅
      *  @param applyDispose 是否跟随取消socket

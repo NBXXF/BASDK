@@ -1,4 +1,4 @@
-package com.bkt.contract.ba.common.format
+package com.bkt.contract.ba.common.jsontypeadapter
 
 import com.xxf.arch.json.typeadapter.format.NumberObjectFormatTypeAdapter
 import java.math.BigDecimal

@@ -21,14 +21,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val view: View = findViewById(R.id.test);
         view.setOnClickListener {
-         /*   BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT", CacheType.firstCache, TimeUnit.MINUTES.toMillis(5))
-                    .doOnError {
-                        XXF.getLogger().d("============>depth err:" + it);
-                    }
-                    .`as`(XXF.bindLifecycle(this))
-                    .subscribe {
-                        XXF.getLogger().d("============>depth:" + it);
-                    }*/
+            val s: Boolean = true;
+            var str:String=s.toString();
+            XXF.getLogger().d("================>s:" + str)
+            val s2: Boolean = true;
+            XXF.getLogger().d("================>s:" + s2.toString())
+
+            /*   BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT", CacheType.firstCache, TimeUnit.MINUTES.toMillis(5))
+                       .doOnError {
+                           XXF.getLogger().d("============>depth err:" + it);
+                       }
+                       .`as`(XXF.bindLifecycle(this))
+                       .subscribe {
+                           XXF.getLogger().d("============>depth:" + it);
+                       }*/
             /* BaClient.instance.getService(PairService::class.java).getPairs()
                      .observeOn(AndroidSchedulers.mainThread())
                      .`as`(XXF.bindLifecycle(this))
@@ -67,7 +73,6 @@ class MainActivity : AppCompatActivity() {
                       .subscribe();*/
 
 
-
     }
 
     @SuppressLint("CheckResult")
@@ -79,12 +84,12 @@ class MainActivity : AppCompatActivity() {
                     .subscribe {
                         XXF.getLogger().d("==============>it:" + it)
                     };*/
-  /*      BaClient.instance.getService(PairService::class.java)
-                .subPairs()
-                .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
-                .subscribe {
-                    XXF.getLogger().d("==============>it:" + it)
-                };*/
+        /*      BaClient.instance.getService(PairService::class.java)
+                      .subPairs()
+                      .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
+                      .subscribe {
+                          XXF.getLogger().d("==============>it:" + it)
+                      };*/
         /*  BaClient.instance.getService(PairService::class.java)
                  .subPairs(ContractType.USDT)
                  .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))

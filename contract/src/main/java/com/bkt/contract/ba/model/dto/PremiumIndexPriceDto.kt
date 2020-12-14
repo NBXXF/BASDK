@@ -1,11 +1,10 @@
 package com.bkt.contract.ba.model.dto
 
-import com.bkt.contract.ba.common.format.Number_percent_auto_0_4_DOWN_FormatTypeAdapter
+import com.bkt.contract.ba.common.jsontypeadapter.Number_percent_auto_0_4_DOWN_FormatTypeAdapter
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
-import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_FormatTypeAdapter
 
 /**
  * @Description: 指数价 http socket 复用一个

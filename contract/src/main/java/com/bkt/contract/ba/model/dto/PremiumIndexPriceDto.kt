@@ -1,17 +1,61 @@
 package com.bkt.contract.ba.model.dto
 
 import com.bkt.contract.ba.common.jsontypeadapter.Number_percent_auto_0_4_DOWN_FormatTypeAdapter
+import com.google.gson.*
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
+import com.xxf.arch.XXF
+import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
+import java.lang.reflect.Type
 
 /**
  * @Description: 指数价 http socket 复用一个
+ *  /dapi/v1/premiumIndex 和 /fapi/v1/premiumIndex 一个返回是数组 一个返回是对象
  * @Author: XGod
  * @CreateDate: 2020/12/11 17:16
  */
-class PremiumIndexPriceDto {
+@JsonAdapter(PremiumIndexPriceDto.PremiumIndexPriceTypeAdapter::class)
+open class PremiumIndexPriceDto {
+
+    /**
+     * /dapi/v1/premiumIndex 和 /fapi/v1/premiumIndex 一个返回是数组 一个返回是对象
+     */
+    internal class PremiumIndexPriceTypeAdapter : JsonSerializer<PremiumIndexPriceDto>, JsonDeserializer<PremiumIndexPriceDto> {
+        override fun serialize(src: PremiumIndexPriceDto?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
+            return context!!.serialize(src);
+        }
+
+        override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): PremiumIndexPriceDto {
+            if (json!!.isJsonArray) {
+                val firstElement = json.asJsonArray.get(0);
+                return context!!.deserialize(firstElement, PremiumIndexPriceWithoutJsonAdapterDto::class.java);
+            } else {
+                return context!!.deserialize(json, PremiumIndexPriceWithoutJsonAdapterDto::class.java);
+            }
+        }
+    }
+
+    /**
+     * 避免循环调用
+     */
+    internal class PremiumIndexPriceWithoutJsonAdapterDto : PremiumIndexPriceDto {
+
+
+        constructor(symbol: String,
+                    markPrice: NumberFormatObject,
+                    indexPrice: NumberFormatObject,
+                    estimatedSettlePrice: NumberFormatObject,
+                    lastFundingRate: NumberFormatObject,
+                    nextFundingTime: Long) : super(symbol,
+                markPrice,
+                indexPrice,
+                estimatedSettlePrice,
+                lastFundingRate,
+                nextFundingTime) {
+        }
+    }
     /**
      * /fapi/v1/premiumIndex
      *

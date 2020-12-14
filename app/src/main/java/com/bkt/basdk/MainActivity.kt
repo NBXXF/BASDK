@@ -48,10 +48,16 @@ class MainActivity : AppCompatActivity() {
                           .subscribe{
                               XXF.getLogger().d("============>Kline http:"+it);
                           }*/
-            BaClient.instance.getService(PriceService::class.java).getPremiumIndex("BTCUSDT", null)
+          /*  BaClient.instance.getService(PriceService::class.java).getPremiumIndex("BTCUSDT", null)
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
                         XXF.getLogger().d("============>yes2:" + it);
+                    }*/
+
+            BaClient.instance.getService(PriceService::class.java).getPremiumIndex("BTCUSDT",null)
+                    .`as`(XXF.bindLifecycle(this))
+                    .subscribe {
+                        XXF.getLogger().d("============>IndexPrice:" + it);
                     }
 
         }
@@ -131,11 +137,7 @@ class MainActivity : AppCompatActivity() {
                           .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                           .subscribe();*/
 
-        BaClient.instance.getService(PriceService::class.java).subMarkPrice("BTCUSDT")
-                .`as`(XXF.bindLifecycle(this))
-                .subscribe {
-                    XXF.getLogger().d("============>IndexPrice:" + it);
-                }
+
     }
 
 

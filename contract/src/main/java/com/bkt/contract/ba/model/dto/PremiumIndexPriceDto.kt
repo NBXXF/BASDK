@@ -53,7 +53,9 @@ class PremiumIndexPriceDto {
     val markPrice: NumberFormatObject
 
     /**
-     * 指数价格
+     * 指数价格,
+     * USDT scoket 有,USD Socket没有该字段注意!!!
+     * http接口 usdt和usd都有
      */
     @SerializedName("indexPrice", alternate = ["i"])
     @JsonAdapter(Number_UNFormatTypeAdapter::class)

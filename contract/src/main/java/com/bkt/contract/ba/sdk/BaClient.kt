@@ -8,6 +8,7 @@ import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
 import java.lang.RuntimeException
+import java.util.concurrent.Callable
 
 /**
  * @Description: BA 客户端
@@ -65,33 +66,50 @@ class BaClient private constructor() {
         if (clazz == CommonService::class.java) {
             return CommonService.INSTANCE as T;
         }
+        if (clazz == OrderService::class.java) {
+            return OrderService.INSTANCE as T;
+        }
         return PairService.INSTANCE as T;
     }
 
     /**
      * 获取api service
      */
-    internal fun getApiService(symbol: String): Observable<ContractProxyApiService> {
-        return getService(PairService::class.java)
-                .getPairType(symbol)
-                .map(object : Function<ContractType, ContractProxyApiService> {
-                    override fun apply(t: ContractType): ContractProxyApiService {
-                        return BaClient.instance.initializer!!.getApiService(t);
-                    }
-                });
+    internal fun getApiService(symbol: String, type: ContractType? = null): Observable<ContractProxyApiService> {
+        if (type == null) {
+            return getService(PairService::class.java)
+                    .getPairType(symbol)
+                    .map(object : Function<ContractType, ContractProxyApiService> {
+                        override fun apply(t: ContractType): ContractProxyApiService {
+                            return BaClient.instance.initializer!!.getApiService(t);
+                        }
+                    });
+        }
+        return Observable.fromCallable(object : Callable<ContractProxyApiService> {
+            override fun call(): ContractProxyApiService {
+                return BaClient.instance.initializer!!.getApiService(type!!);
+            }
+        })
     }
 
     /**
      * 获取socket service
      */
-    internal fun getSocketService(symbol: String): Observable<ContractProxySocketService> {
-        return getService(PairService::class.java)
-                .getPairType(symbol)
-                .map(object : Function<ContractType, ContractProxySocketService> {
-                    override fun apply(t: ContractType): ContractProxySocketService {
-                        return BaClient.instance.initializer!!.getSocketService(t);
-                    }
-                });
+    internal fun getSocketService(symbol: String, type: ContractType? = null): Observable<ContractProxySocketService> {
+        if (type == null) {
+            return getService(PairService::class.java)
+                    .getPairType(symbol)
+                    .map(object : Function<ContractType, ContractProxySocketService> {
+                        override fun apply(t: ContractType): ContractProxySocketService {
+                            return BaClient.instance.initializer!!.getSocketService(t);
+                        }
+                    });
+        }
+        return Observable.fromCallable(object : Callable<ContractProxySocketService> {
+            override fun call(): ContractProxySocketService {
+                return BaClient.instance.initializer!!.getSocketService(type!!);
+            }
+        })
     }
 
 }

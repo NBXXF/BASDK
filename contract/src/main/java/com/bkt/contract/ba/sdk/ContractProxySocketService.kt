@@ -167,6 +167,8 @@ abstract class ContractProxySocketService : WsStatusListener {
 
     /**
      * 订阅指数价
+     * 注意 只有usd有
+     * ustd 并没有该socket
      */
     fun subIndexPrice(symbol: String): Observable<IndexPriceEvent> {
         return bus.ofType(IndexPriceEvent::class.java)

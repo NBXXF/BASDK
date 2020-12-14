@@ -6,5 +6,10 @@ package com.bkt.contract.ba.service
  * @CreateDate: 2020/12/14 11:27
  */
 interface OrderService : ExportService {
-
+    companion object {
+        internal val INSTANCE: OrderService by lazy {
+            object : OrderService {
+            }
+        }
+    }
 }

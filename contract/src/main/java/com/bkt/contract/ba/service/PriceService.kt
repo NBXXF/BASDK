@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.service
 
+import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.dto.PremiumIndexPriceDto
 import com.bkt.contract.ba.model.event.IndexPriceEvent
 import com.bkt.contract.ba.sdk.BaClient
@@ -43,7 +44,8 @@ interface PriceService : ExportService {
 
 
     /**
-     * 订阅市价 和汇率结算
+     * 订阅市价 和汇率结算 (注意:USD 并不包含指数价)
+     * 如果只关心 指数价变化 请用 {@link #subIndexPrice(symbol: String)}
      */
     fun subMarkPrice(symbol: String): Observable<PremiumIndexPriceDto> {
         return BaClient.instance.getSocketService(symbol)
@@ -56,13 +58,35 @@ interface PriceService : ExportService {
 
     /**
      * 订阅指数价
+     *
+     * 框架已经趋同 只调这个function 便可订阅指数价变化
      */
-    @Deprecated("过时  请用subMarkPrice")
     fun subIndexPrice(symbol: String): Observable<IndexPriceEvent> {
-        return BaClient.instance.getSocketService(symbol)
-                .flatMap(object : Function<ContractProxySocketService, ObservableSource<IndexPriceEvent>> {
-                    override fun apply(t: ContractProxySocketService): ObservableSource<IndexPriceEvent> {
-                        return t.subIndexPrice(symbol);
+        return PairService.INSTANCE.getPairType(symbol)
+                .flatMap(object : Function<ContractType, ObservableSource<IndexPriceEvent>> {
+                    override fun apply(t: ContractType): ObservableSource<IndexPriceEvent> {
+                        /**
+                         * usd: indexPrice
+                         * usdt是markPrice
+                         */
+                        if (t == ContractType.USDT) {
+                            return BaClient.instance.getSocketService(symbol, type = t)
+                                    .flatMap(object : Function<ContractProxySocketService, ObservableSource<PremiumIndexPriceDto>> {
+                                        override fun apply(t: ContractProxySocketService): ObservableSource<PremiumIndexPriceDto> {
+                                            return t.subMarkPrice(symbol);
+                                        }
+                                    }).map(object : Function<PremiumIndexPriceDto, IndexPriceEvent> {
+                                        override fun apply(t: PremiumIndexPriceDto): IndexPriceEvent {
+                                            return IndexPriceEvent(t.symbol, t.indexPrice);
+                                        }
+                                    });
+                        }
+                        return BaClient.instance.getSocketService(symbol, type = t)
+                                .flatMap(object : Function<ContractProxySocketService, ObservableSource<IndexPriceEvent>> {
+                                    override fun apply(t: ContractProxySocketService): ObservableSource<IndexPriceEvent> {
+                                        return t.subIndexPrice(symbol);
+                                    }
+                                });
                     }
                 });
     }

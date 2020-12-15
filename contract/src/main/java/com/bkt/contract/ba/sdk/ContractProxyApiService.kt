@@ -177,4 +177,31 @@ interface ContractProxyApiService {
             @Query("timestamp") timestamp: Long
     ): Observable<ListOrSingle<OrderInfoDto>>;
 
+
+    /**
+     * https://binance-docs.github.io/apidocs/testnet/cn/#trade-12
+     * 查询持仓
+     */
+    @GET("v2/positionRisk")
+    fun getPositionRisk(
+            @Query("symbol") symbol: String?,
+            @Query("recvWindow") recvWindow: Long?,
+            @Query("timestamp") timestamp: Long
+    ): Observable<ListOrSingle<PositionRiskDto>>;
+
+    /**
+     * https://binance-docs.github.io/apidocs/testnet/cn/#v2-user_data-3
+     * 账户成交历史 (USER_DATA)
+     */
+    @GET("v1/userTrades")
+    fun getUserTrades(
+            @Query("symbol") symbol: String,
+            @Query("startTime") startTime: Long?,
+            @Query("endTime") endTime: Long?,
+            @Query("fromId") fromId: String?,
+            @Query("limit") limit: Int?,
+            @Query("recvWindow") recvWindow: Long?,
+            @Query("timestamp") timestamp: Long
+    ): Observable<ListOrSingle<TradInfoDto>>;
+
 }

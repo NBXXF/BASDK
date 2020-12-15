@@ -1,8 +1,12 @@
 package com.bkt.contract.ba.service
 
 import com.bkt.contract.ba.enums.ContractType
+import com.bkt.contract.ba.enums.OderStatus
+import com.bkt.contract.ba.enums.OrderType
 import com.bkt.contract.ba.model.dto.OrderInfoDto
 import com.bkt.contract.ba.model.dto.OrderRequestDto
+import com.bkt.contract.ba.model.dto.PositionRiskDto
+import com.bkt.contract.ba.model.dto.TradInfoDto
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
 import com.xxf.arch.json.JsonUtils
@@ -41,7 +45,7 @@ interface OrderService : ExportService {
     }
 
     /**
-     * 查询当前挂单 (USER_DATA)
+     * 查询当前挂单 ==当前委托
      * @param orderId  系统订单号
      * @param origClientOrderId  用户自定义的订单号
      * @param recvWindow
@@ -57,7 +61,7 @@ interface OrderService : ExportService {
     }
 
     /**
-     * 查看当前全部挂单 (USER_DATA)
+     * 查看当前全部挂单 ==当前委托
      *
      *@param symbol
      */
@@ -71,7 +75,7 @@ interface OrderService : ExportService {
     }
 
     /**
-     * 查看当前全部挂单 (USER_DATA)
+     * 查看当前全部挂单 ==当前委托
      * 最多返回 40条  注意不是完全返回所有数据
      */
     fun getOpenOrders(type: ContractType, recvWindow: Long?, timestamp: Long): Observable<ListOrSingle<OrderInfoDto>> {
@@ -108,4 +112,83 @@ interface OrderService : ExportService {
                     }
                 });
     }
+
+    /**
+     * 获取持仓
+     * 按交易对获取
+     */
+    fun getPositionRisk(symbol: String,
+                        recvWindow: Long?,
+                        timestamp: Long): Observable<ListOrSingle<PositionRiskDto>> {
+        return BaClient.instance.getApiService(symbol)
+                .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<PositionRiskDto>>> {
+                    override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<PositionRiskDto>> {
+                        return t.getPositionRisk(symbol, recvWindow, timestamp);
+                    }
+                });
+    }
+
+    /**
+     * 获取持仓
+     * 按类型获取
+     */
+    fun getPositionRisk(type: ContractType,
+                        recvWindow: Long?,
+                        timestamp: Long): Observable<ListOrSingle<PositionRiskDto>> {
+        return BaClient.instance.initializer?.getApiService(type)!!.getPositionRisk(null, recvWindow, timestamp);
+    }
+
+    /**
+     * 获取历史成交
+     * 按交易对获取
+     */
+    fun getUserTrades(
+            symbol: String,
+            startTime: Long?,
+            endTime: Long?,
+            fromId: String?,
+            limit: Int?,
+            recvWindow: Long?,
+            timestamp: Long
+    ): Observable<ListOrSingle<TradInfoDto>> {
+        return BaClient.instance.getApiService(symbol)
+                .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<TradInfoDto>>> {
+                    override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<TradInfoDto>> {
+                        return t.getUserTrades(symbol, startTime, endTime, fromId, limit, recvWindow, timestamp);
+                    }
+                });
+    }
+
+    /**
+     * 获取历史委托
+     * 按交易对获取
+     * 实现逻辑:从全部订单中过滤
+     */
+    fun getHistoryEntrust(symbol: String,
+                          orderId: String?,
+                          startTime: Long?,
+                          endTime: Long?,
+                          limit: Int?,
+                          recvWindow: Long?,
+                          timestamp: Long): Observable<ListOrSingle<OrderInfoDto>> {
+        return this.getAllOrders(symbol, orderId, startTime, endTime, limit, recvWindow, timestamp)
+                .map(object : Function<ListOrSingle<OrderInfoDto>, ListOrSingle<OrderInfoDto>> {
+                    override fun apply(t: ListOrSingle<OrderInfoDto>): ListOrSingle<OrderInfoDto> {
+                        val results: ListOrSingle<OrderInfoDto> = ListOrSingle();
+                        /**
+                         * 限价计划委托=TAKE_PROFIT 止盈限价单  STOP 止损限价单
+                         * 查询历史委托
+                         * 目前历史委托只有 OrderType.TAKE_PROFIT  OrderType.STOP
+                         */
+                        t.forEach {
+                            if (it.status != null && it.status != OderStatus.NEW
+                                    && (it.type == OrderType.TAKE_PROFIT || it.type == OrderType.STOP)) {
+                                results.add(it);
+                            }
+                        }
+                        return results;
+                    }
+                });
+    }
+
 }

@@ -3,6 +3,7 @@ package com.bkt.contract.ba.sdk
 import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.po.DepthEventDtoPo
 import com.google.gson.JsonObject
+import com.xxf.arch.json.datastructure.ListOrEmpty
 import com.xxf.arch.json.datastructure.ListOrSingle
 import io.reactivex.Observable
 import retrofit2.CacheType
@@ -129,5 +130,51 @@ interface ContractProxyApiService {
     @POST("v1/order")
     @FormUrlEncoded
     fun createOrder(@FieldMap map: Map<String, Any>): Observable<OrderInfoDto>;
+
+
+    /**
+     * https://binance-docs.github.io/apidocs/testnet/cn/#user_data-3
+     * 查询当前挂单 (USER_DATA)
+     */
+    @GET("v1/openOrder")
+    fun getOpenOrder(@Query("symbol") symbol: String,
+                     @Query("orderId") orderId: String?,
+                     @Query("origClientOrderId") origClientOrderId: String?,
+                     @Query("recvWindow") recvWindow: Long?,
+                     @Query("timestamp") timestamp: Long
+    ): Observable<ListOrSingle<OrderInfoDto>>;
+
+    /**
+     * https://binance-docs.github.io/apidocs/testnet/cn/#user_data-4
+     * 查询当前挂单 (USER_DATA)
+     */
+    @GET("v1/openOrders")
+    fun getOpenOrders(@Query("symbol") symbol: String?,
+                      @Query("recvWindow") recvWindow: Long?,
+                      @Query("timestamp") timestamp: Long
+    ): Observable<ListOrSingle<OrderInfoDto>>;
+
+
+    /**
+     * 查询所有订单(包括历史订单) (USER_DATA)
+     *
+     * 请注意，如果订单满足如下条件，不会被查询到：
+     * 订单的最终状态为 CANCELED 或者 EXPIRED, 并且
+     * 订单没有任何的成交记录, 并且
+     * 订单生成时间 + 30天 < 当前时间
+     *
+     * @param orderId 只返回此orderID及之后的订单，缺省返回最近的订单
+     * @param limit  默认值:500 最大值:1000
+     */
+    @GET("v1/allOrders")
+    fun getAllOrders(
+            @Query("symbol") symbol: String,
+            @Query("orderId") orderId: String?,
+            @Query("startTime") startTime: Long?,
+            @Query("endTime") endTime: Long?,
+            @Query("limit") limit: Int?,
+            @Query("recvWindow") recvWindow: Long?,
+            @Query("timestamp") timestamp: Long
+    ): Observable<ListOrSingle<OrderInfoDto>>;
 
 }

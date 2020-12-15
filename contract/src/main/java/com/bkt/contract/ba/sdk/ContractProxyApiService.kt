@@ -204,4 +204,22 @@ interface ContractProxyApiService {
             @Query("timestamp") timestamp: Long
     ): Observable<ListOrSingle<TradInfoDto>>;
 
+
+    /**
+     * https://binance-docs.github.io/apidocs/testnet/cn/#user_data-6
+     * 获取账户损益资金流水(USER_DATA)
+     *
+     * @param limit 默认值:100 最大值:1000
+     */
+    @GET("v1/income")
+    fun getUserIncome(
+            @Query("symbol") symbol: String?,
+            @Query("incomeType") incomeType: String?,
+            @Query("startTime") startTime: Long?,
+            @Query("endTime") endTime: Long?,
+            @Query("limit") limit: Int?,
+            @Query("recvWindow") recvWindow: Long?,
+            @Query("timestamp") timestamp: Long
+    ): Observable<ListOrSingle<IncomeDto>>;
+
 }

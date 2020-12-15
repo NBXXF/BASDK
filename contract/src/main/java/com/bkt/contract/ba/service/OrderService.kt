@@ -1,12 +1,10 @@
 package com.bkt.contract.ba.service
 
 import com.bkt.contract.ba.enums.ContractType
+import com.bkt.contract.ba.enums.IncomeType
 import com.bkt.contract.ba.enums.OderStatus
 import com.bkt.contract.ba.enums.OrderType
-import com.bkt.contract.ba.model.dto.OrderInfoDto
-import com.bkt.contract.ba.model.dto.OrderRequestDto
-import com.bkt.contract.ba.model.dto.PositionRiskDto
-import com.bkt.contract.ba.model.dto.TradInfoDto
+import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
 import com.xxf.arch.json.JsonUtils
@@ -191,4 +189,40 @@ interface OrderService : ExportService {
                 });
     }
 
+    /**
+     * 按交易对获取资金流水
+     * @param limit  默认值:100 最大值:1000
+     */
+    fun getUserIncome(
+            symbol: String,
+            incomeType: IncomeType?,
+            startTime: Long?,
+            endTime: Long?,
+            limit: Int?,
+            recvWindow: Long?,
+            timestamp: Long
+    ): Observable<ListOrSingle<IncomeDto>> {
+        return BaClient.instance.getApiService(symbol)
+                .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<IncomeDto>>> {
+                    override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<IncomeDto>> {
+                        return t.getUserIncome(symbol, if (incomeType == null) null else incomeType.value, startTime, endTime, limit, recvWindow, timestamp);
+                    }
+                });
+    }
+
+    /**
+     * 按类型获取资金流水
+     */
+    fun getUserIncome(
+            type: ContractType,
+            incomeType: IncomeType?,
+            startTime: Long?,
+            endTime: Long?,
+            limit: Int?,
+            recvWindow: Long?,
+            timestamp: Long
+    ): Observable<ListOrSingle<IncomeDto>> {
+        return BaClient.instance.initializer?.getApiService(type)!!
+                .getUserIncome(null, if (incomeType == null) null else incomeType.value, startTime, endTime, limit, recvWindow, timestamp);
+    }
 }

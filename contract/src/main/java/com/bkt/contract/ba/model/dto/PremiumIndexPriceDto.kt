@@ -23,7 +23,7 @@ open class PremiumIndexPriceDto {
         override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): PremiumIndexPriceDto {
             val pre: PremiumIndexPriceDto = context!!.deserialize(json, PremiumIndexPriceWithoutJsonAdapterDto::class.java);
             try {
-                val config = PairService.INSTANCE.getPairConfig().get(pre.symbol);
+                val config = PairService.INSTANCE.getPairConfig(pre.symbol);
                 /**
                  * 接口并没有格式化
                  */

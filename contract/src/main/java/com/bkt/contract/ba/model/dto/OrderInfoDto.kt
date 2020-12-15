@@ -3,7 +3,10 @@ package com.bkt.contract.ba.model.dto
 import com.bkt.contract.ba.enums.*
 import com.google.gson.annotations.JsonAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
+import com.xxf.arch.json.typeadapter.format.formatobject.TimeFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
+import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_hl_MM_hl_dd_FormatTypeAdapter
+import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_HH_c_mm_c_ss_FormatTypeAdapter
 
 /**
  * @Description: 订单信息
@@ -133,7 +136,11 @@ class OrderInfoDto {
     var pair: String? = null
 
 
-    var time: Long = 0
+    /**
+     * 订单时间
+     */
+    @JsonAdapter(Time_yyyy_s_MM_s_dd_HH_c_mm_c_ss_FormatTypeAdapter::class)
+    var time: TimeFormatObject? = null
 
     /**
      * timeInForce
@@ -161,7 +168,8 @@ class OrderInfoDto {
     /**
      * 更新时间
      */
-    var updateTime: Long = 0
+    @JsonAdapter(Time_yyyy_s_MM_s_dd_HH_c_mm_c_ss_FormatTypeAdapter::class)
+    var updateTime: TimeFormatObject? = null;
 
     /**
      * 条件价格触发类型

@@ -1,6 +1,7 @@
 package com.bkt.contract.ba.service
 
 import android.text.TextUtils
+import androidx.annotation.Nullable
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.dto.ExchangeInfoDto
 import com.bkt.contract.ba.model.dto.PairConfigDto
@@ -10,6 +11,7 @@ import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.service.inner.PairDbService
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
+import io.reactivex.annotations.CheckReturnValue
 import io.reactivex.functions.Function
 import retrofit2.CacheType
 
@@ -187,6 +189,20 @@ interface PairService : ExportService {
             e.printStackTrace()
         }
         return mutableMapOf();
+    }
+
+    /**
+     * 获取交易对配置信息
+     */
+    @CheckReturnValue
+    @Nullable
+    fun getPairConfig(symbol: String): PairConfigDto? {
+        try {
+            return getPairConfig().get(symbol);
+        } catch (e: Throwable) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

@@ -126,8 +126,8 @@ interface OrderService : ExportService {
     /**
      * 按类型获取持仓
      */
-    private fun getPositionRisk(type: ContractType,
-                                recvWindow: Long?): Observable<ListOrSingle<PositionRiskDto>> {
+    fun getPositionRisk(type: ContractType,
+                        recvWindow: Long?): Observable<ListOrSingle<PositionRiskDto>> {
         return getPositionRiskInner(type, null, recvWindow);
     }
 

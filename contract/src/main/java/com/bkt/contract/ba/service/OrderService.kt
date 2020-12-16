@@ -11,13 +11,12 @@ import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.json.MapTypeToken
 import com.xxf.arch.json.datastructure.ListOrSingle
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
+import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_FormatTypeAdapter
 import com.xxf.arch.utils.NumberUtils
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
-import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function
-import retrofit2.http.GET
-import retrofit2.http.Query
+import io.reactivex.functions.Function3
 
 /**
  * @Description: 订单下单service
@@ -50,13 +49,12 @@ interface OrderService : ExportService {
      * @param orderId  系统订单号
      * @param origClientOrderId  用户自定义的订单号
      * @param recvWindow
-     * @param timestamp
      */
-    fun getOpenOrder(symbol: String, orderId: String?, origClientOrderId: String?, recvWindow: Long?, timestamp: Long): Observable<ListOrSingle<OrderInfoDto>> {
+    fun getOpenOrder(symbol: String, orderId: String?, origClientOrderId: String?, recvWindow: Long?): Observable<ListOrSingle<OrderInfoDto>> {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<OrderInfoDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<OrderInfoDto>> {
-                        return t.getOpenOrder(symbol, orderId, origClientOrderId, recvWindow, timestamp);
+                        return t.getOpenOrder(symbol, orderId, origClientOrderId, recvWindow, System.currentTimeMillis());
                     }
                 });
     }
@@ -66,11 +64,11 @@ interface OrderService : ExportService {
      *
      *@param symbol
      */
-    fun getOpenOrders(symbol: String, recvWindow: Long?, timestamp: Long): Observable<ListOrSingle<OrderInfoDto>> {
+    fun getOpenOrders(symbol: String, recvWindow: Long?): Observable<ListOrSingle<OrderInfoDto>> {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<OrderInfoDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<OrderInfoDto>> {
-                        return t.getOpenOrders(symbol, recvWindow, timestamp);
+                        return t.getOpenOrders(symbol, recvWindow, System.currentTimeMillis());
                     }
                 });
     }
@@ -79,8 +77,8 @@ interface OrderService : ExportService {
      * 查看当前全部挂单 ==当前委托
      * 最多返回 40条  注意不是完全返回所有数据
      */
-    fun getOpenOrders(type: ContractType, recvWindow: Long?, timestamp: Long): Observable<ListOrSingle<OrderInfoDto>> {
-        return BaClient.instance.initializer?.getApiService(type)!!.getOpenOrders(null, recvWindow, timestamp);
+    fun getOpenOrders(type: ContractType, recvWindow: Long?): Observable<ListOrSingle<OrderInfoDto>> {
+        return BaClient.instance.initializer?.getApiService(type)!!.getOpenOrders(null, recvWindow, System.currentTimeMillis());
     }
 
     /**
@@ -103,83 +101,90 @@ interface OrderService : ExportService {
             startTime: Long?,
             endTime: Long?,
             limit: Int?,
-            recvWindow: Long?,
-            timestamp: Long
+            recvWindow: Long?
     ): Observable<ListOrSingle<OrderInfoDto>> {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<OrderInfoDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<OrderInfoDto>> {
-                        return t.getAllOrders(symbol, orderId, startTime, endTime, limit, recvWindow, timestamp);
+                        return t.getAllOrders(symbol, orderId, startTime, endTime, limit, recvWindow, System.currentTimeMillis());
                     }
                 });
     }
 
     /**
-     * 获取持仓
+     * 获取指定交易对持仓
      * 按交易对获取
      */
     fun getPositionRisk(symbol: String,
-                        recvWindow: Long?,
-                        timestamp: Long): Observable<ListOrSingle<PositionRiskDto>> {
-        return BaClient.instance.getApiService(symbol)
-                .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<PositionRiskDto>>> {
-                    override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<PositionRiskDto>> {
-                        return Observable.zip(t.getPositionRisk(symbol, recvWindow, timestamp),
-                                UserService.INSTANCE.getLeverageBrackets(symbol),
-                                object : BiFunction<ListOrSingle<PositionRiskDto>, List<LeverageBracketDto.BracketsBean>, ListOrSingle<PositionRiskDto>> {
-                                    override fun apply(t1: ListOrSingle<PositionRiskDto>, t2: List<LeverageBracketDto.BracketsBean>): ListOrSingle<PositionRiskDto> {
-                                        /**
-                                         * 持倉接口並未返回
-                                         * 需要赋值这三个字段
-                                        var earningRate: NumberFormatObject? = null
-                                        var marginRate: NumberFormatObject? = null;
-                                        var maintenanceMarginRate: NumberFormatObject? = null;
-                                         */
-                                        t1.forEach {
-                                            val earningRateDecimal = NumberUtils.divide(it.unRealizedProfit?.origin, it.isolatedMargin?.origin, Math.max(it.unRealizedProfit?.origin!!.scale(), it.isolatedMargin?.origin!!.scale()));
-                                            it.earningRate = NumberFormatObject(earningRateDecimal, NumberUtils.formatRoundDown(earningRateDecimal, 2, 2));
-
-                                            it.maintenanceMarginRate = t2.getBracket(it.leverage)?.maintMarginRatio;
-                                        }
-                                        return t1;
-                                    }
-                                });
+                        recvWindow: Long?): Observable<ListOrSingle<PositionRiskDto>> {
+        return PairService.INSTANCE.getPairType(symbol)
+                .flatMap(object : Function<ContractType, ObservableSource<ListOrSingle<PositionRiskDto>>> {
+                    override fun apply(type: ContractType): ObservableSource<ListOrSingle<PositionRiskDto>> {
+                        return getPositionRiskInner(type, symbol, recvWindow);
                     }
-                });
+                })
+    }
+
+    /**
+     * 按类型获取持仓
+     */
+    private fun getPositionRisk(type: ContractType,
+                                recvWindow: Long?): Observable<ListOrSingle<PositionRiskDto>> {
+        return getPositionRiskInner(type, null, recvWindow);
     }
 
     /**
      * 获取持仓
-     * 按类型获取
+     * @param symbol 传空代表当前类型所有币种余额
      */
-    fun getPositionRisk(type: ContractType,
-                        recvWindow: Long?): Observable<ListOrSingle<PositionRiskDto>> {
+    private fun getPositionRiskInner(type: ContractType,
+                                     symbol: String?,
+                                     recvWindow: Long?): Observable<ListOrSingle<PositionRiskDto>> {
         return Observable.zip(
                 UserService.INSTANCE.getLeverageBrackets(type),
-                BaClient.instance.initializer?.getApiService(type)!!.getPositionRisk(null, recvWindow, System.currentTimeMillis()), object : BiFunction<Map<String, List<LeverageBracketDto.BracketsBean>>, ListOrSingle<PositionRiskDto>, ListOrSingle<PositionRiskDto>> {
-            override fun apply(t1: Map<String, List<LeverageBracketDto.BracketsBean>>, t2: ListOrSingle<PositionRiskDto>): ListOrSingle<PositionRiskDto> {
-                /**
-                 * 持倉接口並未返回
-                 * 需要赋值这三个字段
-                var earningRate: NumberFormatObject? = null
-                var marginRate: NumberFormatObject? = null;
-                var maintenanceMarginRate: NumberFormatObject? = null;
-                 */
-                t2.forEach {
-                    val earningRateDecimal = NumberUtils.divide(it.unRealizedProfit?.origin, it.isolatedMargin?.origin, Math.max(it.unRealizedProfit?.origin!!.scale(), it.isolatedMargin?.origin!!.scale()));
-                    it.earningRate = NumberFormatObject(earningRateDecimal, NumberUtils.formatRoundDown(earningRateDecimal, 2, 2));
+                UserService.INSTANCE.getAllBalanceToMap(null),
+                BaClient.instance.initializer?.getApiService(type)!!.getPositionRisk(symbol, recvWindow, System.currentTimeMillis()),
+                object : Function3<Map<String, List<LeverageBracketDto.BracketsBean>>, Map<String, CoinBalanceDto>, ListOrSingle<PositionRiskDto>, ListOrSingle<PositionRiskDto>> {
+                    override fun apply(leverageMap: Map<String, List<LeverageBracketDto.BracketsBean>>, balances: Map<String, CoinBalanceDto>, positionRisks: ListOrSingle<PositionRiskDto>): ListOrSingle<PositionRiskDto> {
+                        /**
+                         * 持倉接口並未返回
+                         * 需要赋值这三个字段
+                        var earningRate: NumberFormatObject? = null
+                        var marginRate: NumberFormatObject? = null;
+                        var maintenanceMarginRate: NumberFormatObject? = null;
+                         */
+                        positionRisks.forEach {
+                            /**
+                             * unRealizedProfit/isolatedMargin *100
+                             */
+                            val earningRateDecimal = NumberUtils.divide(it.unRealizedProfit?.origin, it.isolatedMargin?.origin, Math.max(it.unRealizedProfit?.origin!!.scale(), it.isolatedMargin?.origin!!.scale()));
+                            it.earningRate = NumberFormatObject(earningRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(earningRateDecimal));
 
-                    val leverageBracket: List<LeverageBracketDto.BracketsBean>? = t1.get(CommonService.INSTANCE.convertPair(it.symbol));
-                    if (leverageBracket != null) {
-                        val bracket = leverageBracket.getBracket(it.leverage);
-                        if (bracket != null) {
-                            it.maintenanceMarginRate = bracket.maintMarginRatio;
+                            val leverageBracket: List<LeverageBracketDto.BracketsBean>? = leverageMap.get(CommonService.INSTANCE.convertPair(it.symbol));
+                            if (leverageBracket != null) {
+                                it.maintenanceMarginRate = leverageBracket.getBracket(it.leverage)?.maintMarginRatio;
+                            }
+
+                            /**
+                             * isolatedMargin/(逐仓模式下钱包余额+unRealizedProfit)
+                             */
+                            val pairConfigs = PairService.INSTANCE.getPairConfigs();
+                            val pairConfig = pairConfigs.get(it.symbol);
+                            if (pairConfig != null) {
+                                var balance: CoinBalanceDto? = balances.get(pairConfig.baseAsset);
+                                if (balance == null) {
+                                    balance = balances.get(pairConfig.quoteAsset);
+                                }
+                                if (balance != null) {
+                                    val marginRateDecimal = NumberUtils.divide(it.isolatedMargin?.origin, NumberUtils.add(balance.balance?.origin, it.unRealizedProfit?.origin))
+                                    it.marginRate = NumberFormatObject(marginRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(earningRateDecimal));
+                                }
+                            }
+
                         }
+                        return positionRisks;
                     }
-                }
-                return t2;
-            }
-        });
+                });
     }
 
     /**
@@ -205,13 +210,12 @@ interface OrderService : ExportService {
             endTime: Long?,
             fromId: String?,
             limit: Int?,
-            recvWindow: Long?,
-            timestamp: Long
+            recvWindow: Long?
     ): Observable<ListOrSingle<TradInfoDto>> {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<TradInfoDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<TradInfoDto>> {
-                        return t.getUserTrades(symbol, startTime, endTime, fromId, limit, recvWindow, timestamp);
+                        return t.getUserTrades(symbol, startTime, endTime, fromId, limit, recvWindow, System.currentTimeMillis());
                     }
                 });
     }
@@ -226,9 +230,8 @@ interface OrderService : ExportService {
                           startTime: Long?,
                           endTime: Long?,
                           limit: Int?,
-                          recvWindow: Long?,
-                          timestamp: Long): Observable<ListOrSingle<OrderInfoDto>> {
-        return this.getAllOrders(symbol, orderId, startTime, endTime, limit, recvWindow, timestamp)
+                          recvWindow: Long?): Observable<ListOrSingle<OrderInfoDto>> {
+        return this.getAllOrders(symbol, orderId, startTime, endTime, limit, recvWindow)
                 .map(object : Function<ListOrSingle<OrderInfoDto>, ListOrSingle<OrderInfoDto>> {
                     override fun apply(t: ListOrSingle<OrderInfoDto>): ListOrSingle<OrderInfoDto> {
                         val results: ListOrSingle<OrderInfoDto> = ListOrSingle();
@@ -258,13 +261,12 @@ interface OrderService : ExportService {
             startTime: Long?,
             endTime: Long?,
             limit: Int?,
-            recvWindow: Long?,
-            timestamp: Long
+            recvWindow: Long?
     ): Observable<ListOrSingle<IncomeDto>> {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<IncomeDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<IncomeDto>> {
-                        return t.getUserIncome(symbol, if (incomeType == null) null else incomeType.value, startTime, endTime, limit, recvWindow, timestamp);
+                        return t.getUserIncome(symbol, if (incomeType == null) null else incomeType.value, startTime, endTime, limit, recvWindow, System.currentTimeMillis());
                     }
                 });
     }
@@ -278,10 +280,9 @@ interface OrderService : ExportService {
             startTime: Long?,
             endTime: Long?,
             limit: Int?,
-            recvWindow: Long?,
-            timestamp: Long
+            recvWindow: Long?
     ): Observable<ListOrSingle<IncomeDto>> {
         return BaClient.instance.initializer?.getApiService(type)!!
-                .getUserIncome(null, if (incomeType == null) null else incomeType.value, startTime, endTime, limit, recvWindow, timestamp);
+                .getUserIncome(null, if (incomeType == null) null else incomeType.value, startTime, endTime, limit, recvWindow, System.currentTimeMillis());
     }
 }

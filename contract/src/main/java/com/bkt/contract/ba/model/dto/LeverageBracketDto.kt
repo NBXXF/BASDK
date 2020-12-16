@@ -2,14 +2,9 @@ package com.bkt.contract.ba.model.dto
 
 import android.text.TextUtils
 import com.bkt.contract.ba.service.CommonService
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
 import com.google.gson.annotations.JsonAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
-import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
-import java.lang.reflect.Type
-
+import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_FormatTypeAdapter
 /**
  * @Description: 杠杆分层标准
  * @Author: XGod
@@ -103,7 +98,7 @@ class LeverageBracketDto {
         /**
          * 该层对应的维持保证金率
          */
-        @JsonAdapter(Number_UNFormatTypeAdapter::class)
+        @JsonAdapter(Number_percent_auto_2_2_DOWN_FormatTypeAdapter::class)
         val maintMarginRatio: NumberFormatObject? = null
 
         /**

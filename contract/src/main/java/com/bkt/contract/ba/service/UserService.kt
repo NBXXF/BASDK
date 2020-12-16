@@ -1,14 +1,17 @@
 package com.bkt.contract.ba.service
 
 import com.bkt.contract.ba.enums.ContractType
+import com.bkt.contract.ba.model.dto.CoinBalanceDto
 import com.bkt.contract.ba.model.dto.LeverageBracketDto
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
 import com.xxf.arch.json.datastructure.ListOrSingle
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
+import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function
 import org.jetbrains.annotations.Contract
+import retrofit2.http.Query
 
 /**
  * @Description: 用户service
@@ -56,4 +59,52 @@ interface UserService : ExportService {
                     }
                 });
     }
+
+    /**
+     * 获取账户余额
+     * @param type
+     * @param recvWindow
+     */
+    fun getBalance(type: ContractType, recvWindow: Long?): Observable<ListOrSingle<CoinBalanceDto>> {
+        return BaClient.instance.initializer!!.getApiService(type)
+                .getBalance(recvWindow, System.currentTimeMillis());
+    }
+
+    /**
+     * 获取账户余额
+     * 转换成map[key=asset,value] eg. 方便业务层获取
+     * @param type
+     * @param recvWindow
+     */
+    fun getBalanceToMap(type: ContractType, recvWindow: Long?): Observable<Map<String, CoinBalanceDto>> {
+        return BaClient.instance.initializer!!.getApiService(type)
+                .getBalance(recvWindow, System.currentTimeMillis())
+                .map(object : Function<ListOrSingle<CoinBalanceDto>, Map<String, CoinBalanceDto>> {
+                    override fun apply(t: ListOrSingle<CoinBalanceDto>): Map<String, CoinBalanceDto> {
+                        val map: MutableMap<String, CoinBalanceDto> = mutableMapOf();
+                        t.forEach {
+                            it.asset?.let { it1 -> map.put(it1, it) };
+                        }
+                        return map;
+                    }
+                });
+    }
+
+    /**
+     * 获取所有账户余额 包含USDT和USD
+     */
+    fun getAllBalanceToMap(recvWindow: Long?): Observable<Map<String, CoinBalanceDto>> {
+        return Observable.zip(
+                getBalanceToMap(ContractType.USDT, null),
+                getBalanceToMap(ContractType.USD, null),
+                object : BiFunction<Map<String, CoinBalanceDto>, Map<String, CoinBalanceDto>, Map<String, CoinBalanceDto>> {
+                    override fun apply(t1: Map<String, CoinBalanceDto>, t2: Map<String, CoinBalanceDto>): Map<String, CoinBalanceDto> {
+                        val map: MutableMap<String, CoinBalanceDto> = mutableMapOf();
+                        map.putAll(t1);
+                        map.putAll(t2);
+                        return map;
+                    }
+                })
+    }
+
 }

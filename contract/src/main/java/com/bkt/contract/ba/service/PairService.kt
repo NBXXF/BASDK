@@ -182,7 +182,7 @@ interface PairService : ExportService {
     /**
      * 获取交易对配置 有内存缓存加速 快
      */
-    fun getPairConfig(): Map<String, PairConfigDto> {
+    fun getPairConfigs(): Map<String, PairConfigDto> {
         try {
             return PairDbService.getPairConfig().blockingFirst();
         } catch (e: Throwable) {
@@ -196,9 +196,9 @@ interface PairService : ExportService {
      */
     @CheckReturnValue
     @Nullable
-    fun getPairConfig(symbol: String): PairConfigDto? {
+    fun getPairConfigs(symbol: String): PairConfigDto? {
         try {
-            return getPairConfig().get(symbol);
+            return getPairConfigs().get(symbol);
         } catch (e: Throwable) {
             e.printStackTrace();
         }

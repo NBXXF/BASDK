@@ -235,4 +235,12 @@ interface ContractProxyApiService {
                            @Query("recvWindow") recvWindow: Long?,
                            @Query("timestamp") timestamp: Long)
             : Observable<ListOrSingle<LeverageBracketDto>>;
+
+    /**
+     * 账户余额 (USER_DATA)
+     * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#user_data-6
+     */
+    @GET("v1/balance")
+    fun getBalance(@Query("recvWindow") recvWindow: Long?,
+                   @Query("timestamp") timestamp: Long):Observable<ListOrSingle<CoinBalanceDto>>;
 }

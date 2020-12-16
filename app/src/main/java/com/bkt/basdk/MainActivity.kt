@@ -12,7 +12,9 @@ import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.service.*
 import com.xxf.arch.XXF
 import io.reactivex.Observable
+import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Function
 import io.reactivex.subjects.BehaviorSubject
 import retrofit2.CacheType
 import java.util.concurrent.TimeUnit
@@ -28,12 +30,12 @@ class MainActivity : AppCompatActivity() {
             XXF.getLogger().d("================>s:" + str)
             val s2: Boolean = true;
             XXF.getLogger().d("================>s:" + s2.toString())
-      /*      BaClient.instance.getService(PairService::class.java).getPairs()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .`as`(XXF.bindLifecycle(this))
-                    .subscribe {
-                        XXF.getLogger().d("============>getPairs.......");
-                    }*/
+            /*      BaClient.instance.getService(PairService::class.java).getPairs()
+                          .observeOn(AndroidSchedulers.mainThread())
+                          .`as`(XXF.bindLifecycle(this))
+                          .subscribe {
+                              XXF.getLogger().d("============>getPairs.......");
+                          }*/
             /*   BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT", CacheType.firstCache, TimeUnit.MINUTES.toMillis(5))
                        .doOnError {
                            XXF.getLogger().d("============>depth err:" + it);
@@ -62,10 +64,16 @@ class MainActivity : AppCompatActivity() {
                            XXF.getLogger().d("============>IndexPrice:" + it);
                        }*/
 
-            BaClient.instance.getService(UserService::class.java).getLeverageBrackets(ContractType.USDT)
+            /*   BaClient.instance.getService(UserService::class.java).getLeverageBrackets(ContractType.USDT)
+                       .`as`(XXF.bindLifecycle(this))
+                       .subscribe {
+                           XXF.getLogger().d("============>LeverageBrackets:" + it);
+                       }*/
+
+            BaClient.instance.getService(CommonService::class.java).getAdlQuantileByType(ContractType.USDT, null)
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
-                        XXF.getLogger().d("============>LeverageBrackets:" + it);
+                        XXF.getLogger().d("============>getAdlQuantileByType:" + it);
                     }
 
         }
@@ -146,11 +154,19 @@ class MainActivity : AppCompatActivity() {
                           .subscribe();*/
 
 
-        BehaviorSubject.create<Long>().switchIfEmpty(Observable.just(1))
-                .`as`(XXF.bindLifecycle(this))
+        /*      BehaviorSubject.create<Long>().switchIfEmpty(Observable.just(1))
+                      .`as`(XXF.bindLifecycle(this))
+                      .subscribe {
+                          XXF.getLogger().d("==============>yes:" + it);
+                      }*/
+
+        BaClient.instance.getService(CommonService::class.java)
+                .subAdlQuantileByType(ContractType.USDT, null)
+                .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                 .subscribe {
-                    XXF.getLogger().d("==============>yes:" + it);
+                    XXF.getLogger().d("==============>subAdlQuantileByType:" + it);
                 }
+
     }
 
 

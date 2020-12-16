@@ -280,4 +280,14 @@ interface ContractProxyApiService {
             @Field("recvWindow") recvWindow: Long?,
             @Field("timestamp") timestamp: Long
     ): Observable<PositionMarginResultDto>;
+
+    /**
+     * https://binance-docs.github.io/apidocs/testnet/cn/#user_data-8
+     * 持仓ADL队列估算
+     */
+    @GET("v1/adlQuantile")
+    fun getAdlQuantile(@Query("symbol") symbol: String?,
+                       @Query("recvWindow") recvWindow: Long?,
+                       @Query("timestamp") timestamp: Long)
+            : Observable<ListOrSingle<AdlQuantileDto>>;
 }

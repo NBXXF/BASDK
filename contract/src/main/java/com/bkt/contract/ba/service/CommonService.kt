@@ -1,7 +1,8 @@
 package com.bkt.contract.ba.service
 
-import com.bkt.contract.ba.model.dto.LeverageBracketDto
-import com.bkt.contract.ba.model.dto.PositionRiskDto
+import com.bkt.contract.ba.common.AdlQuantileListToMapFunction
+import com.bkt.contract.ba.enums.ContractType
+import com.bkt.contract.ba.model.dto.AdlQuantileDto
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
 import com.xxf.arch.json.datastructure.ListOrSingle
@@ -12,6 +13,7 @@ import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
 import java.math.BigDecimal
+import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
 /**
@@ -72,6 +74,62 @@ interface CommonService : ExportService {
         return symbol;
     }
 
+    /**
+     * 持仓ADL队列估算
+     */
+    fun getAdlQuantile(symbol: String,
+                       recvWindow: Long?)
+            : Observable<LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>> {
+        return BaClient.instance.getApiService(symbol)
+                .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<AdlQuantileDto>>> {
+                    override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<AdlQuantileDto>> {
+                        return t.getAdlQuantile(symbol, recvWindow, System.currentTimeMillis());
+                    }
+                }).map(AdlQuantileListToMapFunction());
+    }
 
+    /**
+     * 按类型获取持仓ADL队列估算
+     */
+    fun getAdlQuantileByType(type: ContractType, recvWindow: Long?)
+            : Observable<LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>> {
+        return BaClient.instance.initializer?.getApiService(type)!!
+                .getAdlQuantile(null, recvWindow, System.currentTimeMillis())
+                .map(AdlQuantileListToMapFunction());
+    }
+
+    /**
+     * 订阅持仓ADL队列估算
+     */
+    fun subAdlQuantile(symbol: String,
+                       recvWindow: Long?): Observable<LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>> {
+        /**
+         * 每30秒更新数据
+         */
+        return Observable.interval(1, 30 + 1, TimeUnit.SECONDS)
+                .flatMap(object : Function<Long, ObservableSource<LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>>> {
+                    override fun apply(t: Long): ObservableSource<LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>> {
+                        return getAdlQuantile(symbol, recvWindow)
+                                .onErrorResumeNext(Observable.empty());
+                    }
+                });
+    }
+
+    /**
+     * 按类型订阅持仓ADL队列估算
+     */
+    fun subAdlQuantileByType(type: ContractType,
+                             recvWindow: Long?): Observable<LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>> {
+        /**
+         * 每30秒更新数据
+         */
+        return Observable.interval(1, 30 + 1, TimeUnit.SECONDS)
+                .flatMap(object : Function<Long, ObservableSource<LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>>> {
+                    override fun apply(t: Long): ObservableSource<LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>> {
+                        return getAdlQuantileByType(type, recvWindow)
+                                .onErrorResumeNext(Observable.empty());
+                    }
+                });
+    }
 
 }

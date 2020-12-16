@@ -131,13 +131,23 @@ open class PositionRiskDto : PairConfigProviderModel {
     var maintenanceMarginRate: NumberFormatObject? = null;
 
 
+    /**
+     * 持仓adl队列 自动加/减仓进度
+     * 本地字段 http接口并没有,通过v1/adlQuantile 组装了
+     *
+     * 如果想及时更新 请订阅
+     * BaClient.instance.getService(CommonService::class.java).subAdlQuantileXXX()
+     */
+    @Expose(serialize = false, deserialize = false)
+    var adlQuantile: AdlQuantileDto.AdlQuantileItem? = null;
+
+
     override fun provideSymbol(): String? {
         return symbol;
     }
 
-
     override fun toString(): String {
-        return "PositionRiskDto(entryPrice=$entryPrice, marginType=$marginType, isAutoAddMargin=$isAutoAddMargin, isolatedMargin=$isolatedMargin, leverage=$leverage, liquidationPrice=$liquidationPrice, markPrice=$markPrice, maxNotionalValue=$maxNotionalValue, positionAmt=$positionAmt, symbol=$symbol, unRealizedProfit=$unRealizedProfit, positionSide=$positionSide, earningRate=$earningRate, marginRate=$marginRate, maintenanceMarginRate=$maintenanceMarginRate)"
+        return "PositionRiskDto(entryPrice=$entryPrice, marginType=$marginType, isAutoAddMargin=$isAutoAddMargin, isolatedMargin=$isolatedMargin, leverage=$leverage, liquidationPrice=$liquidationPrice, markPrice=$markPrice, maxNotionalValue=$maxNotionalValue, positionAmt=$positionAmt, symbol=$symbol, unRealizedProfit=$unRealizedProfit, positionSide=$positionSide, earningRate=$earningRate, marginRate=$marginRate, maintenanceMarginRate=$maintenanceMarginRate, adlQuantile=$adlQuantile)"
     }
 
 

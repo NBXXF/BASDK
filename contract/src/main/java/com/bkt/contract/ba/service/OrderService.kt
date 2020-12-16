@@ -141,9 +141,10 @@ interface OrderService : ExportService {
         return Observable.zip(
                 UserService.INSTANCE.getLeverageBrackets(type),
                 UserService.INSTANCE.getAllBalanceToMap(null),
+                CommonService.INSTANCE.getAdlQuantileByType(type, recvWindow),
                 BaClient.instance.initializer?.getApiService(type)!!.getPositionRisk(symbol, recvWindow, System.currentTimeMillis()),
-                object : Function3<Map<String, List<LeverageBracketDto.BracketsBean>>, Map<String, CoinBalanceDto>, ListOrSingle<PositionRiskDto>, ListOrSingle<PositionRiskDto>> {
-                    override fun apply(leverageMap: Map<String, List<LeverageBracketDto.BracketsBean>>, balances: Map<String, CoinBalanceDto>, positionRisks: ListOrSingle<PositionRiskDto>): ListOrSingle<PositionRiskDto> {
+                object : io.reactivex.functions.Function4<Map<String, List<LeverageBracketDto.BracketsBean>>, Map<String, CoinBalanceDto>, LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, ListOrSingle<PositionRiskDto>, ListOrSingle<PositionRiskDto>> {
+                    override fun apply(leverageMap: Map<String, List<LeverageBracketDto.BracketsBean>>, balances: Map<String, CoinBalanceDto>, adlQuantiles: LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, positionRisks: ListOrSingle<PositionRiskDto>): ListOrSingle<PositionRiskDto> {
                         /**
                          * 持倉接口並未返回
                          * 需要赋值这三个字段

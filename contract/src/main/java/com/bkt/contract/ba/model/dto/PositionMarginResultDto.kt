@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.model.dto
 
+import com.bkt.contract.ba.enums.PositionMarginType
 import java.math.BigDecimal
 
 /**
@@ -8,5 +9,9 @@ import java.math.BigDecimal
  * @CreateDate: 2020/12/16 16:23
  */
 class PositionMarginResultDto : BaResultDto() {
-    val amount:BigDecimal?=null;
+    val amount: BigDecimal? = null;
+    val type: PositionMarginType? = null;
+    override fun toString(): String {
+        return "PositionMarginResultDto(amount=$amount, type=$type)" + super.toString();
+    }
 }

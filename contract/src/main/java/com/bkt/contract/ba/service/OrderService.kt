@@ -285,4 +285,29 @@ interface OrderService : ExportService {
         return BaClient.instance.initializer?.getApiService(type)!!
                 .getUserIncome(null, if (incomeType == null) null else incomeType.value, startTime, endTime, limit, recvWindow, System.currentTimeMillis());
     }
+
+
+    /**
+     * 针对交易对 撤销全部订单
+     */
+    fun cancelAllOrder(symbol: String, recvWindow: Long?): Observable<ListOrSingle<OrderInfoDto>> {
+        return BaClient.instance.getApiService(symbol)
+                .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<OrderInfoDto>>> {
+                    override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<OrderInfoDto>> {
+                        return t.cancelAllOrder(symbol,recvWindow,System.currentTimeMillis());
+                    }
+                });
+    }
+
+    /**
+     * 针对交易对 撤销一个单
+     */
+    fun cancelOrder(symbol: String, orderId: String?, origClientOrderId: String?, recvWindow: Long?): Observable<BaResultDto> {
+        return BaClient.instance.getApiService(symbol)
+                .flatMap(object : Function<ContractProxyApiService, ObservableSource<BaResultDto>> {
+                    override fun apply(t: ContractProxyApiService): ObservableSource<BaResultDto> {
+                        return t.cancelOrder(symbol,orderId,origClientOrderId,recvWindow,System.currentTimeMillis());
+                    }
+                });
+    }
 }

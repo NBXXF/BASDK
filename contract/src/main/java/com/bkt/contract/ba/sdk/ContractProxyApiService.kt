@@ -242,5 +242,26 @@ interface ContractProxyApiService {
      */
     @GET("v1/balance")
     fun getBalance(@Query("recvWindow") recvWindow: Long?,
-                   @Query("timestamp") timestamp: Long):Observable<ListOrSingle<CoinBalanceDto>>;
+                   @Query("timestamp") timestamp: Long): Observable<ListOrSingle<CoinBalanceDto>>;
+
+    /**
+     * 撤销全部订单 (TRADE)
+     * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#trade-6
+     */
+    @DELETE("v1/allOpenOrders")
+    fun cancelAllOrder(@Query("symbol") symbol: String,
+                       @Query("recvWindow") recvWindow: Long?,
+                       @Query("timestamp") timestamp: Long): Observable<ListOrSingle<OrderInfoDto>>;
+
+
+    /**
+     * 撤销全部订单 (TRADE)
+     * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#trade-6
+     */
+    @DELETE("v1/order")
+    fun cancelOrder(@Query("symbol") symbol: String,
+                       @Query("orderId") orderId: String?,
+                       @Query("origClientOrderId") origClientOrderId: String?,
+                       @Query("recvWindow") recvWindow: Long?,
+                       @Query("timestamp") timestamp: Long): Observable<BaResultDto>;
 }

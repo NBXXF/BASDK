@@ -180,7 +180,7 @@ interface PairService : ExportService {
     }
 
     /**
-     * 获取交易对配置 有内存缓存加速
+     * 获取交易对配置 有内存缓存加速 快
      */
     fun getPairConfig(): Map<String, PairConfigDto> {
         try {
@@ -192,7 +192,7 @@ interface PairService : ExportService {
     }
 
     /**
-     * 获取交易对配置信息
+     * 获取交易对配置信息  有内存缓存加速 快
      */
     @CheckReturnValue
     @Nullable

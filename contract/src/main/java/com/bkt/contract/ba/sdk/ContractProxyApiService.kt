@@ -222,4 +222,17 @@ interface ContractProxyApiService {
             @Query("timestamp") timestamp: Long
     ): Observable<ListOrSingle<IncomeDto>>;
 
+
+    /**
+     * 杠杆分层标准
+     *
+     * 注意！！:USDT和USD 不一样 一个传递pair  一个传递 symbol
+     * 如果symbol 和pair都不传 那么就是所有的
+     */
+    @GET("v1/leverageBracket")
+    fun getLeverageBracket(@Query("symbol") symbol: String?,
+                           @Query("pair") pair: String?,
+                           @Query("recvWindow") recvWindow: Long?,
+                           @Query("timestamp") timestamp: Long)
+            : Observable<ListOrSingle<LeverageBracketDto>>;
 }

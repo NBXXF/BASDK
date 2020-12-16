@@ -13,7 +13,7 @@ import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_HH_c_m
  * @Author: XGod
  * @CreateDate: 2020/12/14 14:27
  */
-class OrderInfoDto {
+open class OrderInfoDto {
     /**
      * {
      * "avgPrice": "0.0",              // 平均成交价

@@ -10,7 +10,7 @@ import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapt
  * @Author: XGod
  * @CreateDate: 2020/12/15 15:25
  */
-class IncomeDto {
+open class IncomeDto {
     /**
      * v1/income (HMAC SHA256)
      *  {

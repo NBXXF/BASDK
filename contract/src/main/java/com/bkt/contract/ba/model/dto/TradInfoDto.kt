@@ -13,7 +13,7 @@ import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_HH_c_m
  * @Author: XGod
  * @CreateDate: 2020/12/15 13:59
  */
-class TradInfoDto {
+open class TradInfoDto {
     /**
      * v1/userTrades (HMAC SHA256)
      * {

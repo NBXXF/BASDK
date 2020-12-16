@@ -11,7 +11,7 @@ import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapt
  * @Author: XGod
  * @CreateDate: 2020/12/15 13:36
  */
-class PositionRiskDto {
+open class PositionRiskDto {
     /**
      *   {
     "entryPrice": "0.00000", // 开仓均价
@@ -96,8 +96,36 @@ class PositionRiskDto {
     var positionSide: PositionDirection? = null
 
 
+    /**
+     * TODO
+     * 收益率
+     * unRealizedProfit/isolatedMargin *100
+     * 本地字段
+     */
+    var earningRate: NumberFormatObject? = null
+
+
+    /**
+     * TODO
+     * 保证金率
+     * 逐仓仓位维持保证金/（逐仓模式下钱包余额+未实现盈亏）
+     * isolatedMargin/(逐仓模式下钱包余额+unRealizedProfit)
+     *
+     * https://docs.qq.com/doc/DV1NzZWVCZXdQbW1Q
+     */
+    var marginRate: NumberFormatObject? = null;
+
+
+    /**
+     * TODO
+     * 维持保证金率
+     * 需要掉这个接口 获取 /dapi/v1/leverageBracket
+     */
+    var maintenanceMarginRate: NumberFormatObject? = null;
+
+
     override fun toString(): String {
-        return "PositionRiskDto(entryPrice=$entryPrice, marginType=$marginType, isAutoAddMargin=$isAutoAddMargin, isolatedMargin=$isolatedMargin, leverage=$leverage, liquidationPrice=$liquidationPrice, markPrice=$markPrice, maxNotionalValue=$maxNotionalValue, positionAmt=$positionAmt, symbol=$symbol, unRealizedProfit=$unRealizedProfit, positionSide=$positionSide)"
+        return "PositionRiskDto(entryPrice=$entryPrice, marginType=$marginType, isAutoAddMargin=$isAutoAddMargin, isolatedMargin=$isolatedMargin, leverage=$leverage, liquidationPrice=$liquidationPrice, markPrice=$markPrice, maxNotionalValue=$maxNotionalValue, positionAmt=$positionAmt, symbol=$symbol, unRealizedProfit=$unRealizedProfit, positionSide=$positionSide, earningRate=$earningRate, marginRate=$marginRate, maintenanceMarginRate=$maintenanceMarginRate)"
     }
 
 

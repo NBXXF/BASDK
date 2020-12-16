@@ -2,6 +2,7 @@ package com.bkt.contract.ba.model.dto
 
 import com.bkt.contract.ba.enums.MarginType
 import com.bkt.contract.ba.enums.PositionDirection
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.JsonAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
@@ -97,30 +98,35 @@ open class PositionRiskDto {
 
 
     /**
-     * TODO
+     * 本地字段,接口没有
+     *
      * 收益率
      * unRealizedProfit/isolatedMargin *100
-     * 本地字段
      */
+    @Expose(serialize = false, deserialize = false)
     var earningRate: NumberFormatObject? = null
 
 
     /**
-     * TODO
+     * 本地字段,接口没有
+     *
      * 保证金率
      * 逐仓仓位维持保证金/（逐仓模式下钱包余额+未实现盈亏）
      * isolatedMargin/(逐仓模式下钱包余额+unRealizedProfit)
      *
      * https://docs.qq.com/doc/DV1NzZWVCZXdQbW1Q
      */
+    @Expose(serialize = false, deserialize = false)
     var marginRate: NumberFormatObject? = null;
 
 
     /**
-     * TODO
+     * 本地字段,接口没有
+     *
      * 维持保证金率
-     * 需要掉这个接口 获取 /dapi/v1/leverageBracket
+     * 需要调这个接口 获取 /dapi/v1/leverageBracket
      */
+    @Expose(serialize = false, deserialize = false)
     var maintenanceMarginRate: NumberFormatObject? = null;
 
 

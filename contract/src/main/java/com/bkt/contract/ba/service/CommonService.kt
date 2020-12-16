@@ -1,8 +1,16 @@
 package com.bkt.contract.ba.service
 
+import com.bkt.contract.ba.model.dto.LeverageBracketDto
+import com.bkt.contract.ba.model.dto.PositionRiskDto
+import com.bkt.contract.ba.sdk.BaClient
+import com.bkt.contract.ba.sdk.ContractProxyApiService
+import com.xxf.arch.json.datastructure.ListOrSingle
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_Signed_FormatTypeAdapter
 import com.xxf.arch.utils.NumberUtils
+import io.reactivex.Observable
+import io.reactivex.ObservableSource
+import io.reactivex.functions.Function
 import java.math.BigDecimal
 import kotlin.math.max
 
@@ -49,4 +57,21 @@ interface CommonService : ExportService {
         val riseFallRange = getRiseFallRange(closePrice, openPrice);
         return NumberFormatObject(riseFallRange, Number_percent_auto_2_2_DOWN_Signed_FormatTypeAdapter().format(riseFallRange));
     }
+
+    /**
+     * symbol 转pair
+     */
+    fun convertPair(symbol: String?): String? {
+        if (symbol != null) {
+            if (symbol.contains("-")) {
+                return symbol.split("-").get(0);
+            } else if (symbol.contains("/")) {
+                return symbol.split("/").get(0);
+            }
+        }
+        return symbol;
+    }
+
+
+
 }

@@ -69,6 +69,9 @@ class BaClient private constructor() {
         if (clazz == OrderService::class.java) {
             return OrderService.INSTANCE as T;
         }
+        if (clazz == UserService::class.java) {
+            return UserService.INSTANCE as T;
+        }
         return PairService.INSTANCE as T;
     }
 

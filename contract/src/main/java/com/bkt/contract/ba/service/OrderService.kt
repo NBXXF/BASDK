@@ -10,8 +10,11 @@ import com.bkt.contract.ba.sdk.ContractProxyApiService
 import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.json.MapTypeToken
 import com.xxf.arch.json.datastructure.ListOrSingle
+import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
+import com.xxf.arch.utils.NumberUtils
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
+import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -121,7 +124,26 @@ interface OrderService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<PositionRiskDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<PositionRiskDto>> {
-                        return t.getPositionRisk(symbol, recvWindow, timestamp);
+                        return Observable.zip(t.getPositionRisk(symbol, recvWindow, timestamp),
+                                UserService.INSTANCE.getLeverageBrackets(symbol),
+                                object : BiFunction<ListOrSingle<PositionRiskDto>, List<LeverageBracketDto.BracketsBean>, ListOrSingle<PositionRiskDto>> {
+                                    override fun apply(t1: ListOrSingle<PositionRiskDto>, t2: List<LeverageBracketDto.BracketsBean>): ListOrSingle<PositionRiskDto> {
+                                        /**
+                                         * 持倉接口並未返回
+                                         * 需要赋值这三个字段
+                                        var earningRate: NumberFormatObject? = null
+                                        var marginRate: NumberFormatObject? = null;
+                                        var maintenanceMarginRate: NumberFormatObject? = null;
+                                         */
+                                        t1.forEach {
+                                            val earningRateDecimal = NumberUtils.divide(it.unRealizedProfit?.origin, it.isolatedMargin?.origin, Math.max(it.unRealizedProfit?.origin!!.scale(), it.isolatedMargin?.origin!!.scale()));
+                                            it.earningRate = NumberFormatObject(earningRateDecimal, NumberUtils.formatRoundDown(earningRateDecimal, 2, 2));
+
+                                            it.maintenanceMarginRate = t2.getBracket(it.leverage)?.maintMarginRatio;
+                                        }
+                                        return t1;
+                                    }
+                                });
                     }
                 });
     }
@@ -131,9 +153,46 @@ interface OrderService : ExportService {
      * 按类型获取
      */
     fun getPositionRisk(type: ContractType,
-                        recvWindow: Long?,
-                        timestamp: Long): Observable<ListOrSingle<PositionRiskDto>> {
-        return BaClient.instance.initializer?.getApiService(type)!!.getPositionRisk(null, recvWindow, timestamp);
+                        recvWindow: Long?): Observable<ListOrSingle<PositionRiskDto>> {
+        return Observable.zip(
+                UserService.INSTANCE.getLeverageBrackets(type),
+                BaClient.instance.initializer?.getApiService(type)!!.getPositionRisk(null, recvWindow, System.currentTimeMillis()), object : BiFunction<Map<String, List<LeverageBracketDto.BracketsBean>>, ListOrSingle<PositionRiskDto>, ListOrSingle<PositionRiskDto>> {
+            override fun apply(t1: Map<String, List<LeverageBracketDto.BracketsBean>>, t2: ListOrSingle<PositionRiskDto>): ListOrSingle<PositionRiskDto> {
+                /**
+                 * 持倉接口並未返回
+                 * 需要赋值这三个字段
+                var earningRate: NumberFormatObject? = null
+                var marginRate: NumberFormatObject? = null;
+                var maintenanceMarginRate: NumberFormatObject? = null;
+                 */
+                t2.forEach {
+                    val earningRateDecimal = NumberUtils.divide(it.unRealizedProfit?.origin, it.isolatedMargin?.origin, Math.max(it.unRealizedProfit?.origin!!.scale(), it.isolatedMargin?.origin!!.scale()));
+                    it.earningRate = NumberFormatObject(earningRateDecimal, NumberUtils.formatRoundDown(earningRateDecimal, 2, 2));
+
+                    val leverageBracket: List<LeverageBracketDto.BracketsBean>? = t1.get(CommonService.INSTANCE.convertPair(it.symbol));
+                    if (leverageBracket != null) {
+                        val bracket = leverageBracket.getBracket(it.leverage);
+                        if (bracket != null) {
+                            it.maintenanceMarginRate = bracket.maintMarginRatio;
+                        }
+                    }
+                }
+                return t2;
+            }
+        });
+    }
+
+    /**
+     * 通过杠杆倍数获取维持保证金率
+     */
+    private fun List<LeverageBracketDto.BracketsBean>.getBracket(leverage: Int): LeverageBracketDto.BracketsBean? {
+        var firstMatch: LeverageBracketDto.BracketsBean? = null;
+        for (item: LeverageBracketDto.BracketsBean in this) {
+            if (leverage <= item.initialLeverage) {
+                firstMatch = item;
+            }
+        }
+        return firstMatch;
     }
 
     /**

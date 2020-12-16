@@ -56,10 +56,16 @@ class MainActivity : AppCompatActivity() {
                           XXF.getLogger().d("============>yes2:" + it);
                       }*/
 
-            BaClient.instance.getService(PriceService::class.java).getPremiumIndex("BTCUSDT", null)
+         /*   BaClient.instance.getService(PriceService::class.java).getPremiumIndex("BTCUSDT", null)
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
                         XXF.getLogger().d("============>IndexPrice:" + it);
+                    }*/
+
+            BaClient.instance.getService(UserService::class.java).getLeverageBrackets(ContractType.USDT)
+                    .`as`(XXF.bindLifecycle(this))
+                    .subscribe {
+                        XXF.getLogger().d("============>LeverageBrackets:" + it);
                     }
 
         }

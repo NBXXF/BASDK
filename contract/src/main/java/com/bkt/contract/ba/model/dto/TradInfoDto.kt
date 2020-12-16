@@ -2,6 +2,7 @@ package com.bkt.contract.ba.model.dto
 
 import com.bkt.contract.ba.enums.PositionDirection
 import com.bkt.contract.ba.enums.Side
+import com.bkt.contract.ba.model.PairConfigProviderModel
 import com.google.gson.annotations.JsonAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.formatobject.TimeFormatObject
@@ -13,7 +14,7 @@ import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_HH_c_m
  * @Author: XGod
  * @CreateDate: 2020/12/15 13:59
  */
-open class TradInfoDto {
+open class TradInfoDto : PairConfigProviderModel {
     /**
      * v1/userTrades (HMAC SHA256)
      * {
@@ -112,5 +113,9 @@ open class TradInfoDto {
      */
     @JsonAdapter(Time_yyyy_s_MM_s_dd_HH_c_mm_c_ss_FormatTypeAdapter::class)
     var time: TimeFormatObject? = null;
+
+    override fun provideSymbol(): String? {
+        return symbol;
+    }
 
 }

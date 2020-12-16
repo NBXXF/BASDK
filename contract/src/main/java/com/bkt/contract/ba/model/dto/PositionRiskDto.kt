@@ -2,6 +2,7 @@ package com.bkt.contract.ba.model.dto
 
 import com.bkt.contract.ba.enums.MarginType
 import com.bkt.contract.ba.enums.PositionDirection
+import com.bkt.contract.ba.model.PairConfigProviderModel
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.JsonAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
@@ -12,7 +13,7 @@ import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapt
  * @Author: XGod
  * @CreateDate: 2020/12/15 13:36
  */
-open class PositionRiskDto {
+open class PositionRiskDto : PairConfigProviderModel {
     /**
      *   {
     "entryPrice": "0.00000", // 开仓均价
@@ -128,6 +129,11 @@ open class PositionRiskDto {
      */
     @Expose(serialize = false, deserialize = false)
     var maintenanceMarginRate: NumberFormatObject? = null;
+
+
+    override fun provideSymbol(): String? {
+        return symbol;
+    }
 
 
     override fun toString(): String {

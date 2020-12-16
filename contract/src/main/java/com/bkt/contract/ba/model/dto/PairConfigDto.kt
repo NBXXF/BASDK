@@ -1,6 +1,7 @@
 package com.bkt.contract.ba.model.dto
 
 import android.text.TextUtils
+import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.enums.OderFilterType
 import com.bkt.contract.ba.enums.OrderType
 import com.bkt.contract.ba.enums.TimeInForce
@@ -115,9 +116,10 @@ class PairConfigDto : Serializable {
     val timeInForce: List<TimeInForce>? = null
 
 
-    override fun toString(): String {
-        return "PairConfigDto(symbol=$symbol,pair=$pair, status=$status, maintMarginPercent=$maintMarginPercent, requiredMarginPercent=$requiredMarginPercent, baseAsset=$baseAsset, quoteAsset=$quoteAsset, marginAsset=$marginAsset, pricePrecision=$pricePrecision, quantityPrecision=$quantityPrecision, baseAssetPrecision=$baseAssetPrecision, quotePrecision=$quotePrecision, underlyingType=$underlyingType, settlePlan=$settlePlan, triggerProtect=$triggerProtect, underlyingSubType=$underlyingSubType, filters=$filters, orderType=$orderType, timeInForce=$timeInForce)"
-    }
+    /**
+     * 本地字段 接口 并没有
+     */
+    var contractType: ContractType? = null;
 
 
     /**
@@ -130,5 +132,9 @@ class PairConfigDto : Serializable {
             e.printStackTrace()
         }
         return null;
+    }
+
+    override fun toString(): String {
+        return "PairConfigDto(symbol=$symbol, status=$status, maintMarginPercent=$maintMarginPercent, requiredMarginPercent=$requiredMarginPercent, baseAsset=$baseAsset, quoteAsset=$quoteAsset, marginAsset=$marginAsset, pricePrecision=$pricePrecision, quantityPrecision=$quantityPrecision, baseAssetPrecision=$baseAssetPrecision, quotePrecision=$quotePrecision, underlyingType=$underlyingType, settlePlan=$settlePlan, triggerProtect=$triggerProtect, underlyingSubType=$underlyingSubType, filters=$filters, orderType=$orderType, timeInForce=$timeInForce, contractType=$contractType)"
     }
 }

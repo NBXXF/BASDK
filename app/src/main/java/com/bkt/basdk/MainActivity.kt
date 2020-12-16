@@ -28,7 +28,12 @@ class MainActivity : AppCompatActivity() {
             XXF.getLogger().d("================>s:" + str)
             val s2: Boolean = true;
             XXF.getLogger().d("================>s:" + s2.toString())
-
+      /*      BaClient.instance.getService(PairService::class.java).getPairs()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .`as`(XXF.bindLifecycle(this))
+                    .subscribe {
+                        XXF.getLogger().d("============>getPairs.......");
+                    }*/
             /*   BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT", CacheType.firstCache, TimeUnit.MINUTES.toMillis(5))
                        .doOnError {
                            XXF.getLogger().d("============>depth err:" + it);
@@ -37,12 +42,7 @@ class MainActivity : AppCompatActivity() {
                        .subscribe {
                            XXF.getLogger().d("============>depth:" + it);
                        }*/
-            /* BaClient.instance.getService(PairService::class.java).getPairs()
-                     .observeOn(AndroidSchedulers.mainThread())
-                     .`as`(XXF.bindLifecycle(this))
-                     .subscribe {
-                         XXF.getLogger().d("============>yes......."+it);
-                     }*/
+
 
             /*      BaClient.instance.getService(KLineService::class.java)
                           .getKLine("BTCUSDT","1w",System.currentTimeMillis()-TimeUnit.DAYS.toMillis(1),System.currentTimeMillis(),500)
@@ -56,11 +56,11 @@ class MainActivity : AppCompatActivity() {
                           XXF.getLogger().d("============>yes2:" + it);
                       }*/
 
-         /*   BaClient.instance.getService(PriceService::class.java).getPremiumIndex("BTCUSDT", null)
-                    .`as`(XXF.bindLifecycle(this))
-                    .subscribe {
-                        XXF.getLogger().d("============>IndexPrice:" + it);
-                    }*/
+            /*   BaClient.instance.getService(PriceService::class.java).getPremiumIndex("BTCUSDT", null)
+                       .`as`(XXF.bindLifecycle(this))
+                       .subscribe {
+                           XXF.getLogger().d("============>IndexPrice:" + it);
+                       }*/
 
             BaClient.instance.getService(UserService::class.java).getLeverageBrackets(ContractType.USDT)
                     .`as`(XXF.bindLifecycle(this))

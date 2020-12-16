@@ -1,11 +1,11 @@
 package com.bkt.contract.ba.model.dto
 
 import com.bkt.contract.ba.enums.*
+import com.bkt.contract.ba.model.PairConfigProviderModel
 import com.google.gson.annotations.JsonAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.formatobject.TimeFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
-import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_hl_MM_hl_dd_FormatTypeAdapter
 import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_HH_c_mm_c_ss_FormatTypeAdapter
 
 /**
@@ -13,7 +13,7 @@ import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_HH_c_m
  * @Author: XGod
  * @CreateDate: 2020/12/14 14:27
  */
-open class OrderInfoDto {
+open class OrderInfoDto : PairConfigProviderModel {
     /**
      * {
      * "avgPrice": "0.0",              // 平均成交价
@@ -180,5 +180,10 @@ open class OrderInfoDto {
      * 是否开启条件单触发保护
      */
     var priceProtect = false
+
+
+    override fun provideSymbol(): String? {
+        return symbol;
+    }
 
 }

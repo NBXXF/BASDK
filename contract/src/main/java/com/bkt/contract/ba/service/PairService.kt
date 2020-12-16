@@ -63,6 +63,7 @@ interface PairService : ExportService {
                                     val pairPosList: MutableList<PairInfoPo> = mutableListOf<PairInfoPo>();
                                     for (value: PairConfigDto in t1.symbols!!) {
                                         val pairInfoPo = PairInfoPo(value.symbol);
+                                        value.contractType = ContractType.USDT;
                                         pairInfoPo.config = value;
                                         pairInfoPo.index = pairPosList.size;
                                         pairInfoPo.contractType = ContractType.USDT.value;
@@ -71,6 +72,7 @@ interface PairService : ExportService {
                                     }
 
                                     for (value: PairConfigDto in t3.symbols!!) {
+                                        value.contractType = ContractType.USD;
                                         val pairInfoPo = PairInfoPo(value.symbol);
                                         pairInfoPo.config = value;
                                         pairInfoPo.index = pairPosList.size;
@@ -196,7 +198,7 @@ interface PairService : ExportService {
      */
     @CheckReturnValue
     @Nullable
-    fun getPairConfigs(symbol: String): PairConfigDto? {
+    fun getPairConfigs(symbol: String?): PairConfigDto? {
         try {
             return getPairConfigs().get(symbol);
         } catch (e: Throwable) {

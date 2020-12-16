@@ -5,7 +5,7 @@ package com.bkt.contract.ba.model.dto
  * @Author: XGod
  * @CreateDate: 2020/12/16 15:49
  */
-class BaResultDto() {
+open class BaResultDto {
     val code: Long? = 0;
     val msg: String? = null;
 

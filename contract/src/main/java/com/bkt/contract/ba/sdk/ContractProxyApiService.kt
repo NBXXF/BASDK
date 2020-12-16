@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.sdk
 
+import com.bkt.contract.ba.enums.PositionMarginType
 import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.po.DepthEventDtoPo
 import com.google.gson.JsonObject
@@ -260,8 +261,23 @@ interface ContractProxyApiService {
      */
     @DELETE("v1/order")
     fun cancelOrder(@Query("symbol") symbol: String,
-                       @Query("orderId") orderId: String?,
-                       @Query("origClientOrderId") origClientOrderId: String?,
-                       @Query("recvWindow") recvWindow: Long?,
-                       @Query("timestamp") timestamp: Long): Observable<BaResultDto>;
+                    @Query("orderId") orderId: String?,
+                    @Query("origClientOrderId") origClientOrderId: String?,
+                    @Query("recvWindow") recvWindow: Long?,
+                    @Query("timestamp") timestamp: Long): Observable<BaResultDto>;
+
+    /**
+     * 调整逐仓保证金
+     *https://binance-docs.github.io/apidocs/delivery_testnet/cn/#trade-11
+     */
+    @POST("v1/positionMargin")
+    @FormUrlEncoded
+    fun changePositionMargin(
+            @Field("symbol") symbol: String,
+            @Field("positionSide") positionSide: String?,
+            @Field("amount") amount: String,
+            @Field("type") type: PositionMarginType,
+            @Field("recvWindow") recvWindow: Long?,
+            @Field("timestamp") timestamp: Long
+    ): Observable<PositionMarginResultDto>;
 }

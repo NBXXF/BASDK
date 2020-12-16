@@ -1,9 +1,6 @@
 package com.bkt.contract.ba.service
 
-import com.bkt.contract.ba.enums.ContractType
-import com.bkt.contract.ba.enums.IncomeType
-import com.bkt.contract.ba.enums.OderStatus
-import com.bkt.contract.ba.enums.OrderType
+import com.bkt.contract.ba.enums.*
 import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
@@ -17,6 +14,7 @@ import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
 import io.reactivex.functions.Function3
+import retrofit2.http.Field
 
 /**
  * @Description: 订单下单service
@@ -294,7 +292,7 @@ interface OrderService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<OrderInfoDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<OrderInfoDto>> {
-                        return t.cancelAllOrder(symbol,recvWindow,System.currentTimeMillis());
+                        return t.cancelAllOrder(symbol, recvWindow, System.currentTimeMillis());
                     }
                 });
     }
@@ -306,7 +304,25 @@ interface OrderService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<BaResultDto>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<BaResultDto> {
-                        return t.cancelOrder(symbol,orderId,origClientOrderId,recvWindow,System.currentTimeMillis());
+                        return t.cancelOrder(symbol, orderId, origClientOrderId, recvWindow, System.currentTimeMillis());
+                    }
+                });
+    }
+
+    /**
+     * 调整保证金
+     */
+    fun changePositionMargin(
+            symbol: String,
+            positionSide: PositionDirection?,
+            amount: String,
+            type: PositionMarginType,
+            recvWindow: Long?
+    ): Observable<PositionMarginResultDto> {
+        return BaClient.instance.getApiService(symbol)
+                .flatMap(object : Function<ContractProxyApiService, ObservableSource<PositionMarginResultDto>> {
+                    override fun apply(t: ContractProxyApiService): ObservableSource<PositionMarginResultDto> {
+                        return t.changePositionMargin(symbol, if (positionSide == null) null else positionSide.value, amount, type, recvWindow, System.currentTimeMillis())
                     }
                 });
     }

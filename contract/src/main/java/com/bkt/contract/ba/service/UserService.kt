@@ -118,6 +118,7 @@ interface UserService : ExportService {
 
     /**
      * 获取所有账户余额 包含USDT和USD
+     * 转换成map[key=asset,value] eg. 方便业务层获取
      */
     fun getAllBalanceToMap(recvWindow: Long?): Observable<Map<String, CoinBalanceDto>> {
         return Observable.zip(

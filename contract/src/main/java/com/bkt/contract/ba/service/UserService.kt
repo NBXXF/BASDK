@@ -4,6 +4,7 @@ import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.dto.ChangeLeverageResDto
 import com.bkt.contract.ba.model.dto.CoinBalanceDto
 import com.bkt.contract.ba.model.dto.LeverageBracketDto
+import com.bkt.contract.ba.model.event.AccountUpdateEvent
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
 import com.xxf.arch.json.datastructure.ListOrSingle
@@ -147,6 +148,15 @@ interface UserService : ExportService {
                         return t.changeLeverage(symbol, leverage, recvWindow, System.currentTimeMillis())
                     }
                 });
+    }
+
+    /**
+     * Balance和Position更新推送
+     * 币安傻屌设计
+     */
+    fun subAccountUpdate(type: ContractType): Observable<AccountUpdateEvent.AccountChangeInfo> {
+        return BaClient.instance.initializer!!.getSocketService(type)
+                .subAccountUpdate();
     }
 
 }

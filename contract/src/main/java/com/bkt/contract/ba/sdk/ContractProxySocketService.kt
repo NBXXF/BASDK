@@ -7,11 +7,8 @@ import com.bkt.contract.ba.common.TickerDtoToPairInfoPoListFunction
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.enums.SocketEvent
 import com.bkt.contract.ba.model.dto.*
+import com.bkt.contract.ba.model.event.*
 import com.bkt.contract.ba.model.po.DepthEventDtoPo
-import com.bkt.contract.ba.model.event.IndexPriceEvent
-import com.bkt.contract.ba.model.event.KLineSEvent
-import com.bkt.contract.ba.model.event.OrderUpdateEvent
-import com.bkt.contract.ba.model.event.SocketRequestBody
 import com.bkt.contract.ba.model.po.PairInfoPo
 import com.bkt.contract.ba.model.po.PairTradePo
 import com.bkt.contract.ba.service.inner.DepthDbService
@@ -190,6 +187,15 @@ abstract class ContractProxySocketService : WsStatusListener {
                 }
     }
 
+    /**
+     * Balance和Position更新推送
+     */
+    fun subAccountUpdate(): Observable<AccountUpdateEvent.AccountChangeInfo> {
+        return bus.ofType(AccountUpdateEvent::class.java)
+                .filter { it.account != null }
+                .map { it.account }
+    }
+
 
     override fun onMessage(text: String?) {
         log("onMessage:$text")
@@ -239,6 +245,10 @@ abstract class ContractProxySocketService : WsStatusListener {
                                         val toBean = JsonUtils.toBeanList(text, OrderUpdateEvent::class.java).get(0);
                                         bus.onNext(toBean);
                                     }
+                                    SocketEvent.ACCOUNT_UPDATE.value -> {
+                                        val toBean = JsonUtils.toBeanList(text, AccountUpdateEvent::class.java).get(0);
+                                        bus.onNext(toBean);
+                                    }
                                     else -> throw  RuntimeException("not support event:" + event);
                                 }
                             }
@@ -274,6 +284,10 @@ abstract class ContractProxySocketService : WsStatusListener {
                                 }
                                 SocketEvent.ORDER_TRADE_UPDATE.value -> {
                                     val toBean = JsonUtils.toBean(text, OrderUpdateEvent::class.java);
+                                    bus.onNext(toBean);
+                                }
+                                SocketEvent.ACCOUNT_UPDATE.value -> {
+                                    val toBean = JsonUtils.toBean(text, AccountUpdateEvent::class.java);
                                     bus.onNext(toBean);
                                 }
                                 else -> throw  RuntimeException("not support event:" + event);

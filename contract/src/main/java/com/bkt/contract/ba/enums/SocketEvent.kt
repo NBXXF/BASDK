@@ -58,5 +58,12 @@ enum class SocketEvent(val value: String) {
      * 当有新订单创建、订单有新成交或者新的状态变化时会推送此类事件
      */
     @SerializedName("ORDER_TRADE_UPDATE")
-    ORDER_TRADE_UPDATE("ORDER_TRADE_UPDATE")
+    ORDER_TRADE_UPDATE("ORDER_TRADE_UPDATE"),
+
+
+    /**
+     * Balance和Position更新推送
+     */
+    @SerializedName("ACCOUNT_UPDATE")
+    ACCOUNT_UPDATE("ACCOUNT_UPDATE")
 }

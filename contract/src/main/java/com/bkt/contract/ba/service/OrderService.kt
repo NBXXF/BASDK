@@ -152,6 +152,7 @@ interface OrderService : ExportService {
                         var earningRate: NumberFormatObject? = null
                         var marginRate: NumberFormatObject? = null;
                         var maintenanceMarginRate: NumberFormatObject? = null;
+                        var adlQuantile: AdlQuantileDto.AdlQuantileItem? = null;
                          */
                         positionRisks.forEach {
                             /**
@@ -181,6 +182,7 @@ interface OrderService : ExportService {
                                 }
                             }
 
+                            it.adlQuantile = adlQuantiles.get(it.symbol);
                         }
                         return positionRisks;
                     }

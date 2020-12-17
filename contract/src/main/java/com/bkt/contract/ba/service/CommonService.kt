@@ -149,6 +149,7 @@ interface CommonService : ExportService {
 
     /**
      * 持仓ADL队列估算
+     * [key=symbol,value]
      */
     fun getAdlQuantile(symbol: String,
                        recvWindow: Long?)
@@ -163,6 +164,7 @@ interface CommonService : ExportService {
 
     /**
      * 按类型获取持仓ADL队列估算
+     * [key=symbol,value]
      */
     fun getAdlQuantileByType(type: ContractType, recvWindow: Long?)
             : Observable<LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>> {
@@ -173,6 +175,7 @@ interface CommonService : ExportService {
 
     /**
      * 订阅持仓ADL队列估算
+     * [key=symbol,value]
      */
     fun subAdlQuantile(symbol: String,
                        recvWindow: Long?): Observable<LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>> {
@@ -190,6 +193,7 @@ interface CommonService : ExportService {
 
     /**
      * 按类型订阅持仓ADL队列估算
+     * [key=symbol,value]
      */
     fun subAdlQuantileByType(type: ContractType,
                              recvWindow: Long?): Observable<LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>> {

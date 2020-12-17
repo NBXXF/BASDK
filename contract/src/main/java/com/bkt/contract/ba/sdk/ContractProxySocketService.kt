@@ -4,14 +4,13 @@ import android.annotation.SuppressLint
 import android.text.TextUtils
 import android.util.Log
 import com.bkt.contract.ba.common.TickerDtoToPairInfoPoListFunction
+import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.enums.SocketEvent
-import com.bkt.contract.ba.model.dto.KLineEventDto
-import com.bkt.contract.ba.model.dto.PremiumIndexPriceDto
+import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.po.DepthEventDtoPo
-import com.bkt.contract.ba.model.dto.TickerEventDto
-import com.bkt.contract.ba.model.dto.TradeEventDto
 import com.bkt.contract.ba.model.event.IndexPriceEvent
 import com.bkt.contract.ba.model.event.KLineSEvent
+import com.bkt.contract.ba.model.event.OrderUpdateEvent
 import com.bkt.contract.ba.model.event.SocketRequestBody
 import com.bkt.contract.ba.model.po.PairInfoPo
 import com.bkt.contract.ba.model.po.PairTradePo
@@ -179,6 +178,18 @@ abstract class ContractProxySocketService : WsStatusListener {
                 }.filter { TextUtils.equals(it.symbol, symbol) };
     }
 
+    /**
+     * 订阅订单变化事件
+     */
+    fun subOrderChange(type: ContractType): Observable<OrderUpdateEvent> {
+        return bus.ofType(OrderUpdateEvent::class.java)
+                .filter {
+                    it.order != null
+                            && it.orderEventType != null
+                            && type == it.order.getPairConfig()?.contractType;
+                }
+    }
+
 
     override fun onMessage(text: String?) {
         log("onMessage:$text")
@@ -224,6 +235,10 @@ abstract class ContractProxySocketService : WsStatusListener {
                                         val toBean = JsonUtils.toBeanList(text, KLineSEvent::class.java).get(0);
                                         bus.onNext(toBean);
                                     }
+                                    SocketEvent.ORDER_TRADE_UPDATE.value -> {
+                                        val toBean = JsonUtils.toBeanList(text, OrderUpdateEvent::class.java).get(0);
+                                        bus.onNext(toBean);
+                                    }
                                     else -> throw  RuntimeException("not support event:" + event);
                                 }
                             }
@@ -255,6 +270,10 @@ abstract class ContractProxySocketService : WsStatusListener {
                                 }
                                 SocketEvent.KLine.value -> {
                                     val toBean = JsonUtils.toBean(text, KLineSEvent::class.java)
+                                    bus.onNext(toBean);
+                                }
+                                SocketEvent.ORDER_TRADE_UPDATE.value -> {
+                                    val toBean = JsonUtils.toBean(text, OrderUpdateEvent::class.java);
                                     bus.onNext(toBean);
                                 }
                                 else -> throw  RuntimeException("not support event:" + event);

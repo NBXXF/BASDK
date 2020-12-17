@@ -2,6 +2,7 @@ package com.bkt.contract.ba.service
 
 import com.bkt.contract.ba.enums.*
 import com.bkt.contract.ba.model.dto.*
+import com.bkt.contract.ba.model.event.OrderUpdateEvent
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
 import com.xxf.arch.json.JsonUtils
@@ -254,8 +255,11 @@ interface OrderService : ExportService {
     /**
      * 订阅订单变化事件
      */
-    fun subOrderChange(type: ContractType) {
-
+    fun subOrderChange(type: ContractType): Observable<OrderUpdateEvent> {
+        return BaClient.instance
+                .initializer!!
+                .getSocketService(type)
+                .subOrderChange(type);
     }
 
     /**

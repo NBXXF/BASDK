@@ -90,6 +90,11 @@ interface CommonService : ExportService {
     fun getServerTime(): Observable<Long> {
         return BaClient.instance.initializer!!.getApiService(ContractType.USDT)
                 .getServerTime()
+                .onErrorResumeNext(object : Function<Throwable, ObservableSource<ServerTimeDto>> {
+                    override fun apply(t: Throwable): ObservableSource<ServerTimeDto> {
+                        return BaClient.instance.initializer!!.getApiService(ContractType.USD).getServerTime();
+                    }
+                })
                 .map { it.serverTime }
     }
 

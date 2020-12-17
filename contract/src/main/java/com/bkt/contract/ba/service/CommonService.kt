@@ -2,17 +2,26 @@ package com.bkt.contract.ba.service
 
 import com.bkt.contract.ba.common.AdlQuantileListToMapFunction
 import com.bkt.contract.ba.enums.ContractType
+import com.bkt.contract.ba.model.CodeDescModel
 import com.bkt.contract.ba.model.dto.AdlQuantileDto
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
+import com.xxf.arch.XXF
+import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.json.datastructure.ListOrSingle
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_Signed_FormatTypeAdapter
 import com.xxf.arch.utils.NumberUtils
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
+import io.reactivex.Scheduler
 import io.reactivex.functions.Function
+import io.reactivex.schedulers.Schedulers
+import org.json.JSONArray
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.math.BigDecimal
+import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
@@ -72,6 +81,43 @@ interface CommonService : ExportService {
             }
         }
         return symbol;
+    }
+
+    private fun getFromAssets(fileName: String?): String? {
+        try {
+            val inputReader = InputStreamReader(XXF.getApplication().resources.assets.open(fileName!!))
+            val bufReader = BufferedReader(inputReader)
+            var line: String? = ""
+            var Result: String? = ""
+            while (bufReader.readLine().also { line = it } != null) Result += line
+            return Result
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    /**
+     * 获取ba 状态码 对应的描述
+     * 为防止后端只给了code msg=null
+     * 为了国际化
+     */
+    fun getHttpCodeDesc(isChinaLocal: Boolean): Observable<Map<Int, String>> {
+        return Observable
+                .fromCallable(object : Callable<String?> {
+                    override fun call(): String? {
+                        return getFromAssets(if (isChinaLocal) "ba_code_list.json" else "ba_code_list.json_en");
+                    }
+                }).map(object : Function<String?, Map<Int, String>> {
+                    override fun apply(t: String): Map<Int, String> {
+                        val toBeanList = JsonUtils.toBeanList(JSONArray(t).toString(), CodeDescModel::class.java);
+                        val map: MutableMap<Int, String> = mutableMapOf();
+                        toBeanList.forEach {
+                            map.put(it.code, it.desc);
+                        }
+                        return map;
+                    }
+                }).subscribeOn(Schedulers.io());
     }
 
     /**

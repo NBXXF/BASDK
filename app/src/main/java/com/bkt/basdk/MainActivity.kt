@@ -5,19 +5,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import com.bkt.contract.ba.enums.ContractType
-import com.bkt.contract.ba.model.po.PairInfoPo
 import com.bkt.contract.ba.sdk.BaClient
-import com.bkt.contract.ba.service.*
+import com.bkt.contract.ba.service.CommonService
 import com.xxf.arch.XXF
-import io.reactivex.Observable
-import io.reactivex.ObservableSource
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Function
-import io.reactivex.subjects.BehaviorSubject
-import retrofit2.CacheType
-import java.util.concurrent.TimeUnit
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.StringReader
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +19,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val view: View = findViewById(R.id.test);
         view.setOnClickListener {
+            CodeDescUtil.test();
+
             val s: Boolean = true;
             var str: String = s.toString();
             XXF.getLogger().d("================>s:" + str)
@@ -74,6 +70,12 @@ class MainActivity : AppCompatActivity() {
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
                         XXF.getLogger().d("============>getAdlQuantileByType:" + it);
+                    }
+
+            BaClient.instance.getService(CommonService::class.java).getHttpCodeDesc(true)
+                    .`as`(XXF.bindLifecycle(this))
+                    .subscribe {
+                        XXF.getLogger().d("=============>httpCode:" + it);
                     }
 
         }
@@ -166,6 +168,7 @@ class MainActivity : AppCompatActivity() {
                 .subscribe {
                     XXF.getLogger().d("==============>subAdlQuantileByType:" + it);
                 }
+
 
     }
 

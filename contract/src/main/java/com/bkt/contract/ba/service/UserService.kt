@@ -1,6 +1,7 @@
 package com.bkt.contract.ba.service
 
 import com.bkt.contract.ba.enums.ContractType
+import com.bkt.contract.ba.model.dto.ChangeLeverageResDto
 import com.bkt.contract.ba.model.dto.CoinBalanceDto
 import com.bkt.contract.ba.model.dto.LeverageBracketDto
 import com.bkt.contract.ba.sdk.BaClient
@@ -11,6 +12,7 @@ import io.reactivex.ObservableSource
 import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function
 import org.jetbrains.annotations.Contract
+import retrofit2.http.Field
 import retrofit2.http.Query
 
 /**
@@ -105,6 +107,21 @@ interface UserService : ExportService {
                         return map;
                     }
                 })
+    }
+
+    /**
+     * 调整杠杆
+     * @param leverage 目标杠杆倍数：1 到 125 整数
+     */
+    fun changeLeverage(symbol: String,
+                       leverage: Int,
+                       recvWindow: Long?): Observable<ChangeLeverageResDto> {
+        return BaClient.instance.getApiService(symbol)
+                .flatMap(object : Function<ContractProxyApiService, ObservableSource<ChangeLeverageResDto>> {
+                    override fun apply(t: ContractProxyApiService): ObservableSource<ChangeLeverageResDto> {
+                        return t.changeLeverage(symbol, leverage, recvWindow, System.currentTimeMillis())
+                    }
+                });
     }
 
 }

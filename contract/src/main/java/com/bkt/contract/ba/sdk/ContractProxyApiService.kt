@@ -290,4 +290,15 @@ interface ContractProxyApiService {
                        @Query("recvWindow") recvWindow: Long?,
                        @Query("timestamp") timestamp: Long)
             : Observable<ListOrSingle<AdlQuantileDto>>;
+
+
+    /**
+     * https://binance-docs.github.io/apidocs/testnet/cn/#trade-9
+     * 调整开仓杠杆 (TRADE)
+     */
+    @POST("v1/leverage")
+    fun changeLeverage(@Field("symbol") symbol: String,
+                       @Field("leverage") leverage: Int,
+                       @Field("recvWindow") recvWindow: Long?,
+                       @Field("timestamp") timestamp: Long): Observable<ChangeLeverageResDto>;
 }

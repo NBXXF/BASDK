@@ -1,0 +1,550 @@
+[
+  {
+    "code": -1000,
+    "desc": "An unknown error occured while processing the request."
+  },
+  {
+    "code": -1001,
+    "desc": "Internal error; unable to process your request. Please try again."
+  },
+  {
+    "code": -1002,
+    "desc": "You are not authorized to execute this request."
+  },
+  {
+    "code": -1003,
+    "desc": "Too many requests queued."
+  },
+  {
+    "code": -1004,
+    "desc": "This IP is already on the white list"
+  },
+  {
+    "code": -1005,
+    "desc": "No such IP has been white listed"
+  },
+  {
+    "code": -1006,
+    "desc": "An unexpected response was received from the message bus. Execution status unknown."
+  },
+  {
+    "code": -1007,
+    "desc": "Timeout waiting for response from backend server. Send status unknown; execution status unknown."
+  },
+  {
+    "code": -1014,
+    "desc": "Unsupported order combination."
+  },
+  {
+    "code": -1015,
+    "desc": "Too many new orders."
+  },
+  {
+    "code": -1016,
+    "desc": "This service is no longer available."
+  },
+  {
+    "code": -1020,
+    "desc": "This operation is not supported."
+  },
+  {
+    "code": -1021,
+    "desc": "Timestamp for this request is outside of the recvWindow."
+  },
+  {
+    "code": -1022,
+    "desc": "Signature for this request is not valid."
+  },
+  {
+    "code": -1023,
+    "desc": "Start time is greater than end time."
+  },
+  {
+    "code": -1100,
+    "desc": "Illegal characters found in a parameter."
+  },
+  {
+    "code": -1103,
+    "desc": "An unknown parameter was sent."
+  },
+  {
+    "code": -1104,
+    "desc": "Not all sent parameters were read."
+  },
+  {
+    "code": -1105,
+    "desc": "A parameter was empty."
+  },
+  {
+    "code": -1106,
+    "desc": "A parameter was sent when not required."
+  },
+  {
+    "code": -1111,
+    "desc": "Precision is over the maximum defined for this asset."
+  },
+  {
+    "code": -1112,
+    "desc": "No orders on book for symbol."
+  },
+  {
+    "code": -1114,
+    "desc": "TimeInForce parameter sent when not required."
+  },
+  {
+    "code": -1115,
+    "desc": "Invalid timeInForce."
+  },
+  {
+    "code": -1116,
+    "desc": "Invalid orderType."
+  },
+  {
+    "code": -1117,
+    "desc": "Invalid side."
+  },
+  {
+    "code": -1118,
+    "desc": "New client order ID was empty."
+  },
+  {
+    "code": -1119,
+    "desc": "Original client order ID was empty."
+  },
+  {
+    "code": -1120,
+    "desc": "Invalid interval."
+  },
+  {
+    "code": -1121,
+    "desc": "Invalid symbol."
+  },
+  {
+    "code": -1125,
+    "desc": "This listenKey does not exist."
+  },
+  {
+    "code": -1127,
+    "desc": "Lookup interval is too big."
+  },
+  {
+    "code": -1128,
+    "desc": "Combination of optional parameters invalid."
+  },
+  {
+    "code": -1130,
+    "desc": "Invalid data sent for a parameter."
+  },
+  {
+    "code": -2010,
+    "desc": "NEW_ORDER_REJECTED"
+  },
+  {
+    "code": -2011,
+    "desc": "CANCEL_REJECTED"
+  },
+  {
+    "code": -2013,
+    "desc": "Order does not exist."
+  },
+  {
+    "code": -2014,
+    "desc": "API-key format invalid."
+  },
+  {
+    "code": -2015,
+    "desc": "Invalid API-key, IP, or permissions for action."
+  },
+  {
+    "code": -2016,
+    "desc": "No trading window could be found for the symbol. Try ticker/24hrs instead."
+  },
+  {
+    "code": -2018,
+    "desc": "Balance is insufficient."
+  },
+  {
+    "code": -2019,
+    "desc": "Margin is insufficient."
+  },
+  {
+    "code": -2020,
+    "desc": "Unable to fill."
+  },
+  {
+    "code": -2021,
+    "desc": "Order would immediately trigger."
+  },
+  {
+    "code": -2022,
+    "desc": "ReduceOnly Order is rejected."
+  },
+  {
+    "code": -2023,
+    "desc": "User in liquidation mode now."
+  },
+  {
+    "code": -2024,
+    "desc": "Position is not sufficient."
+  },
+  {
+    "code": -2025,
+    "desc": "Reach max open order limit."
+  },
+  {
+    "code": -2026,
+    "desc": "This OrderType is not supported when reduceOnly."
+  },
+  {
+    "code": -2027,
+    "desc": "Exceeded the maximum allowable position at current leverage."
+  },
+  {
+    "code": -2028,
+    "desc": "Leverage is smaller than permitted: insufficient margin balance."
+  },
+  {
+    "code": -4000,
+    "desc": "Invalid order status."
+  },
+  {
+    "code": -4001,
+    "desc": "Price less than 0."
+  },
+  {
+    "code": -4002,
+    "desc": "Price greater than max price."
+  },
+  {
+    "code": -4003,
+    "desc": "Quantity less than zero."
+  },
+  {
+    "code": -4004,
+    "desc": "Quantity less than min quantity."
+  },
+  {
+    "code": -4005,
+    "desc": "Quantity greater than max quantity."
+  },
+  {
+    "code": -4006,
+    "desc": "Stop price less than zero."
+  },
+  {
+    "code": -4007,
+    "desc": "Stop price greater than max price."
+  },
+  {
+    "code": -4008,
+    "desc": "Tick size less than zero."
+  },
+  {
+    "code": -4009,
+    "desc": "Max price less than min price."
+  },
+  {
+    "code": -4010,
+    "desc": "Max qty less than min qty."
+  },
+  {
+    "code": -4011,
+    "desc": "Step size less than zero."
+  },
+  {
+    "code": -4012,
+    "desc": "Max num orders less than zero."
+  },
+  {
+    "code": -4013,
+    "desc": "Price less than min price."
+  },
+  {
+    "code": -4014,
+    "desc": "Price not increased by tick size."
+  },
+  {
+    "code": -4015,
+    "desc": "Client order id is not valid."
+  },
+  {
+    "code": -4016,
+    "desc": "Price is higher than mark price multiplier cap."
+  },
+  {
+    "code": -4017,
+    "desc": "Multiplier up less than zero."
+  },
+  {
+    "code": -4018,
+    "desc": "Multiplier down less than zero."
+  },
+  {
+    "code": -4019,
+    "desc": "Composite scale too large."
+  },
+  {
+    "code": -4020,
+    "desc": "Target strategy invalid for orderType '%s',reduceOnly '%b'."
+  },
+  {
+    "code": -4021,
+    "desc": "Invalid depth limit."
+  },
+  {
+    "code": -4022,
+    "desc": "market status sent is not valid."
+  },
+  {
+    "code": -4023,
+    "desc": "Qty not increased by step size."
+  },
+  {
+    "code": -4024,
+    "desc": "Price is lower than mark price multiplier floor."
+  },
+  {
+    "code": -4025,
+    "desc": "Multiplier decimal less than zero."
+  },
+  {
+    "code": -4026,
+    "desc": "Commission invalid."
+  },
+  {
+    "code": -4027,
+    "desc": "Invalid account type."
+  },
+  {
+    "code": -4028,
+    "desc": "Invalid leverage"
+  },
+  {
+    "code": -4029,
+    "desc": "Tick size precision is invalid."
+  },
+  {
+    "code": -4030,
+    "desc": "Step size precision is invalid."
+  },
+  {
+    "code": -4031,
+    "desc": "Invalid parameter working type"
+  },
+  {
+    "code": -4032,
+    "desc": "Exceed maximum cancel order size."
+  },
+  {
+    "code": -4033,
+    "desc": "Insurance account not found."
+  },
+  {
+    "code": -4044,
+    "desc": "Balance Type is invalid."
+  },
+  {
+    "code": -4045,
+    "desc": "Reach max stop order limit."
+  },
+  {
+    "code": -4046,
+    "desc": "No need to change margin type."
+  },
+  {
+    "code": -4047,
+    "desc": "Margin type cannot be changed if there exists open orders."
+  },
+  {
+    "code": -4048,
+    "desc": "Margin type cannot be changed if there exists position."
+  },
+  {
+    "code": -4049,
+    "desc": "Add margin only support for isolated position."
+  },
+  {
+    "code": -4050,
+    "desc": "Cross balance insufficient."
+  },
+  {
+    "code": -4051,
+    "desc": "Isolated balance insufficient."
+  },
+  {
+    "code": -4052,
+    "desc": "No need to change auto add margin."
+  },
+  {
+    "code": -4053,
+    "desc": "Auto add margin only support for isolated position."
+  },
+  {
+    "code": -4054,
+    "desc": "Cannot add position margin: position is 0."
+  },
+  {
+    "code": -4055,
+    "desc": "Amount must be positive."
+  },
+  {
+    "code": -4056,
+    "desc": "Invalid api key type."
+  },
+  {
+    "code": -4057,
+    "desc": "Invalid api public key"
+  },
+  {
+    "code": -4058,
+    "desc": "maxPrice and priceDecimal too large,please check."
+  },
+  {
+    "code": -4059,
+    "desc": "No need to change position side."
+  },
+  {
+    "code": -4060,
+    "desc": "Invalid position side."
+  },
+  {
+    "code": -4061,
+    "desc": "Order's position side does not match user's setting."
+  },
+  {
+    "code": -4062,
+    "desc": "Invalid or improper reduceOnly value."
+  },
+  {
+    "code": -4063,
+    "desc": "Invalid options request type"
+  },
+  {
+    "code": -4064,
+    "desc": "Invalid options time frame"
+  },
+  {
+    "code": -4065,
+    "desc": "Invalid options amount"
+  },
+  {
+    "code": -4066,
+    "desc": "Invalid options event type"
+  },
+  {
+    "code": -4067,
+    "desc": "Position side cannot be changed if there exists open orders."
+  },
+  {
+    "code": -4068,
+    "desc": "Position side cannot be changed if there exists position."
+  },
+  {
+    "code": -4069,
+    "desc": "Invalid options premium fee"
+  },
+  {
+    "code": -4070,
+    "desc": "Client options id is not valid."
+  },
+  {
+    "code": -4071,
+    "desc": "Invalid options direction"
+  },
+  {
+    "code": -4072,
+    "desc": "premium fee is not updated, reject order"
+  },
+  {
+    "code": -4073,
+    "desc": "input premium fee is less than 0, reject order"
+  },
+  {
+    "code": -4074,
+    "desc": "Order amount is bigger than upper boundary or less than 0, reject order"
+  },
+  {
+    "code": -4075,
+    "desc": "output premium fee is less than 0, reject order"
+  },
+  {
+    "code": -4076,
+    "desc": "original fee is too much higher than last fee"
+  },
+  {
+    "code": -4077,
+    "desc": "place order amount has reached to limit, reject order"
+  },
+  {
+    "code": -4078,
+    "desc": "options internal error"
+  },
+  {
+    "code": -4079,
+    "desc": "invalid options id"
+  },
+  {
+    "code": -4080,
+    "desc": "user not found"
+  },
+  {
+    "code": -4081,
+    "desc": "options not found"
+  },
+  {
+    "code": -4082,
+    "desc": "Invalid number of batch place orders."
+  },
+  {
+    "code": -4083,
+    "desc": "Fail to place batch orders."
+  },
+  {
+    "code": -4084,
+    "desc": "Method is not allowed currently. Upcoming soon."
+  },
+  {
+    "code": -4085,
+    "desc": "Invalid notional limit coefficient"
+  },
+  {
+    "code": -4086,
+    "desc": "Invalid price spread threshold"
+  },
+  {
+    "code": -4087,
+    "desc": "User can only place reduce only order"
+  },
+  {
+    "code": -4088,
+    "desc": "User can not place order currently"
+  },
+  {
+    "code": -4104,
+    "desc": "Invalid contract type"
+  },
+  {
+    "code": -4114,
+    "desc": "clientTranId is not valid"
+  },
+  {
+    "code": -4115,
+    "desc": "clientTranId is duplicated"
+  },
+  {
+    "code": -4118,
+    "desc": "ReduceOnly Order Failed. Please check your existing position and open orders"
+  },
+  {
+    "code": -4131,
+    "desc": "The counterparty's best price does not meet the PERCENT_PRICE filter limit"
+  },
+  {
+    "code": -4135,
+    "desc": "Invalid activation price"
+  },
+  {
+    "code": -4141,
+    "desc": "Symbol is closed"
+  }
+]

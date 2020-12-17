@@ -93,6 +93,17 @@ interface CommonService : ExportService {
                 .map { it.serverTime }
     }
 
+    /**
+     * 获取所有合约乘数[symbol:合约乘数]
+     */
+    fun getContractMultipliers(): Map<String, Int> {
+        return PairService.INSTANCE.getPairConfigs()
+                .mapValues {
+                    it.value.contractSize;
+                }
+    }
+
+
     private fun getFromAssets(fileName: String?): String? {
         try {
             val inputReader = InputStreamReader(XXF.getApplication().resources.assets.open(fileName!!))

@@ -123,6 +123,12 @@ class PairConfigDto : Serializable {
 
 
     /**
+     * 合约乘数 只有 币本位合约USD有
+     */
+    val contractSize: Int = 0;
+
+
+    /**
      * 获取下单配置
      */
     fun getFilter(filterType: OderFilterType): OderFilterDto? {
@@ -135,6 +141,8 @@ class PairConfigDto : Serializable {
     }
 
     override fun toString(): String {
-        return "PairConfigDto(symbol=$symbol, status=$status, maintMarginPercent=$maintMarginPercent, requiredMarginPercent=$requiredMarginPercent, baseAsset=$baseAsset, quoteAsset=$quoteAsset, marginAsset=$marginAsset, pricePrecision=$pricePrecision, quantityPrecision=$quantityPrecision, baseAssetPrecision=$baseAssetPrecision, quotePrecision=$quotePrecision, underlyingType=$underlyingType, settlePlan=$settlePlan, triggerProtect=$triggerProtect, underlyingSubType=$underlyingSubType, filters=$filters, orderType=$orderType, timeInForce=$timeInForce, contractType=$contractType)"
+        return "PairConfigDto(symbol=$symbol, status=$status, maintMarginPercent=$maintMarginPercent, requiredMarginPercent=$requiredMarginPercent, baseAsset=$baseAsset, quoteAsset=$quoteAsset, marginAsset=$marginAsset, pricePrecision=$pricePrecision, quantityPrecision=$quantityPrecision, baseAssetPrecision=$baseAssetPrecision, quotePrecision=$quotePrecision, underlyingType=$underlyingType, settlePlan=$settlePlan, triggerProtect=$triggerProtect, underlyingSubType=$underlyingSubType, filters=$filters, orderType=$orderType, timeInForce=$timeInForce, contractType=$contractType, contractSize=$contractSize)"
     }
+
+
 }

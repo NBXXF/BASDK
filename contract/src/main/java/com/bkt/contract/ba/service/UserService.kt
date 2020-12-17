@@ -108,7 +108,7 @@ interface UserService : ExportService {
                 .getBalance(recvWindow, System.currentTimeMillis())
                 .map(object : Function<ListOrSingle<CoinBalanceDto>, Map<String, CoinBalanceDto>> {
                     override fun apply(t: ListOrSingle<CoinBalanceDto>): Map<String, CoinBalanceDto> {
-                        val map: MutableMap<String, CoinBalanceDto> = mutableMapOf();
+                        val map: LinkedHashMap<String, CoinBalanceDto> = LinkedHashMap();
                         t.forEach {
                             it.asset?.let { it1 -> map.put(it1, it) };
                         }
@@ -127,7 +127,7 @@ interface UserService : ExportService {
                 getBalanceToMap(ContractType.USD, recvWindow),
                 object : BiFunction<Map<String, CoinBalanceDto>, Map<String, CoinBalanceDto>, Map<String, CoinBalanceDto>> {
                     override fun apply(t1: Map<String, CoinBalanceDto>, t2: Map<String, CoinBalanceDto>): Map<String, CoinBalanceDto> {
-                        val map: MutableMap<String, CoinBalanceDto> = mutableMapOf();
+                        val map: LinkedHashMap<String, CoinBalanceDto> = LinkedHashMap();
                         map.putAll(t1);
                         map.putAll(t2);
                         return map;

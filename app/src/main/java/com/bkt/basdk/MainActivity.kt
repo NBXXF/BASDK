@@ -10,6 +10,7 @@ import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.service.CommonService
 import com.bkt.contract.ba.service.PairService
 import com.xxf.arch.XXF
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -29,17 +30,19 @@ class MainActivity : AppCompatActivity() {
             val s2: Boolean = true;
             XXF.getLogger().d("================>s:" + s2.toString());
 
-            BaClient.instance.getService(CommonService::class.java).getServerTime()
+            /* BaClient.instance.getService(CommonService::class.java).getServerTime()
+                     .`as`(XXF.bindLifecycle(this))
+                     .subscribe {
+                         XXF.getLogger().d("================>serverTime:" + it);
+                     }*/
+            val contractMultipliers = BaClient.instance.getService(CommonService::class.java).getContractMultipliers();
+            XXF.getLogger().d("============>contractMultipliers:" + contractMultipliers);
+            BaClient.instance.getService(PairService::class.java).getPairs()
+                    .observeOn(AndroidSchedulers.mainThread())
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
-                        XXF.getLogger().d("================>serverTime:" + it);
+                        XXF.getLogger().d("============>getPairs.......");
                     }
-            /*      BaClient.instance.getService(PairService::class.java).getPairs()
-                          .observeOn(AndroidSchedulers.mainThread())
-                          .`as`(XXF.bindLifecycle(this))
-                          .subscribe {
-                              XXF.getLogger().d("============>getPairs.......");
-                          }*/
             /*   BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT", CacheType.firstCache, TimeUnit.MINUTES.toMillis(5))
                        .doOnError {
                            XXF.getLogger().d("============>depth err:" + it);

@@ -95,6 +95,7 @@ interface CommonService : ExportService {
 
     /**
      * 获取所有合约乘数[symbol:合约乘数]
+     * 注意！！ 只有USD 币本位有合约乘数一说  USDT取到的是0
      */
     fun getContractMultipliers(): Map<String, Int> {
         return PairService.INSTANCE.getPairConfigs()

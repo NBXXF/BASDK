@@ -1,10 +1,7 @@
 package com.bkt.contract.ba.model.dto
 
 import android.text.TextUtils
-import com.bkt.contract.ba.enums.ContractType
-import com.bkt.contract.ba.enums.OderFilterType
-import com.bkt.contract.ba.enums.OrderType
-import com.bkt.contract.ba.enums.TimeInForce
+import com.bkt.contract.ba.enums.*
 import java.io.Serializable
 import java.lang.Exception
 
@@ -117,10 +114,14 @@ class PairConfigDto : Serializable {
 
 
     /**
-     * 本地字段 接口 并没有
+     * ba类型
      */
-    var contractType: ContractType? = null;
+    val contractType: BaContractType? = null;
 
+    /**
+     * 按USDT 和USD 进行划分
+     */
+    var contractClassifyType: ContractType? = null;
 
     /**
      * 合约乘数 只有 币本位合约USD有

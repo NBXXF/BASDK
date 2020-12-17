@@ -47,7 +47,7 @@ open class PairInfoPo : Serializable {
 
 
     /**
-     * 合约类型
+     * 合约类型 USDT/USD
      */
     var contractType: String = ContractType.USDT.value;
 

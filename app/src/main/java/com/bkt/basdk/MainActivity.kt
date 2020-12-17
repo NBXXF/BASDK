@@ -8,7 +8,9 @@ import androidx.lifecycle.Lifecycle
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.service.CommonService
+import com.bkt.contract.ba.service.PairService
 import com.xxf.arch.XXF
+import io.reactivex.functions.Consumer
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.StringReader
@@ -25,7 +27,13 @@ class MainActivity : AppCompatActivity() {
             var str: String = s.toString();
             XXF.getLogger().d("================>s:" + str)
             val s2: Boolean = true;
-            XXF.getLogger().d("================>s:" + s2.toString())
+            XXF.getLogger().d("================>s:" + s2.toString());
+
+            BaClient.instance.getService(CommonService::class.java).getServerTime()
+                    .`as`(XXF.bindLifecycle(this))
+                    .subscribe {
+                        XXF.getLogger().d("================>serverTime:" + it);
+                    }
             /*      BaClient.instance.getService(PairService::class.java).getPairs()
                           .observeOn(AndroidSchedulers.mainThread())
                           .`as`(XXF.bindLifecycle(this))
@@ -170,6 +178,24 @@ class MainActivity : AppCompatActivity() {
                 }
 
 
+        Cat(Person()).say();
+    }
+
+
+    interface Animal {
+        fun say();
+    }
+
+    class Person : Animal {
+        override fun say() {
+            System.out.println("==========>is person");
+        }
+    }
+
+    class Cat(p: Animal) : Animal by p {
+        override fun say() {
+            System.out.println("============>is cat")
+        }
     }
 
 

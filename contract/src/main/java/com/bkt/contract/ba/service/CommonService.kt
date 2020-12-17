@@ -4,6 +4,7 @@ import com.bkt.contract.ba.common.AdlQuantileListToMapFunction
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.CodeDescModel
 import com.bkt.contract.ba.model.dto.AdlQuantileDto
+import com.bkt.contract.ba.model.dto.ServerTimeDto
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
 import com.xxf.arch.XXF
@@ -81,6 +82,15 @@ interface CommonService : ExportService {
             }
         }
         return symbol;
+    }
+
+    /**
+     * 获取服务器时间戳
+     */
+    fun getServerTime(): Observable<Long> {
+        return BaClient.instance.initializer!!.getApiService(ContractType.USDT)
+                .getServerTime()
+                .map { it.serverTime }
     }
 
     private fun getFromAssets(fileName: String?): String? {

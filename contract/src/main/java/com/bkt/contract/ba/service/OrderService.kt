@@ -250,6 +250,14 @@ interface OrderService : ExportService {
                 });
     }
 
+
+    /**
+     * 订阅订单变化事件
+     */
+    fun subOrderChange(type: ContractType) {
+
+    }
+
     /**
      * 按交易对获取资金流水
      * @param limit  默认值:100 最大值:1000

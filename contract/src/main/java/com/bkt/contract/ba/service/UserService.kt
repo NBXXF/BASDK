@@ -11,9 +11,6 @@ import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function
-import org.jetbrains.annotations.Contract
-import retrofit2.http.Field
-import retrofit2.http.Query
 
 /**
  * @Description: 用户service
@@ -67,9 +64,36 @@ interface UserService : ExportService {
      * @param type
      * @param recvWindow
      */
-    fun getBalance(type: ContractType, recvWindow: Long?): Observable<ListOrSingle<CoinBalanceDto>> {
+    fun getBalanceByType(type: ContractType, recvWindow: Long?): Observable<ListOrSingle<CoinBalanceDto>> {
         return BaClient.instance.initializer!!.getApiService(type)
                 .getBalance(recvWindow, System.currentTimeMillis());
+    }
+
+    /**
+     * 查询单个币种的余额
+     */
+    fun getBalance(symbol: String, recvWindow: Long?): Observable<CoinBalanceDto> {
+        return PairService.INSTANCE
+                .getPairType(symbol)
+                .flatMap(object : Function<ContractType, ObservableSource<CoinBalanceDto>> {
+                    override fun apply(t: ContractType): ObservableSource<CoinBalanceDto> {
+                        return getBalanceToMap(t, recvWindow)
+                                .flatMap(object : Function<Map<String, CoinBalanceDto>, ObservableSource<CoinBalanceDto>> {
+                                    override fun apply(t: Map<String, CoinBalanceDto>): ObservableSource<CoinBalanceDto> {
+                                        val pairConfig = PairService.INSTANCE.getPairConfig(symbol);
+                                        var balance = t.get(pairConfig?.baseAsset);
+                                        if (balance == null) {
+                                            balance = t.get(pairConfig?.quoteAsset);
+                                        }
+                                        if (balance == null) {
+                                            return Observable.empty();
+                                        } else {
+                                            return Observable.just(balance);
+                                        }
+                                    }
+                                });
+                    }
+                })
     }
 
     /**
@@ -97,8 +121,8 @@ interface UserService : ExportService {
      */
     fun getAllBalanceToMap(recvWindow: Long?): Observable<Map<String, CoinBalanceDto>> {
         return Observable.zip(
-                getBalanceToMap(ContractType.USDT, null),
-                getBalanceToMap(ContractType.USD, null),
+                getBalanceToMap(ContractType.USDT, recvWindow),
+                getBalanceToMap(ContractType.USD, recvWindow),
                 object : BiFunction<Map<String, CoinBalanceDto>, Map<String, CoinBalanceDto>, Map<String, CoinBalanceDto>> {
                     override fun apply(t1: Map<String, CoinBalanceDto>, t2: Map<String, CoinBalanceDto>): Map<String, CoinBalanceDto> {
                         val map: MutableMap<String, CoinBalanceDto> = mutableMapOf();

@@ -22,7 +22,7 @@ interface PairConfigProviderModel {
     @Nullable
     fun getPairConfig(): PairConfigDto? {
         try {
-            return PairService.INSTANCE.getPairConfigs(provideSymbol());
+            return PairService.INSTANCE.getPairConfig(provideSymbol());
         } catch (e: Throwable) {
             e.printStackTrace()
         }

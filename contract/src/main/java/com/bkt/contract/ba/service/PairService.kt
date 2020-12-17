@@ -198,7 +198,7 @@ interface PairService : ExportService {
      */
     @CheckReturnValue
     @Nullable
-    fun getPairConfigs(symbol: String?): PairConfigDto? {
+    fun getPairConfig(symbol: String?): PairConfigDto? {
         try {
             return getPairConfigs().get(symbol);
         } catch (e: Throwable) {

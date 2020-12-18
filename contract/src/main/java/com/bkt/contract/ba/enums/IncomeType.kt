@@ -11,7 +11,7 @@ enum class IncomeType(val value: String) {
 
     /**
      * 公开文档只有这几种
-     * 收益类型 "TRANSFER"，"WELCOME_BONUS", "REALIZED_PNL"，"FUNDING_FEE", "COMMISSION", and "INSURANCE_CLEAR"
+     * 收益类型 "TRANSFER"，"WELCOME_BONUS", "REALIZED_PNL"，"FUNDING_FEE", "COMMISSION", and "INSURANCE_CLEAR" "DELIVERED_SETTELMENT"
      *
      * 而ba前端代码太多种
      * 从前端代码拷贝而来
@@ -35,6 +35,9 @@ enum class IncomeType(val value: String) {
     TRANSFER("TRANSFER"),
 
 
+    /**
+     * TODO 中文意思
+     */
     @SerializedName("WELCOME_BONUS")
     WELCOME_BONUS("WELCOME_BONUS"),
 
@@ -97,5 +100,12 @@ enum class IncomeType(val value: String) {
      * 期权购置手续费
      */
     @SerializedName("OPTIONS_PREMIUM_FEE")
-    OPTIONS_PREMIUM_FEE("OPTIONS_PREMIUM_FEE")
+    OPTIONS_PREMIUM_FEE("OPTIONS_PREMIUM_FEE"),
+
+
+    /**
+     * TODO 中文意思
+     */
+    @SerializedName("DELIVERED_SETTELMENT")
+    DELIVERED_SETTELMENT("DELIVERED_SETTELMENT")
 }

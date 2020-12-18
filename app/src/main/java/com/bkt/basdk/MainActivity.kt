@@ -9,6 +9,7 @@ import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.service.CommonService
 import com.bkt.contract.ba.service.PairService
+import com.bkt.contract.ba.service.PriceService
 import com.xxf.arch.XXF
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
@@ -42,6 +43,13 @@ class MainActivity : AppCompatActivity() {
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
                         XXF.getLogger().d("============>getPairs.......");
+                    }
+
+            BaClient.instance.getService(PriceService::class.java).getTickerPrice(ContractType.USDT)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .`as`(XXF.bindLifecycle(this))
+                    .subscribe {
+                        XXF.getLogger().d("============>tickerPrice:" + it);
                     }
             /*   BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT", CacheType.firstCache, TimeUnit.MINUTES.toMillis(5))
                        .doOnError {

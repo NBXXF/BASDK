@@ -1,15 +1,19 @@
 package com.bkt.contract.ba.service
 
 import com.bkt.contract.ba.enums.ContractType
+import com.bkt.contract.ba.model.dto.AdlQuantileDto
 import com.bkt.contract.ba.model.dto.PremiumIndexPriceDto
+import com.bkt.contract.ba.model.dto.TickerPriceDto
 import com.bkt.contract.ba.model.event.IndexPriceEvent
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
 import com.bkt.contract.ba.sdk.ContractProxySocketService
+import com.xxf.arch.json.datastructure.ListOrSingle
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
 import retrofit2.CacheType
+import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
 /**
@@ -93,4 +97,23 @@ interface PriceService : ExportService {
                 });
     }
 
+    /**
+     * 获取最新价 返回一个
+     */
+    fun getTickerPrice(symbol: String): Observable<ListOrSingle<TickerPriceDto>> {
+        return BaClient.instance.getApiService(symbol, null)
+                .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<TickerPriceDto>>> {
+                    override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<TickerPriceDto>> {
+                        return t.getTickerPrice(symbol);
+                    }
+                });
+    }
+
+    /**
+     * 按类型获取最新价 返回多个
+     */
+    fun getTickerPrice(type: ContractType): Observable<ListOrSingle<TickerPriceDto>> {
+        return BaClient.instance.initializer!!.getApiService(type)
+                .getTickerPrice(null);
+    }
 }

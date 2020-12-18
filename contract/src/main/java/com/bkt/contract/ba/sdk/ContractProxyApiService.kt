@@ -111,6 +111,13 @@ interface ContractProxyApiService {
 
 
     /**
+     * 获取最新价
+     * @param symbol 不发送交易对参数，则会返回所有交易对信息
+     */
+    @GET("v1/ticker/price")
+    fun getTickerPrice(@Query("symbol") symbol: String?): Observable<ListOrSingle<TickerPriceDto>>;
+
+    /**
      * https://binance-docs.github.io/apidocs/testnet/cn/#trade-2
      * 下单
      *

@@ -1,10 +1,12 @@
 package com.bkt.basdk
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
+import com.bkt.basdk.ui.UserActivity
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.service.CommonService
@@ -13,6 +15,7 @@ import com.bkt.contract.ba.service.PriceService
 import com.xxf.arch.XXF
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
+import kotlinx.android.synthetic.main.activity_main.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.StringReader
@@ -22,6 +25,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val view: View = findViewById(R.id.test);
+        userInfoBtn.setOnClickListener {
+            startActivity(Intent(it.context,UserActivity::class.java));
+        }
         view.setOnClickListener {
             CodeDescUtil.test();
 

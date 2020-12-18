@@ -1,4 +1,4 @@
-package com.bkt.basdk.api;
+package com.bkt.basdk.http;
 
 import androidx.annotation.Nullable;
 

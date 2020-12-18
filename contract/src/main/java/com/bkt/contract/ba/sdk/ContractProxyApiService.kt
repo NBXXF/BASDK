@@ -319,8 +319,8 @@ interface ContractProxyApiService {
      * 查询持仓模式
      */
     @GET("v1/positionSide/dual")
-    fun getPositionSideDual(@Field("recvWindow") recvWindow: Long?,
-                            @Field("timestamp") timestamp: Long): Observable<PositionSideDualDto>;
+    fun getPositionSideDual(@Query("recvWindow") recvWindow: Long?,
+                            @Query("timestamp") timestamp: Long): Observable<PositionSideDualDto>;
 
     /**
      * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#trade
@@ -332,4 +332,41 @@ interface ContractProxyApiService {
             @Field("dualSidePosition") dualSidePosition: String,
             @Field("recvWindow") recvWindow: Long?,
             @Field("timestamp") timestamp: Long): Observable<BaResultDto>;
+
+
+    /**
+     * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#websocket-2
+     * 创建一个新的user data stream,返回值为一个listenKey,即websocket订阅的stream名称。如果该帐户具有有效的listenKey,则将返回该listenKey并将其有效期延长60分钟。
+     */
+    @POST("v1/listenKey")
+    fun createListenKey(): Observable<ListenKeyDto>;
+
+    /**
+     * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#listenkey-user_stream
+     *有效期延长至本次调用后60分钟
+     */
+    @PUT("v1/listenKey")
+    fun lengthenListenKey(): Observable<JsonObject>;
+
+
+    /**
+     * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#listenkey-user_stream-2
+     * 关闭listenKey 关闭某账户数据流
+     */
+    @DELETE("v1/listenKey")
+    fun deleteListenKey(): Observable<JsonObject>;
+
+
+    /**
+     * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#user_data-7
+     * 获取用户账户信息
+     * 对于单向持仓模式，"positions"仅会展示"BOTH"方向的持仓
+     * 对于双向持仓模式，"positions"会展示所有"BOTH", "LONG", 和"SHORT"方向的持仓
+     */
+    @GET("v1/account")
+    fun getAccount(
+            @Cache type: CacheType,
+            @Header("cache") cacheTime: Long,
+            @Query("recvWindow") recvWindow: Long?,
+            @Query("timestamp") timestamp: Long): Observable<AccountInfoDto>;
 }

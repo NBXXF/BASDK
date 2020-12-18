@@ -5,12 +5,15 @@ import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.event.AccountUpdateEvent
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
+import com.google.gson.JsonObject
 import com.xxf.arch.json.datastructure.ListOrSingle
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function
-import retrofit2.http.Field
+import retrofit2.CacheType
+import retrofit2.http.*
+import java.util.concurrent.TimeUnit
 
 /**
  * @Description: 用户service
@@ -23,6 +26,30 @@ interface UserService : ExportService {
             object : UserService {
             }
         }
+    }
+
+    /**
+     * 创建一个新的user data stream,返回值为一个listenKey,即websocket订阅的stream名称。如果该帐户具有有效的listenKey,则将返回该listenKey并将其有效期延长60分钟。
+     */
+    fun createListenKey(type: ContractType): Observable<ListenKeyDto> {
+        return BaClient.instance.initializer!!.getApiService(type)
+                .createListenKey();
+    }
+
+    /**
+     * 有效期延长至本次调用后60分钟
+     */
+    fun lengthenListenKey(type: ContractType): Observable<JsonObject> {
+        return BaClient.instance.initializer!!.getApiService(type)
+                .lengthenListenKey()
+    }
+
+    /**
+     * 关闭listenKey 关闭某账户数据流
+     */
+    fun deleteListenKey(type: ContractType): Observable<JsonObject> {
+        return BaClient.instance.initializer!!.getApiService(type)
+                .deleteListenKey();
     }
 
     /**
@@ -147,6 +174,21 @@ interface UserService : ExportService {
                         return t.changeLeverage(symbol, leverage, recvWindow, System.currentTimeMillis())
                     }
                 });
+    }
+
+    /**
+     * 获取账户信息
+     * 对于单向持仓模式，"positions"仅会展示"BOTH"方向的持仓
+     * 对于双向持仓模式，"positions"会展示所有"BOTH", "LONG", 和"SHORT"方向的持仓
+     */
+    fun getAccount(type: ContractType,
+                   recvWindow: Long?,
+                   cacheType: CacheType = CacheType.onlyRemote,
+                   cacheTime: Long = TimeUnit.MINUTES.toMillis(5)
+    ): Observable<AccountInfoDto> {
+        return BaClient.instance
+                .initializer!!.getApiService(type)
+                .getAccount(cacheType, cacheTime, recvWindow, System.currentTimeMillis());
     }
 
     /**

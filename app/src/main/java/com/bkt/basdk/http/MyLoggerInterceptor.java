@@ -1,4 +1,4 @@
-package com.bkt.basdk.api;
+package com.bkt.basdk.http;
 
 import com.xxf.arch.XXF;
 import com.xxf.arch.http.interceptor.HttpExceptionFeedInterceptor;

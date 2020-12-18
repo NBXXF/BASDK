@@ -1,9 +1,7 @@
 package com.bkt.contract.ba.service
 
 import com.bkt.contract.ba.enums.ContractType
-import com.bkt.contract.ba.model.dto.ChangeLeverageResDto
-import com.bkt.contract.ba.model.dto.CoinBalanceDto
-import com.bkt.contract.ba.model.dto.LeverageBracketDto
+import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.event.AccountUpdateEvent
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
@@ -12,6 +10,7 @@ import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function
+import retrofit2.http.Field
 
 /**
  * @Description: 用户service
@@ -157,6 +156,30 @@ interface UserService : ExportService {
     fun subAccountUpdate(type: ContractType): Observable<AccountUpdateEvent.AccountChangeInfo> {
         return BaClient.instance.initializer!!.getSocketService(type)
                 .subAccountUpdate();
+    }
+
+    /**
+     * 获取持仓模式
+     */
+    fun getPositionSideDual(type: ContractType, recvWindow: Long?): Observable<PositionSideDualDto> {
+        return BaClient.instance.initializer!!
+                .getApiService(type)
+                .getPositionSideDual(recvWindow, System.currentTimeMillis());
+    }
+
+
+    /**
+     *更改持仓模式
+     * @param dualSidePosition  "true": 双向持仓模式；"false": 单向持仓模式
+     */
+    fun changePositionSideDual(
+            type: ContractType,
+            dualSidePosition: Boolean,
+            recvWindow: Long?,
+            timestamp: Long): Observable<BaResultDto> {
+        return BaClient.instance.initializer!!
+                .getApiService(type)
+                .changePositionSideDual(dualSidePosition.toString(), recvWindow, System.currentTimeMillis());
     }
 
 }

@@ -313,4 +313,23 @@ interface ContractProxyApiService {
                        @Field("leverage") leverage: Int,
                        @Field("recvWindow") recvWindow: Long?,
                        @Field("timestamp") timestamp: Long): Observable<ChangeLeverageResDto>;
+
+    /**
+     * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#user_data
+     * 查询持仓模式
+     */
+    @GET("v1/positionSide/dual")
+    fun getPositionSideDual(@Field("recvWindow") recvWindow: Long?,
+                            @Field("timestamp") timestamp: Long): Observable<PositionSideDualDto>;
+
+    /**
+     * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#trade
+     * 更改持仓模式
+     */
+    @POST("v1/positionSide/dual")
+    @FormUrlEncoded
+    fun changePositionSideDual(
+            @Field("dualSidePosition") dualSidePosition: String,
+            @Field("recvWindow") recvWindow: Long?,
+            @Field("timestamp") timestamp: Long): Observable<BaResultDto>;
 }

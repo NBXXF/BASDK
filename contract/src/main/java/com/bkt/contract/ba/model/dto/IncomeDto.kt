@@ -4,7 +4,10 @@ import com.bkt.contract.ba.enums.IncomeType
 import com.bkt.contract.ba.model.PairConfigProviderModel
 import com.google.gson.annotations.JsonAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
+import com.xxf.arch.json.typeadapter.format.formatobject.TimeFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
+import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_HH_c_mm_FormatTypeAdapter
+import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_HH_c_mm_c_ss_FormatTypeAdapter
 
 /**
  * @Description: 资金流水 收益
@@ -26,14 +29,22 @@ open class IncomeDto : PairConfigProviderModel {
     }
      */
     var symbol: String? = null
+
     var incomeType: IncomeType? = null
 
     @JsonAdapter(Number_UNFormatTypeAdapter::class)
     var income: NumberFormatObject? = null
+
     var asset: String? = null
+
     var info: String? = null
-    var time: Long = 0
+
+
+    @JsonAdapter(Time_yyyy_s_MM_s_dd_HH_c_mm_c_ss_FormatTypeAdapter::class)
+    var time: TimeFormatObject? = null;
+
     var tranId: String? = null
+
     var tradeId: String? = null
 
 

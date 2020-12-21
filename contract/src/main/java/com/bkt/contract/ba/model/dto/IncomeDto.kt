@@ -1,6 +1,7 @@
 package com.bkt.contract.ba.model.dto
 
 import com.bkt.contract.ba.enums.IncomeType
+import com.bkt.contract.ba.model.PairConfigProviderModel
 import com.google.gson.annotations.JsonAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
@@ -10,7 +11,7 @@ import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapt
  * @Author: XGod
  * @CreateDate: 2020/12/15 15:25
  */
-open class IncomeDto {
+open class IncomeDto : PairConfigProviderModel {
     /**
      * v1/income (HMAC SHA256)
      *  {
@@ -34,6 +35,11 @@ open class IncomeDto {
     var time: Long = 0
     var tranId: String? = null
     var tradeId: String? = null
+
+
+    override fun provideSymbol(): String? {
+        return this.symbol;
+    }
 
 
     override fun toString(): String {

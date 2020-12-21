@@ -4,17 +4,20 @@ import android.text.TextUtils
 import androidx.annotation.Nullable
 import com.bkt.contract.ba.common.HttpDataFunction
 import com.bkt.contract.ba.enums.ContractType
-import com.bkt.contract.ba.model.dto.ExchangeInfoDto
-import com.bkt.contract.ba.model.dto.PairConfigDto
-import com.bkt.contract.ba.model.dto.TickerEventDto
+import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.po.PairInfoPo
 import com.bkt.contract.ba.sdk.BaClient
+import com.bkt.contract.ba.sdk.ContractProxyApiService
 import com.bkt.contract.ba.service.inner.PairDbService
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.annotations.CheckReturnValue
 import io.reactivex.functions.Function
 import retrofit2.CacheType
+import retrofit2.http.Cache
+import retrofit2.http.GET
+import retrofit2.http.Query
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -276,6 +279,19 @@ interface PairService : ExportService {
                         }),
                 PairDbService.subChange(*symbols)
         );
+    }
+
+    /**
+     * 获取最新价
+     */
+    fun getTicker24hr(symbol: String, type: CacheType = CacheType.onlyRemote, cacheTime: Long = TimeUnit.MINUTES.toMillis(5)): Observable<TickerEventDto> {
+        return BaClient.instance.getApiService(symbol)
+                .flatMap(object : Function<ContractProxyApiService, ObservableSource<TickerEventDto>> {
+                    override fun apply(t: ContractProxyApiService): ObservableSource<TickerEventDto> {
+                        return t.getTicker24hr(type, cacheTime, symbol)
+                                .map(HttpDataFunction())
+                    }
+                })
     }
 }
 

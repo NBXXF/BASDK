@@ -45,7 +45,9 @@ interface ContractProxyApiService {
      * https://binance-docs.github.io/apidocs/futures/cn/#24hr
      */
     @GET("v1/ticker/24hr")
-    fun getTicker24hr(@Cache type: CacheType, @Query("symbol") symbol: String): Observable<BktResDto<TickerEventDto>>;
+    fun getTicker24hr(@Cache type: CacheType,
+                      @Header("cache") cacheTime: Long,
+                      @Query("symbol") symbol: String): Observable<BktResDto<TickerEventDto>>;
 
     /**
      * 所有交易对 24hr价格变动情况

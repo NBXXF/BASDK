@@ -1,6 +1,7 @@
 package com.bkt.contract.ba.service
 
 import com.bkt.contract.ba.common.AdlQuantileListToMapFunction
+import com.bkt.contract.ba.common.HttpDataFunction
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.CodeDescModel
 import com.bkt.contract.ba.model.dto.AdlQuantileDto
@@ -90,9 +91,11 @@ interface CommonService : ExportService {
     fun getServerTime(): Observable<Long> {
         return BaClient.instance.initializer!!.getApiService(ContractType.USDT)
                 .getServerTime()
+                .map(HttpDataFunction())
                 .onErrorResumeNext(object : Function<Throwable, ObservableSource<ServerTimeDto>> {
                     override fun apply(t: Throwable): ObservableSource<ServerTimeDto> {
-                        return BaClient.instance.initializer!!.getApiService(ContractType.USD).getServerTime();
+                        return BaClient.instance.initializer!!.getApiService(ContractType.USD).getServerTime()
+                                .map(HttpDataFunction());
                     }
                 })
                 .map { it.serverTime }
@@ -157,7 +160,8 @@ interface CommonService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<AdlQuantileDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<AdlQuantileDto>> {
-                        return t.getAdlQuantile(symbol, recvWindow, System.currentTimeMillis());
+                        return t.getAdlQuantile(symbol, recvWindow, System.currentTimeMillis())
+                                .map(HttpDataFunction());
                     }
                 }).map(AdlQuantileListToMapFunction());
     }
@@ -170,6 +174,7 @@ interface CommonService : ExportService {
             : Observable<LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>> {
         return BaClient.instance.initializer?.getApiService(type)!!
                 .getAdlQuantile(null, recvWindow, System.currentTimeMillis())
+                .map(HttpDataFunction())
                 .map(AdlQuantileListToMapFunction());
     }
 

@@ -21,7 +21,8 @@ import com.xxf.arch.http.url.UrlProvider
  */
 class UsdtUrlProvider : UrlProvider {
     override fun getBaseUrl(apiClazz: Class<*>?): String {
-        return "https://testnet.binancefuture.com/fapi/";
+       // return "https://testnet.binancefuture.com/fapi/";
+        return "http://bkex.ide/api/f/";
     }
 }
 

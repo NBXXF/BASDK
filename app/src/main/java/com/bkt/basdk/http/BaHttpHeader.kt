@@ -25,7 +25,8 @@ class BaHttpHeader : Interceptor {
         MARKET_DATA	需要有效的API-KEY
          */
         var request = chain.request()
-        request = request.newBuilder().addHeader("X-MBX-APIKEY", BuildConfig.X_MBX_APIKEY).build();
+        request = request.newBuilder().addHeader("X-MBX-APIKEY", BuildConfig.X_MBX_APIKEY)
+                .build();
         return chain.proceed(request)
     }
 }

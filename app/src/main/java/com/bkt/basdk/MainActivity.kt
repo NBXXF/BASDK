@@ -42,21 +42,21 @@ class MainActivity : AppCompatActivity() {
                      .subscribe {
                          XXF.getLogger().d("================>serverTime:" + it);
                      }*/
-            val contractMultipliers = BaClient.instance.getService(CommonService::class.java).getContractMultipliers();
+           /* val contractMultipliers = BaClient.instance.getService(CommonService::class.java).getContractMultipliers();
             XXF.getLogger().d("============>contractMultipliers:" + contractMultipliers);
-            BaClient.instance.getService(PairService::class.java).getPairs()
+           */ BaClient.instance.getService(PairService::class.java).getPairs()
                     .observeOn(AndroidSchedulers.mainThread())
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
                         XXF.getLogger().d("============>getPairs.......");
                     }
 
-            BaClient.instance.getService(PriceService::class.java).getTickerPrice(ContractType.USDT)
+ /*           BaClient.instance.getService(PriceService::class.java).getTickerPrice(ContractType.USDT)
                     .observeOn(AndroidSchedulers.mainThread())
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
                         XXF.getLogger().d("============>tickerPrice:" + it);
-                    }
+                    }*/
             /*   BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT", CacheType.firstCache, TimeUnit.MINUTES.toMillis(5))
                        .doOnError {
                            XXF.getLogger().d("============>depth err:" + it);
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
                            XXF.getLogger().d("============>LeverageBrackets:" + it);
                        }*/
 
-            BaClient.instance.getService(CommonService::class.java).getAdlQuantileByType(ContractType.USDT, null)
+   /*         BaClient.instance.getService(CommonService::class.java).getAdlQuantileByType(ContractType.USDT, null)
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
                         XXF.getLogger().d("============>getAdlQuantileByType:" + it);
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
                         XXF.getLogger().d("=============>httpCode:" + it);
-                    }
+                    }*/
 
         }
         /*     BaClient.instance.getService(PairService::class.java).getPairs(ContractType.USDT)
@@ -187,7 +187,7 @@ class MainActivity : AppCompatActivity() {
                           XXF.getLogger().d("==============>yes:" + it);
                       }*/
 
-        BaClient.instance.getService(CommonService::class.java)
+      /*  BaClient.instance.getService(CommonService::class.java)
                 .subAdlQuantileByType(ContractType.USDT, null)
                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                 .subscribe {
@@ -195,7 +195,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
 
-        Cat(Person()).say();
+        Cat(Person()).say();*/
     }
 
 

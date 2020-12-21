@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.service
 
+import com.bkt.contract.ba.common.HttpDataFunction
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.dto.AdlQuantileDto
 import com.bkt.contract.ba.model.dto.PremiumIndexPriceDto
@@ -41,7 +42,9 @@ interface PriceService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<PremiumIndexPriceDto>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<PremiumIndexPriceDto> {
-                        return t.getPremiumIndex(type, cacheTime, symbol, pair).map {
+                        return t.getPremiumIndex(type, cacheTime, symbol, pair)
+                                .map(HttpDataFunction())
+                                .map {
                             it.get(0)
                         };
                     }
@@ -104,7 +107,8 @@ interface PriceService : ExportService {
         return BaClient.instance.getApiService(symbol, null)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<TickerPriceDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<TickerPriceDto>> {
-                        return t.getTickerPrice(symbol);
+                        return t.getTickerPrice(symbol)
+                                .map(HttpDataFunction());
                     }
                 });
     }
@@ -114,6 +118,7 @@ interface PriceService : ExportService {
      */
     fun getTickerPrice(type: ContractType): Observable<ListOrSingle<TickerPriceDto>> {
         return BaClient.instance.initializer!!.getApiService(type)
-                .getTickerPrice(null);
+                .getTickerPrice(null)
+                .map(HttpDataFunction());
     }
 }

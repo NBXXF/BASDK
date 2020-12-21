@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.service
 
+import com.bkt.contract.ba.common.HttpDataFunction
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.event.AccountUpdateEvent
@@ -33,7 +34,8 @@ interface UserService : ExportService {
      */
     fun createListenKey(type: ContractType): Observable<ListenKeyDto> {
         return BaClient.instance.initializer!!.getApiService(type)
-                .createListenKey();
+                .createListenKey()
+                .map(HttpDataFunction())
     }
 
     /**
@@ -42,6 +44,7 @@ interface UserService : ExportService {
     fun lengthenListenKey(type: ContractType): Observable<JsonObject> {
         return BaClient.instance.initializer!!.getApiService(type)
                 .lengthenListenKey()
+                .map(HttpDataFunction())
     }
 
     /**
@@ -49,7 +52,8 @@ interface UserService : ExportService {
      */
     fun deleteListenKey(type: ContractType): Observable<JsonObject> {
         return BaClient.instance.initializer!!.getApiService(type)
-                .deleteListenKey();
+                .deleteListenKey()
+                .map(HttpDataFunction());
     }
 
     /**
@@ -61,6 +65,7 @@ interface UserService : ExportService {
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<List<LeverageBracketDto.BracketsBean>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<List<LeverageBracketDto.BracketsBean>> {
                         return t.getLeverageBracket(symbol, CommonService.INSTANCE.convertPair(symbol), null, System.currentTimeMillis())
+                                .map(HttpDataFunction())
                                 .map { it.get(0).brackets?.sortedBy { it.initialLeverage } };
                     }
                 });
@@ -73,6 +78,7 @@ interface UserService : ExportService {
      */
     fun getLeverageBrackets(type: ContractType): Observable<Map<String, List<LeverageBracketDto.BracketsBean>>> {
         return BaClient.instance.initializer!!.getApiService(type).getLeverageBracket(null, null, null, System.currentTimeMillis())
+                .map(HttpDataFunction())
                 .map(object : Function<ListOrSingle<LeverageBracketDto>, Map<String, List<LeverageBracketDto.BracketsBean>>> {
                     override fun apply(t: ListOrSingle<LeverageBracketDto>): Map<String, List<LeverageBracketDto.BracketsBean>> {
                         val map: MutableMap<String, List<LeverageBracketDto.BracketsBean>> = mutableMapOf();
@@ -93,7 +99,8 @@ interface UserService : ExportService {
      */
     fun getBalanceByType(type: ContractType, recvWindow: Long?): Observable<ListOrSingle<CoinBalanceDto>> {
         return BaClient.instance.initializer!!.getApiService(type)
-                .getBalance(recvWindow, System.currentTimeMillis());
+                .getBalance(recvWindow, System.currentTimeMillis())
+                .map(HttpDataFunction());
     }
 
     /**
@@ -132,6 +139,7 @@ interface UserService : ExportService {
     fun getBalanceToMap(type: ContractType, recvWindow: Long?): Observable<Map<String, CoinBalanceDto>> {
         return BaClient.instance.initializer!!.getApiService(type)
                 .getBalance(recvWindow, System.currentTimeMillis())
+                .map(HttpDataFunction())
                 .map(object : Function<ListOrSingle<CoinBalanceDto>, Map<String, CoinBalanceDto>> {
                     override fun apply(t: ListOrSingle<CoinBalanceDto>): Map<String, CoinBalanceDto> {
                         val map: LinkedHashMap<String, CoinBalanceDto> = LinkedHashMap();
@@ -172,6 +180,7 @@ interface UserService : ExportService {
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ChangeLeverageResDto>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ChangeLeverageResDto> {
                         return t.changeLeverage(symbol, leverage, recvWindow, System.currentTimeMillis())
+                                .map(HttpDataFunction())
                     }
                 });
     }
@@ -188,7 +197,8 @@ interface UserService : ExportService {
     ): Observable<AccountInfoDto> {
         return BaClient.instance
                 .initializer!!.getApiService(type)
-                .getAccount(cacheType, cacheTime, recvWindow, System.currentTimeMillis());
+                .getAccount(cacheType, cacheTime, recvWindow, System.currentTimeMillis())
+                .map(HttpDataFunction());
     }
 
     /**
@@ -206,7 +216,8 @@ interface UserService : ExportService {
     fun getPositionSideDual(type: ContractType, recvWindow: Long?): Observable<PositionSideDualDto> {
         return BaClient.instance.initializer!!
                 .getApiService(type)
-                .getPositionSideDual(recvWindow, System.currentTimeMillis());
+                .getPositionSideDual(recvWindow, System.currentTimeMillis())
+                .map(HttpDataFunction());
     }
 
 
@@ -221,7 +232,8 @@ interface UserService : ExportService {
             timestamp: Long): Observable<BaResultDto> {
         return BaClient.instance.initializer!!
                 .getApiService(type)
-                .changePositionSideDual(dualSidePosition.toString(), recvWindow, System.currentTimeMillis());
+                .changePositionSideDual(dualSidePosition.toString(), recvWindow, System.currentTimeMillis())
+                .map(HttpDataFunction());
     }
 
 }

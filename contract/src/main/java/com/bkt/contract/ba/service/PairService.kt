@@ -2,6 +2,7 @@ package com.bkt.contract.ba.service
 
 import android.text.TextUtils
 import androidx.annotation.Nullable
+import com.bkt.contract.ba.common.HttpDataFunction
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.dto.ExchangeInfoDto
 import com.bkt.contract.ba.model.dto.PairConfigDto
@@ -42,10 +43,10 @@ interface PairService : ExportService {
             val currencyApiService = BaClient.instance.initializer!!.getApiService(ContractType.USD);
             return Observable
                     .zip(
-                            usdtApiService.getExchangeInfo(CacheType.onlyRemote),
-                            usdtApiService.getTicker24hr(CacheType.onlyRemote),
-                            currencyApiService.getExchangeInfo(CacheType.onlyRemote),
-                            currencyApiService.getTicker24hr(CacheType.onlyRemote),
+                            usdtApiService.getExchangeInfo(CacheType.onlyRemote).map(HttpDataFunction()),
+                            usdtApiService.getTicker24hr(CacheType.onlyRemote).map(HttpDataFunction()),
+                            currencyApiService.getExchangeInfo(CacheType.onlyRemote).map(HttpDataFunction()),
+                            currencyApiService.getTicker24hr(CacheType.onlyRemote).map(HttpDataFunction()),
                             object : io.reactivex.functions.Function4<ExchangeInfoDto, List<TickerEventDto>, ExchangeInfoDto, List<TickerEventDto>, List<PairInfoPo>> {
                                 override fun apply(t1: ExchangeInfoDto, t2: List<TickerEventDto>, t3: ExchangeInfoDto, t4: List<TickerEventDto>): List<PairInfoPo> {
                                     val pairConfigList: MutableList<PairConfigDto> = mutableListOf<PairConfigDto>();

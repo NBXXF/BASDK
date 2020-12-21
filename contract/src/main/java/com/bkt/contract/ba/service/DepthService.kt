@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.service
 
+import com.bkt.contract.ba.common.HttpDataFunction
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.po.DepthEventDtoPo
 import com.bkt.contract.ba.sdk.BaClient
@@ -38,6 +39,7 @@ interface DepthService : ExportService {
                 .flatMap(object : Function<ContractType, ObservableSource<DepthEventDtoPo>> {
                     override fun apply(t: ContractType): ObservableSource<DepthEventDtoPo> {
                         return BaClient.instance.initializer!!.getApiService(t).getDepth(cacheType, cacheTime, symbol, 20)
+                                .map(HttpDataFunction())
                                 .map(object : Function<DepthEventDtoPo, DepthEventDtoPo> {
                                     override fun apply(t: DepthEventDtoPo): DepthEventDtoPo {
                                         /**

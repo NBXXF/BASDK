@@ -30,14 +30,14 @@ interface ContractProxyApiService {
      * 获取服务器时间
      */
     @GET("v1/time")
-    fun getServerTime(): Observable<ServerTimeDto>;
+    fun getServerTime(): Observable<BktResDto<ServerTimeDto>>;
 
     /**
      * 获取交易规则和交易对
      * https://binance-docs.github.io/apidocs/futures/cn/#0f3f2d5ee7
      */
     @GET("v1/exchangeInfo")
-    fun getExchangeInfo(@Cache type: CacheType): Observable<ExchangeInfoDto>;
+    fun getExchangeInfo(@Cache type: CacheType): Observable<BktResDto<ExchangeInfoDto>>;
 
 
     /**
@@ -45,14 +45,14 @@ interface ContractProxyApiService {
      * https://binance-docs.github.io/apidocs/futures/cn/#24hr
      */
     @GET("v1/ticker/24hr")
-    fun getTicker24hr(@Cache type: CacheType, @Query("symbol") symbol: String): Observable<TickerEventDto>;
+    fun getTicker24hr(@Cache type: CacheType, @Query("symbol") symbol: String): Observable<BktResDto<TickerEventDto>>;
 
     /**
      * 所有交易对 24hr价格变动情况
      * https://binance-docs.github.io/apidocs/futures/cn/#24hr
      */
     @GET("v1/ticker/24hr")
-    fun getTicker24hr(@Cache type: CacheType): Observable<List<TickerEventDto>>;
+    fun getTicker24hr(@Cache type: CacheType): Observable<BktResDto<List<TickerEventDto>>>;
 
 
     /**
@@ -72,7 +72,7 @@ interface ContractProxyApiService {
                   @Query("interval") interval: String,
                   @Query("startTime") startTime: Long?,
                   @Query("endTime") endTime: Long?,
-                  @Query("limit") limit: Int?): Observable<List<KLineEventDto>>
+                  @Query("limit") limit: Int?): Observable<BktResDto<List<KLineEventDto>>>
 
     /**
      * 获取深度
@@ -83,7 +83,7 @@ interface ContractProxyApiService {
     fun getDepth(@Cache type: CacheType,
                  @Header("cache") cacheTime: Long,
                  @Query("symbol") symbol: String,
-                 @Query("limit") limit: Int): Observable<DepthEventDtoPo>;
+                 @Query("limit") limit: Int): Observable<BktResDto<DepthEventDtoPo>>;
 
     /**
      * 获取成交
@@ -107,7 +107,7 @@ interface ContractProxyApiService {
                         @Header("cache") cacheTime: Long,
                         @Query("symbol") symbol: String,
                         @Query("pair") pair: String?
-    ): Observable<ListOrSingle<PremiumIndexPriceDto>>;
+    ): Observable<BktResDto<ListOrSingle<PremiumIndexPriceDto>>>;
 
 
     /**
@@ -115,7 +115,7 @@ interface ContractProxyApiService {
      * @param symbol 不发送交易对参数，则会返回所有交易对信息
      */
     @GET("v1/ticker/price")
-    fun getTickerPrice(@Query("symbol") symbol: String?): Observable<ListOrSingle<TickerPriceDto>>;
+    fun getTickerPrice(@Query("symbol") symbol: String?): Observable<BktResDto<ListOrSingle<TickerPriceDto>>>;
 
     /**
      * https://binance-docs.github.io/apidocs/testnet/cn/#trade-2
@@ -142,7 +142,7 @@ interface ContractProxyApiService {
      */
     @POST("v1/order")
     @FormUrlEncoded
-    fun createOrder(@FieldMap map: Map<String, Any>): Observable<OrderInfoDto>;
+    fun createOrder(@FieldMap map: Map<String, Any>): Observable<BktResDto<OrderInfoDto>>;
 
 
     /**
@@ -155,7 +155,7 @@ interface ContractProxyApiService {
                      @Query("origClientOrderId") origClientOrderId: String?,
                      @Query("recvWindow") recvWindow: Long?,
                      @Query("timestamp") timestamp: Long
-    ): Observable<ListOrSingle<OrderInfoDto>>;
+    ): Observable<BktResDto<ListOrSingle<OrderInfoDto>>>;
 
     /**
      * https://binance-docs.github.io/apidocs/testnet/cn/#user_data-4
@@ -165,7 +165,7 @@ interface ContractProxyApiService {
     fun getOpenOrders(@Query("symbol") symbol: String?,
                       @Query("recvWindow") recvWindow: Long?,
                       @Query("timestamp") timestamp: Long
-    ): Observable<ListOrSingle<OrderInfoDto>>;
+    ): Observable<BktResDto<ListOrSingle<OrderInfoDto>>>;
 
 
     /**
@@ -188,7 +188,7 @@ interface ContractProxyApiService {
             @Query("limit") limit: Int?,
             @Query("recvWindow") recvWindow: Long?,
             @Query("timestamp") timestamp: Long
-    ): Observable<ListOrSingle<OrderInfoDto>>;
+    ): Observable<BktResDto<ListOrSingle<OrderInfoDto>>>;
 
 
     /**
@@ -200,7 +200,7 @@ interface ContractProxyApiService {
             @Query("symbol") symbol: String?,
             @Query("recvWindow") recvWindow: Long?,
             @Query("timestamp") timestamp: Long
-    ): Observable<ListOrSingle<PositionRiskDto>>;
+    ): Observable<BktResDto<ListOrSingle<PositionRiskDto>>>;
 
     /**
      * https://binance-docs.github.io/apidocs/testnet/cn/#v2-user_data-3
@@ -215,7 +215,7 @@ interface ContractProxyApiService {
             @Query("limit") limit: Int?,
             @Query("recvWindow") recvWindow: Long?,
             @Query("timestamp") timestamp: Long
-    ): Observable<ListOrSingle<TradInfoDto>>;
+    ): Observable<BktResDto<ListOrSingle<TradInfoDto>>>;
 
 
     /**
@@ -233,7 +233,7 @@ interface ContractProxyApiService {
             @Query("limit") limit: Int?,
             @Query("recvWindow") recvWindow: Long?,
             @Query("timestamp") timestamp: Long
-    ): Observable<ListOrSingle<IncomeDto>>;
+    ): Observable<BktResDto<ListOrSingle<IncomeDto>>>;
 
 
     /**
@@ -247,7 +247,7 @@ interface ContractProxyApiService {
                            @Query("pair") pair: String?,
                            @Query("recvWindow") recvWindow: Long?,
                            @Query("timestamp") timestamp: Long)
-            : Observable<ListOrSingle<LeverageBracketDto>>;
+            : Observable<BktResDto<ListOrSingle<LeverageBracketDto>>>;
 
     /**
      * 账户余额 (USER_DATA)
@@ -255,7 +255,7 @@ interface ContractProxyApiService {
      */
     @GET("v1/balance")
     fun getBalance(@Query("recvWindow") recvWindow: Long?,
-                   @Query("timestamp") timestamp: Long): Observable<ListOrSingle<CoinBalanceDto>>;
+                   @Query("timestamp") timestamp: Long): Observable<BktResDto<ListOrSingle<CoinBalanceDto>>>;
 
     /**
      * 撤销全部订单 (TRADE)
@@ -264,7 +264,7 @@ interface ContractProxyApiService {
     @DELETE("v1/allOpenOrders")
     fun cancelAllOrder(@Query("symbol") symbol: String,
                        @Query("recvWindow") recvWindow: Long?,
-                       @Query("timestamp") timestamp: Long): Observable<ListOrSingle<OrderInfoDto>>;
+                       @Query("timestamp") timestamp: Long): Observable<BktResDto<ListOrSingle<OrderInfoDto>>>;
 
 
     /**
@@ -276,7 +276,7 @@ interface ContractProxyApiService {
                     @Query("orderId") orderId: String?,
                     @Query("origClientOrderId") origClientOrderId: String?,
                     @Query("recvWindow") recvWindow: Long?,
-                    @Query("timestamp") timestamp: Long): Observable<BaResultDto>;
+                    @Query("timestamp") timestamp: Long): Observable<BktResDto<BaResultDto>>;
 
     /**
      * 调整逐仓保证金
@@ -291,7 +291,7 @@ interface ContractProxyApiService {
             @Field("type") type: PositionMarginType,
             @Field("recvWindow") recvWindow: Long?,
             @Field("timestamp") timestamp: Long
-    ): Observable<PositionMarginResultDto>;
+    ): Observable<BktResDto<PositionMarginResultDto>>;
 
     /**
      * https://binance-docs.github.io/apidocs/testnet/cn/#user_data-8
@@ -301,7 +301,7 @@ interface ContractProxyApiService {
     fun getAdlQuantile(@Query("symbol") symbol: String?,
                        @Query("recvWindow") recvWindow: Long?,
                        @Query("timestamp") timestamp: Long)
-            : Observable<ListOrSingle<AdlQuantileDto>>;
+            : Observable<BktResDto<ListOrSingle<AdlQuantileDto>>>;
 
 
     /**
@@ -312,7 +312,7 @@ interface ContractProxyApiService {
     fun changeLeverage(@Field("symbol") symbol: String,
                        @Field("leverage") leverage: Int,
                        @Field("recvWindow") recvWindow: Long?,
-                       @Field("timestamp") timestamp: Long): Observable<ChangeLeverageResDto>;
+                       @Field("timestamp") timestamp: Long): Observable<BktResDto<ChangeLeverageResDto>>;
 
     /**
      * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#user_data
@@ -320,7 +320,7 @@ interface ContractProxyApiService {
      */
     @GET("v1/positionSide/dual")
     fun getPositionSideDual(@Query("recvWindow") recvWindow: Long?,
-                            @Query("timestamp") timestamp: Long): Observable<PositionSideDualDto>;
+                            @Query("timestamp") timestamp: Long): Observable<BktResDto<PositionSideDualDto>>;
 
     /**
      * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#trade
@@ -331,7 +331,7 @@ interface ContractProxyApiService {
     fun changePositionSideDual(
             @Field("dualSidePosition") dualSidePosition: String,
             @Field("recvWindow") recvWindow: Long?,
-            @Field("timestamp") timestamp: Long): Observable<BaResultDto>;
+            @Field("timestamp") timestamp: Long): Observable<BktResDto<BaResultDto>>;
 
 
     /**
@@ -339,14 +339,14 @@ interface ContractProxyApiService {
      * 创建一个新的user data stream,返回值为一个listenKey,即websocket订阅的stream名称。如果该帐户具有有效的listenKey,则将返回该listenKey并将其有效期延长60分钟。
      */
     @POST("v1/listenKey")
-    fun createListenKey(): Observable<ListenKeyDto>;
+    fun createListenKey(): Observable<BktResDto<ListenKeyDto>>;
 
     /**
      * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#listenkey-user_stream
      *有效期延长至本次调用后60分钟
      */
     @PUT("v1/listenKey")
-    fun lengthenListenKey(): Observable<JsonObject>;
+    fun lengthenListenKey(): Observable<BktResDto<JsonObject>>;
 
 
     /**
@@ -354,7 +354,7 @@ interface ContractProxyApiService {
      * 关闭listenKey 关闭某账户数据流
      */
     @DELETE("v1/listenKey")
-    fun deleteListenKey(): Observable<JsonObject>;
+    fun deleteListenKey(): Observable<BktResDto<JsonObject>>;
 
 
     /**
@@ -368,5 +368,5 @@ interface ContractProxyApiService {
             @Cache type: CacheType,
             @Header("cache") cacheTime: Long,
             @Query("recvWindow") recvWindow: Long?,
-            @Query("timestamp") timestamp: Long): Observable<AccountInfoDto>;
+            @Query("timestamp") timestamp: Long): Observable<BktResDto<AccountInfoDto>>;
 }

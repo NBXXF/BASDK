@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.service
 
+import com.bkt.contract.ba.common.HttpDataFunction
 import com.bkt.contract.ba.model.dto.KLineEventDto
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
@@ -57,7 +58,8 @@ interface KLineService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<List<KLineEventDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<List<KLineEventDto>> {
-                        return t.getKLines(type, cacheTime, symbol, interval, startTime, endTime, limit);
+                        return t.getKLines(type, cacheTime, symbol, interval, startTime, endTime, limit)
+                                .map(HttpDataFunction());
                     }
                 }).map(object : Function<List<KLineEventDto>, List<KLineEventDto>> {
                     override fun apply(t: List<KLineEventDto>): List<KLineEventDto> {

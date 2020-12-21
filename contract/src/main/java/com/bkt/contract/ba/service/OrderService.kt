@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.service
 
+import com.bkt.contract.ba.common.HttpDataFunction
 import com.bkt.contract.ba.enums.*
 import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.event.OrderUpdateEvent
@@ -38,7 +39,8 @@ interface OrderService : ExportService {
         return BaClient.instance.getApiService(order.symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<OrderInfoDto>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<OrderInfoDto> {
-                        return t.createOrder(JsonUtils.toMap(JsonUtils.toJsonString(order), MapTypeToken<String, Any>()));
+                        return t.createOrder(JsonUtils.toMap(JsonUtils.toJsonString(order), MapTypeToken<String, Any>()))
+                                .map(HttpDataFunction());
                     }
                 });
     }
@@ -53,7 +55,8 @@ interface OrderService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<OrderInfoDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<OrderInfoDto>> {
-                        return t.getOpenOrder(symbol, orderId, origClientOrderId, recvWindow, System.currentTimeMillis());
+                        return t.getOpenOrder(symbol, orderId, origClientOrderId, recvWindow, System.currentTimeMillis())
+                                .map(HttpDataFunction());
                     }
                 });
     }
@@ -67,7 +70,8 @@ interface OrderService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<OrderInfoDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<OrderInfoDto>> {
-                        return t.getOpenOrders(symbol, recvWindow, System.currentTimeMillis());
+                        return t.getOpenOrders(symbol, recvWindow, System.currentTimeMillis())
+                                .map(HttpDataFunction());
                     }
                 });
     }
@@ -77,7 +81,8 @@ interface OrderService : ExportService {
      * 最多返回 40条  注意不是完全返回所有数据
      */
     fun getOpenOrders(type: ContractType, recvWindow: Long?): Observable<ListOrSingle<OrderInfoDto>> {
-        return BaClient.instance.initializer?.getApiService(type)!!.getOpenOrders(null, recvWindow, System.currentTimeMillis());
+        return BaClient.instance.initializer?.getApiService(type)!!.getOpenOrders(null, recvWindow, System.currentTimeMillis())
+                .map(HttpDataFunction());
     }
 
     /**
@@ -105,7 +110,8 @@ interface OrderService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<OrderInfoDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<OrderInfoDto>> {
-                        return t.getAllOrders(symbol, orderId, startTime, endTime, limit, recvWindow, System.currentTimeMillis());
+                        return t.getAllOrders(symbol, orderId, startTime, endTime, limit, recvWindow, System.currentTimeMillis())
+                                .map(HttpDataFunction());
                     }
                 });
     }
@@ -143,7 +149,8 @@ interface OrderService : ExportService {
                 UserService.INSTANCE.getLeverageBrackets(type),
                 UserService.INSTANCE.getAllBalanceToMap(null),
                 CommonService.INSTANCE.getAdlQuantileByType(type, recvWindow),
-                BaClient.instance.initializer?.getApiService(type)!!.getPositionRisk(symbol, recvWindow, System.currentTimeMillis()),
+                BaClient.instance.initializer?.getApiService(type)!!.getPositionRisk(symbol, recvWindow, System.currentTimeMillis())
+                        .map(HttpDataFunction()),
                 object : io.reactivex.functions.Function4<Map<String, List<LeverageBracketDto.BracketsBean>>, Map<String, CoinBalanceDto>, LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, ListOrSingle<PositionRiskDto>, ListOrSingle<PositionRiskDto>> {
                     override fun apply(leverageMap: Map<String, List<LeverageBracketDto.BracketsBean>>, balances: Map<String, CoinBalanceDto>, adlQuantiles: LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, positionRisks: ListOrSingle<PositionRiskDto>): ListOrSingle<PositionRiskDto> {
                         /**
@@ -217,7 +224,8 @@ interface OrderService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<TradInfoDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<TradInfoDto>> {
-                        return t.getUserTrades(symbol, startTime, endTime, fromId, limit, recvWindow, System.currentTimeMillis());
+                        return t.getUserTrades(symbol, startTime, endTime, fromId, limit, recvWindow, System.currentTimeMillis())
+                                .map(HttpDataFunction());
                     }
                 });
     }
@@ -279,7 +287,8 @@ interface OrderService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<IncomeDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<IncomeDto>> {
-                        return t.getUserIncome(symbol, if (incomeType == null) null else incomeType.value, startTime, endTime, limit, recvWindow, System.currentTimeMillis());
+                        return t.getUserIncome(symbol, if (incomeType == null) null else incomeType.value, startTime, endTime, limit, recvWindow, System.currentTimeMillis())
+                                .map(HttpDataFunction());
                     }
                 });
     }
@@ -296,7 +305,8 @@ interface OrderService : ExportService {
             recvWindow: Long?
     ): Observable<ListOrSingle<IncomeDto>> {
         return BaClient.instance.initializer?.getApiService(type)!!
-                .getUserIncome(null, if (incomeType == null) null else incomeType.value, startTime, endTime, limit, recvWindow, System.currentTimeMillis());
+                .getUserIncome(null, if (incomeType == null) null else incomeType.value, startTime, endTime, limit, recvWindow, System.currentTimeMillis())
+                .map(HttpDataFunction());
     }
 
 
@@ -307,7 +317,8 @@ interface OrderService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<OrderInfoDto>>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<OrderInfoDto>> {
-                        return t.cancelAllOrder(symbol, recvWindow, System.currentTimeMillis());
+                        return t.cancelAllOrder(symbol, recvWindow, System.currentTimeMillis())
+                                .map(HttpDataFunction());
                     }
                 });
     }
@@ -319,7 +330,8 @@ interface OrderService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<BaResultDto>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<BaResultDto> {
-                        return t.cancelOrder(symbol, orderId, origClientOrderId, recvWindow, System.currentTimeMillis());
+                        return t.cancelOrder(symbol, orderId, origClientOrderId, recvWindow, System.currentTimeMillis())
+                                .map(HttpDataFunction());
                     }
                 });
     }
@@ -338,6 +350,7 @@ interface OrderService : ExportService {
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<PositionMarginResultDto>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<PositionMarginResultDto> {
                         return t.changePositionMargin(symbol, if (positionSide == null) null else positionSide.value, amount, type, recvWindow, System.currentTimeMillis())
+                                .map(HttpDataFunction())
                     }
                 });
     }

@@ -142,7 +142,9 @@ interface ContractProxyApiService {
      * recvWindow	LONG	NO
      * timestamp	LONG	YES
      */
-    @POST("v1/order")
+    // @POST("v1/order")
+    //这里用自己的接口
+    @POST("v1/orderCreate")
     @FormUrlEncoded
     fun createOrder(@FieldMap map: Map<String, Any>): Observable<BktResDto<OrderInfoDto>>;
 
@@ -255,9 +257,11 @@ interface ContractProxyApiService {
      * 账户余额 (USER_DATA)
      * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#user_data-6
      */
-    @GET("v1/balance")
-    fun getBalance(@Query("recvWindow") recvWindow: Long?,
-                   @Query("timestamp") timestamp: Long): Observable<BktResDto<ListOrSingle<CoinBalanceDto>>>;
+    @GET("{version}/balance")
+    fun getBalance(
+            @Path("version") version: String,
+            @Query("recvWindow") recvWindow: Long?,
+            @Query("timestamp") timestamp: Long): Observable<BktResDto<ListOrSingle<CoinBalanceDto>>>;
 
     /**
      * 撤销全部订单 (TRADE)

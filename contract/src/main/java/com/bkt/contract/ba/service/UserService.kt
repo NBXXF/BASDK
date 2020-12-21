@@ -99,7 +99,7 @@ interface UserService : ExportService {
      */
     fun getBalanceByType(type: ContractType, recvWindow: Long?): Observable<ListOrSingle<CoinBalanceDto>> {
         return BaClient.instance.initializer!!.getApiService(type)
-                .getBalance(recvWindow, System.currentTimeMillis())
+                .getBalance(if(type==ContractType.USDT) "v2" else "v1",recvWindow, System.currentTimeMillis())
                 .map(HttpDataFunction());
     }
 
@@ -138,7 +138,7 @@ interface UserService : ExportService {
      */
     fun getBalanceToMap(type: ContractType, recvWindow: Long?): Observable<Map<String, CoinBalanceDto>> {
         return BaClient.instance.initializer!!.getApiService(type)
-                .getBalance(recvWindow, System.currentTimeMillis())
+                .getBalance(if(type==ContractType.USDT) "v2" else "v1",recvWindow, System.currentTimeMillis())
                 .map(HttpDataFunction())
                 .map(object : Function<ListOrSingle<CoinBalanceDto>, Map<String, CoinBalanceDto>> {
                     override fun apply(t: ListOrSingle<CoinBalanceDto>): Map<String, CoinBalanceDto> {

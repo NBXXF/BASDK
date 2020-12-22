@@ -103,9 +103,9 @@ class OrderRequestDto {
 
     var recvWindow: Long? = null;
 
-    val timestamp: Long;
+    val timestamp: String;
 
-    constructor(symbol: String, side: Side, positionSide: PositionDirection, type: OrderType, timestamp: Long) {
+    constructor(symbol: String, side: Side, positionSide: PositionDirection, type: OrderType, timestamp: String) {
         this.symbol = symbol
         this.side = side
         this.positionSide = positionSide

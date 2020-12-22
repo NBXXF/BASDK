@@ -101,7 +101,7 @@ class OrderRequestDto {
      */
     var newOrderRespType: NewOrderRespType? = null;
 
-    var recvWindow: Long? = null;
+    var recvWindow: String? = null;
 
     val timestamp: String;
 

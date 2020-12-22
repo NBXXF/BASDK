@@ -34,23 +34,24 @@ class UsdContractSocketService private constructor() : ContractProxySocketServic
     override fun getWsManager(): Observable<WsManager> {
         return Observable.fromCallable(object : Callable<WsManager> {
             override fun call(): WsManager {
-                if (mWsManager == null || !TextUtils.equals(mWsManager?.tag(), wssUrl)) {
-                    mWsManager = WsManager.Builder(XXF.getApplication())
-                            .wsUrl(wssUrl)
-                            .tag(wssUrl)
-                            .needReconnect(true)
-                            .client(OkHttpClientBuilder()
-                                    //  .addInterceptor(BhHttpHeaderInterceptor())
-                                    //.addInterceptor(BktHttpLoggerInterceptor())
-                                    .build()
-                                    .newBuilder()
-                                    //.cookieJar(BhHttpCookieJar())
-                                    .pingInterval(8, TimeUnit.SECONDS)
-                                    .build())
-                            .build()
-                    mWsManager!!.setWsStatusListener(this@UsdContractSocketService);
-                    mWsManager!!.startConnect()
+                if (mWsManager != null && TextUtils.equals(mWsManager?.tag(), wssUrl)) {
+                    return mWsManager!!;
                 }
+                mWsManager = WsManager.Builder(XXF.getApplication())
+                        .wsUrl(wssUrl)
+                        .tag(wssUrl)
+                        .needReconnect(true)
+                        .client(OkHttpClientBuilder()
+                                //  .addInterceptor(BhHttpHeaderInterceptor())
+                                //.addInterceptor(BktHttpLoggerInterceptor())
+                                .build()
+                                .newBuilder()
+                                //.cookieJar(BhHttpCookieJar())
+                                .pingInterval(8, TimeUnit.SECONDS)
+                                .build())
+                        .build()
+                mWsManager!!.setWsStatusListener(this@UsdContractSocketService);
+                mWsManager!!.startConnect()
                 return mWsManager!!;
             }
         }).subscribeOn(Schedulers.io());

@@ -127,6 +127,14 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("CheckResult")
     override fun onResume() {
         super.onResume()
+
+        BaClient.instance.getService(PairService::class.java)
+                .subPairs("BTCUSDT")
+                .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
+                .subscribe {
+                    XXF.getLogger().d("==============>it3:" + it.size)
+                };
+
         /*    BaClient.instance.getService(PairService::class.java)
                     .subPairs(ContractType.USD)
                     .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
@@ -146,12 +154,7 @@ class MainActivity : AppCompatActivity() {
                      XXF.getLogger().d("==============>it2:" + it.size)
                  };
 
-         BaClient.instance.getService(PairService::class.java)
-                 .subPairs("BTCUSDT")
-                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
-                 .subscribe {
-                     XXF.getLogger().d("==============>it3:" + it.size)
-                 };*/
+        */
 
         /*         BaClient.instance.getService(DepthService::class.java)
                          .subDepth("BTCUSDT")

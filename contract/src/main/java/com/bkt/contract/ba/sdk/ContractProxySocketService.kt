@@ -20,6 +20,8 @@ import com.xxf.arch.websocket.WsManager
 import com.xxf.arch.websocket.listener.WsStatusListener
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.Consumer
 import io.reactivex.functions.Function
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
@@ -44,30 +46,30 @@ abstract class ContractProxySocketService : WsStatusListener {
     /**
      * 获取web socket manger对象
      */
-    protected abstract fun getWsManager(): WsManager;
+    protected abstract fun getWsManager(): Observable<WsManager>;
 
     /**
      * 订阅socket event
      */
-    private fun subEvent(event: SocketEvent, body: SocketRequestBody) {
+    private fun subEvent(event: SocketEvent, body: SocketRequestBody, wsManager: WsManager) {
         /**
          * 订阅事件一定要buffer 便于框架重连
          */
         buffer.put(event, body);
         log(" send msg:" + body);
-        if (this.getWsManager() != null && this.getWsManager().isWsConnected) {
-            this.getWsManager().sendMessage(JsonUtils.toJsonString(body))
+        if (wsManager != null && wsManager.isWsConnected) {
+            wsManager.sendMessage(JsonUtils.toJsonString(body))
         }
     }
 
     /**
      * 取消订阅socket
      */
-    private fun unSubEvent(event: SocketEvent, body: SocketRequestBody) {
+    private fun unSubEvent(event: SocketEvent, body: SocketRequestBody, wsManager: WsManager) {
         buffer.remove(event);
         log(" send msg:" + body);
-        if (this.getWsManager() != null && this.getWsManager().isWsConnected) {
-            this.getWsManager().sendMessage(JsonUtils.toJsonString(body))
+        if (wsManager != null && wsManager.isWsConnected) {
+            wsManager.sendMessage(JsonUtils.toJsonString(body))
         }
     }
 
@@ -76,15 +78,20 @@ abstract class ContractProxySocketService : WsStatusListener {
      *  @param applyDispose 是否跟随取消socket
      */
     fun subTicker(applyDispose: Boolean = true): Observable<List<TickerEventDto>> {
-        return bus.ofType(TickerEventWrapper::class.java)
-                .map { it.list }
-                .doOnSubscribe {
-                    subEvent(SocketEvent.MiniTicker24hr, SocketRequestBody.subscribeBody(listOf("!miniTicker@arr")))
-                }.doOnDispose {
-                    if (applyDispose) {
-                        unSubEvent(SocketEvent.MiniTicker24hr, SocketRequestBody.unSubscribeBody(listOf("!miniTicker@arr")))
-                    }
-                };
+        return getWsManager().flatMap(object : Function<WsManager, ObservableSource<List<TickerEventDto>>> {
+            override fun apply(t: WsManager): ObservableSource<List<TickerEventDto>> {
+                return bus.ofType(TickerEventWrapper::class.java)
+                        .map { it.list }
+                        .doOnSubscribe {
+                            subEvent(SocketEvent.MiniTicker24hr, SocketRequestBody.subscribeBody(listOf("!miniTicker@arr")), t)
+                        }.doOnDispose {
+                            if (applyDispose) {
+                                unSubEvent(SocketEvent.MiniTicker24hr, SocketRequestBody.unSubscribeBody(listOf("!miniTicker@arr")), t)
+                            }
+                        };
+            }
+        });
+
     }
 
 
@@ -108,18 +115,23 @@ abstract class ContractProxySocketService : WsStatusListener {
      * 1M
      */
     fun subKLine(symbol: String, interval: String): Observable<KLineEventDto> {
-        return bus.ofType(KLineSEvent::class.java)
-                .doOnSubscribe {
-                    subEvent(SocketEvent.KLine, SocketRequestBody.subscribeBody(listOf(String.format("%s@kline_%s", symbol, interval))))
-                }.doOnDispose {
-                    unSubEvent(SocketEvent.KLine, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@kline_%s", symbol, interval))))
-                }
-                .filter { TextUtils.equals(it.s, symbol) }
-                .map(object : Function<KLineSEvent, KLineEventDto> {
-                    override fun apply(t: KLineSEvent): KLineEventDto {
-                        return t.k;
-                    }
-                });
+        return getWsManager().flatMap(object : Function<WsManager, ObservableSource<KLineEventDto>> {
+            override fun apply(t: WsManager): ObservableSource<KLineEventDto> {
+                return bus.ofType(KLineSEvent::class.java)
+                        .doOnSubscribe {
+                            subEvent(SocketEvent.KLine, SocketRequestBody.subscribeBody(listOf(String.format("%s@kline_%s", symbol, interval))), t)
+                        }.doOnDispose {
+                            unSubEvent(SocketEvent.KLine, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@kline_%s", symbol, interval))), t)
+                        }
+                        .filter { TextUtils.equals(it.s, symbol) }
+                        .map(object : Function<KLineSEvent, KLineEventDto> {
+                            override fun apply(t: KLineSEvent): KLineEventDto {
+                                return t.k;
+                            }
+                        });
+            }
+        });
+
     }
 
     /**
@@ -129,36 +141,48 @@ abstract class ContractProxySocketService : WsStatusListener {
      * @param updateTime 更新间隔ms
      */
     fun subDepth(symbol: String, levels: Int = 20, updateTime: Long = 100): Observable<DepthEventDtoPo> {
-        return bus.ofType(DepthEventDtoPo::class.java)
-                .doOnSubscribe {
-                    subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@depth%s@%sms", symbol.toLowerCase(), levels, updateTime))));
-                }.doOnDispose {
-                    unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@depth%s@%sms", symbol.toLowerCase(), levels, updateTime))));
-                }.filter { TextUtils.equals(it.symbol, symbol) };
+        return getWsManager().flatMap(object : Function<WsManager, ObservableSource<DepthEventDtoPo>> {
+            override fun apply(t: WsManager): ObservableSource<DepthEventDtoPo> {
+                return bus.ofType(DepthEventDtoPo::class.java)
+                        .doOnSubscribe {
+                            subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@depth%s@%sms", symbol.toLowerCase(), levels, updateTime))), t);
+                        }.doOnDispose {
+                            unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@depth%s@%sms", symbol.toLowerCase(), levels, updateTime))), t);
+                        }.filter { TextUtils.equals(it.symbol, symbol) };
+            }
+        });
     }
 
     /**
      * 订阅成交  增量
      */
     fun subTrade(symbol: String): Observable<TradeEventDto> {
-        return bus.ofType(TradeEventDto::class.java)
-                .doOnSubscribe {
-                    subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@aggTrade", symbol.toLowerCase()))));
-                }.doOnDispose {
-                    unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@aggTrade", symbol.toLowerCase()))));
-                }.filter { TextUtils.equals(it.symbol, symbol) };
+        return getWsManager().flatMap(object : Function<WsManager, ObservableSource<TradeEventDto>> {
+            override fun apply(t: WsManager): ObservableSource<TradeEventDto> {
+                return bus.ofType(TradeEventDto::class.java)
+                        .doOnSubscribe {
+                            subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@aggTrade", symbol.toLowerCase()))), t);
+                        }.doOnDispose {
+                            unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@aggTrade", symbol.toLowerCase()))), t);
+                        }.filter { TextUtils.equals(it.symbol, symbol) };
+            }
+        });
     }
 
     /**
      * 订阅市价 和汇率结算
      */
     fun subMarkPrice(symbol: String): Observable<PremiumIndexPriceDto> {
-        return bus.ofType(PremiumIndexPriceDto::class.java)
-                .doOnSubscribe {
-                    subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@markPrice", symbol.toLowerCase()))));
-                }.doOnDispose {
-                    unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@markPrice", symbol.toLowerCase()))));
-                }.filter { TextUtils.equals(it.symbol, symbol) };
+        return getWsManager().flatMap(object : Function<WsManager, ObservableSource<PremiumIndexPriceDto>> {
+            override fun apply(t: WsManager): ObservableSource<PremiumIndexPriceDto> {
+                return bus.ofType(PremiumIndexPriceDto::class.java)
+                        .doOnSubscribe {
+                            subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@markPrice", symbol.toLowerCase()))), t);
+                        }.doOnDispose {
+                            unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@markPrice", symbol.toLowerCase()))), t);
+                        }.filter { TextUtils.equals(it.symbol, symbol) };
+            }
+        });
     }
 
     /**
@@ -167,33 +191,45 @@ abstract class ContractProxySocketService : WsStatusListener {
      * ustd 并没有该socket
      */
     fun subIndexPrice(symbol: String): Observable<IndexPriceEvent> {
-        return bus.ofType(IndexPriceEvent::class.java)
-                .doOnSubscribe {
-                    subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@indexPrice", symbol.toLowerCase()))));
-                }.doOnDispose {
-                    unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@indexPrice", symbol.toLowerCase()))));
-                }.filter { TextUtils.equals(it.symbol, symbol) };
+        return getWsManager().flatMap(object : Function<WsManager, ObservableSource<IndexPriceEvent>> {
+            override fun apply(t: WsManager): ObservableSource<IndexPriceEvent> {
+                return bus.ofType(IndexPriceEvent::class.java)
+                        .doOnSubscribe {
+                            subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(listOf(String.format("%s@indexPrice", symbol.toLowerCase()))), t);
+                        }.doOnDispose {
+                            unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody(listOf(String.format("%s@indexPrice", symbol.toLowerCase()))), t);
+                        }.filter { TextUtils.equals(it.symbol, symbol) };
+            }
+        });
     }
 
     /**
      * 订阅订单变化事件
      */
     fun subOrderChange(type: ContractType): Observable<OrderUpdateEvent> {
-        return bus.ofType(OrderUpdateEvent::class.java)
-                .filter {
-                    it.order != null
-                            && it.orderEventType != null
-                            && type == it.order.getPairConfig()?.contractType;
-                }
+        return getWsManager().flatMap(object : Function<WsManager, ObservableSource<OrderUpdateEvent>> {
+            override fun apply(t: WsManager): ObservableSource<OrderUpdateEvent> {
+                return bus.ofType(OrderUpdateEvent::class.java)
+                        .filter {
+                            it.order != null
+                                    && it.orderEventType != null
+                                    && type == it.order.getPairConfig()?.contractType;
+                        }
+            }
+        });
     }
 
     /**
      * Balance和Position更新推送
      */
     fun subAccountUpdate(): Observable<AccountUpdateEvent.AccountChangeInfo> {
-        return bus.ofType(AccountUpdateEvent::class.java)
-                .filter { it.account != null }
-                .map { it.account }
+        return getWsManager().flatMap(object : Function<WsManager, ObservableSource<AccountUpdateEvent.AccountChangeInfo>> {
+            override fun apply(t: WsManager): ObservableSource<AccountUpdateEvent.AccountChangeInfo> {
+                return bus.ofType(AccountUpdateEvent::class.java)
+                        .filter { it.account != null }
+                        .map { it.account }
+            }
+        });
     }
 
 
@@ -347,20 +383,24 @@ abstract class ContractProxySocketService : WsStatusListener {
         log("onClosed:code:$code reason:$reason")
     }
 
+    @SuppressLint("CheckResult")
     override fun onOpen(response: Response?) {
         log("onOpen:" + response!!.request.url + " code:" + response.code + " msg:" + response.message)
-        try {
-            /**
-             * 网络连接好后 需要重新将事件发出去
-             */
-            val temp: LinkedHashMap<SocketEvent, SocketRequestBody> = linkedMapOf();
-            temp.putAll(buffer);
-            temp.forEach {
-                subEvent(it.key, it.value);
-            }
-        } catch (e: Throwable) {
-            e.printStackTrace()
-        }
+        /**
+         * 网络连接好后 需要重新将事件发出去
+         */
+        getWsManager()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Consumer<WsManager> {
+                    override fun accept(t: WsManager) {
+                        val temp: LinkedHashMap<SocketEvent, SocketRequestBody> = linkedMapOf();
+                        temp.putAll(buffer);
+                        temp.forEach {
+                            subEvent(it.key, it.value, t);
+                        }
+                    }
+                })
     }
 
     override fun onFailure(t: Throwable?, response: Response?) {

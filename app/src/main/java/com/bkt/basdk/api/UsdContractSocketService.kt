@@ -5,6 +5,10 @@ import com.bkt.contract.ba.sdk.ContractProxySocketService
 import com.xxf.arch.XXF
 import com.xxf.arch.http.OkHttpClientBuilder
 import com.xxf.arch.websocket.WsManager
+import io.reactivex.Observable
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
 /**
@@ -27,24 +31,29 @@ class UsdContractSocketService private constructor() : ContractProxySocketServic
             return "wss://dstream.binancefuture.com/ws"
         };
     var mWsManager: WsManager? = null;
-    override fun getWsManager(): WsManager {
-        if (mWsManager == null || !TextUtils.equals(mWsManager?.tag(), wssUrl)) {
-            mWsManager = WsManager.Builder(XXF.getApplication())
-                    .wsUrl(wssUrl)
-                    .tag(wssUrl)
-                    .needReconnect(true)
-                    .client(OkHttpClientBuilder()
-                            //  .addInterceptor(BhHttpHeaderInterceptor())
-                            //.addInterceptor(BktHttpLoggerInterceptor())
+    override fun getWsManager(): Observable<WsManager> {
+        return Observable.fromCallable(object : Callable<WsManager> {
+            override fun call(): WsManager {
+                if (mWsManager == null || !TextUtils.equals(mWsManager?.tag(), wssUrl)) {
+                    mWsManager = WsManager.Builder(XXF.getApplication())
+                            .wsUrl(wssUrl)
+                            .tag(wssUrl)
+                            .needReconnect(true)
+                            .client(OkHttpClientBuilder()
+                                    //  .addInterceptor(BhHttpHeaderInterceptor())
+                                    //.addInterceptor(BktHttpLoggerInterceptor())
+                                    .build()
+                                    .newBuilder()
+                                    //.cookieJar(BhHttpCookieJar())
+                                    .pingInterval(8, TimeUnit.SECONDS)
+                                    .build())
                             .build()
-                            .newBuilder()
-                            //.cookieJar(BhHttpCookieJar())
-                            .pingInterval(8, TimeUnit.SECONDS)
-                            .build())
-                    .build()
-            mWsManager!!.setWsStatusListener(this)
-            mWsManager!!.startConnect()
-        }
-        return mWsManager!!;
+                    mWsManager!!.setWsStatusListener(this@UsdContractSocketService);
+                    mWsManager!!.startConnect()
+                }
+                return mWsManager!!;
+            }
+        }).subscribeOn(Schedulers.io());
+
     }
 }

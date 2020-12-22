@@ -94,14 +94,6 @@ open class PairInfoPo : Serializable {
         }
 
         override fun convertToDatabaseValue(entityProperty: TickerEventDto?): String? {
-            try {
-                /**
-                 * 填充涨跌幅
-                 */
-                entityProperty?.riseFallRange = CommonService.INSTANCE.getRiseFallRangeFormatObject(entityProperty?.closePrice?.origin!!, entityProperty?.openPrice?.origin!!);
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
             return JsonUtils.toJsonString(entityProperty)
         }
     }

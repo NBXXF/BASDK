@@ -1,5 +1,7 @@
 package com.bkt.contract.ba.model.dto
 
+import com.bkt.contract.ba.service.CommonService
+import com.google.gson.*
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 import com.xxf.arch.json.typeadapter.format.NumberObjectFormatTypeAdapter
@@ -7,6 +9,7 @@ import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
 import com.xxf.arch.utils.NumberUtils
 import java.io.Serializable
+import java.lang.reflect.Type
 import java.math.BigDecimal
 
 /**
@@ -14,7 +17,23 @@ import java.math.BigDecimal
  * @Author: XGod
  * @CreateDate: 2020/12/2 16:52
  */
-class TickerEventDto : Serializable {
+@JsonAdapter(TickerEventDto.TickerEventDtoJsonAdapter::class)
+open class TickerEventDto : Serializable {
+
+    inner class TickerEventDtoJsonAdapter : JsonDeserializer<TickerEventDto> {
+        override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): TickerEventDto {
+            val deserialize = context!!.deserialize<WithoutJsonAdapterDto>(json, WithoutJsonAdapterDto::class.java)
+            /**
+             * 填充涨跌幅
+             */
+            deserialize.riseFallRange = CommonService.INSTANCE.getRiseFallRangeFormatObject(deserialize.closePrice?.origin!!, deserialize.openPrice?.origin!!);
+            return deserialize;
+        }
+    }
+
+    inner class WithoutJsonAdapterDto : TickerEventDto() {
+
+    }
     /**
      * {
     "symbol": "BTCUSDT",

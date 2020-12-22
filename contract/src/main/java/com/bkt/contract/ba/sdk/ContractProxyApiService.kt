@@ -267,17 +267,21 @@ interface ContractProxyApiService {
      * 撤销全部订单 (TRADE)
      * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#trade-6
      */
-    @DELETE("v1/allOpenOrders")
+    // @DELETE("v1/allOpenOrders")
+    //用自己转发的
+    @POST("v1/orderCancelAll")
     fun cancelAllOrder(@Query("symbol") symbol: String,
                        @Query("recvWindow") recvWindow: Long?,
                        @Query("timestamp") timestamp: Long): Observable<BktResDto<ListOrSingle<OrderInfoDto>>>;
 
 
     /**
-     * 撤销全部订单 (TRADE)
+     * 撤销指定订单 (TRADE)
      * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#trade-6
      */
-    @DELETE("v1/order")
+    // @DELETE("v1/order")
+    //用自己转发的
+    @POST("v1/orderCancel")
     fun cancelOrder(@Query("symbol") symbol: String,
                     @Query("orderId") orderId: String?,
                     @Query("origClientOrderId") origClientOrderId: String?,
@@ -344,7 +348,9 @@ interface ContractProxyApiService {
      * https://binance-docs.github.io/apidocs/delivery_testnet/cn/#websocket-2
      * 创建一个新的user data stream,返回值为一个listenKey,即websocket订阅的stream名称。如果该帐户具有有效的listenKey,则将返回该listenKey并将其有效期延长60分钟。
      */
-    @POST("v1/listenKey")
+    // @POST("v1/listenKey")
+    //这里用自己的
+    @POST("v1//listenKeyCreate")
     fun createListenKey(): Observable<BktResDto<ListenKeyDto>>;
 
     /**

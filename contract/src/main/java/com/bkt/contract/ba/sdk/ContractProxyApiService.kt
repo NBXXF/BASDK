@@ -350,7 +350,7 @@ interface ContractProxyApiService {
      */
     // @POST("v1/listenKey")
     //这里用自己的
-    @POST("v1//listenKeyCreate")
+    @POST("v1/listenKeyCreate")
     fun createListenKey(): Observable<BktResDto<ListenKeyDto>>;
 
     /**

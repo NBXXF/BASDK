@@ -232,6 +232,18 @@ abstract class ContractProxySocketService : WsStatusListener {
         });
     }
 
+    /**
+     * 发送listenKey
+     * 以事件的形式发送
+     */
+    fun sendListenKey(listenKey: String): Observable<Boolean> {
+        return getWsManager().map(object : Function<WsManager, Boolean> {
+            override fun apply(t: WsManager): Boolean {
+                return t.sendMessage(JsonUtils.toJsonString(SocketRequestBody.subscribeBody(listOf(listenKey))));
+            }
+        });
+    }
+
 
     override fun onMessage(text: String?) {
         log("onMessage:$text")

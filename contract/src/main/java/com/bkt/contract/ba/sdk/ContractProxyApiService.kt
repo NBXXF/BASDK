@@ -286,7 +286,7 @@ interface ContractProxyApiService {
                     @Query("orderId") orderId: String?,
                     @Query("origClientOrderId") origClientOrderId: String?,
                     @Query("recvWindow") recvWindow: Long?,
-                    @Query("timestamp") timestamp: Long): Observable<BktResDto<BaResultDto>>;
+                    @Query("timestamp") timestamp: Long): Observable<BktResDto<OrderInfoDto>>;
 
     /**
      * 调整逐仓保证金

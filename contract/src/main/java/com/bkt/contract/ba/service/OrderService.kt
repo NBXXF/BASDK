@@ -187,6 +187,16 @@ interface OrderService : ExportService {
                                     val marginRateDecimal = NumberUtils.divide(it.isolatedMargin?.origin, NumberUtils.add(balance.balance?.origin, it.unRealizedProfit?.origin))
                                     it.marginRate = NumberFormatObject(marginRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(earningRateDecimal));
                                 }
+
+                                /**
+                                 * 仓位价值计算
+                                 */
+                                if (pairConfig.contractClassifyType == ContractType.USD) {
+                                    val positionValueDecimal = NumberUtils.multiply(pairConfig.contractSize, it.positionAmt?.origin);
+                                    it.positionValue = NumberFormatObject(positionValueDecimal, NumberUtils.formatRoundDown(positionValueDecimal, 0, pairConfig.pricePrecision));
+                                } else {
+                                    it.positionValue = it.positionAmt;
+                                }
                             }
 
                             it.adlQuantile = adlQuantiles.get(it.symbol);
@@ -326,10 +336,10 @@ interface OrderService : ExportService {
     /**
      * 针对交易对 撤销一个单
      */
-    fun cancelOrder(symbol: String, orderId: String?, origClientOrderId: String?, recvWindow: Long?): Observable<BaResultDto> {
+    fun cancelOrder(symbol: String, orderId: String?, origClientOrderId: String?, recvWindow: Long?): Observable<OrderInfoDto> {
         return BaClient.instance.getApiService(symbol)
-                .flatMap(object : Function<ContractProxyApiService, ObservableSource<BaResultDto>> {
-                    override fun apply(t: ContractProxyApiService): ObservableSource<BaResultDto> {
+                .flatMap(object : Function<ContractProxyApiService, ObservableSource<OrderInfoDto>> {
+                    override fun apply(t: ContractProxyApiService): ObservableSource<OrderInfoDto> {
                         return t.cancelOrder(symbol, orderId, origClientOrderId, recvWindow, System.currentTimeMillis())
                                 .map(HttpDataFunction());
                     }

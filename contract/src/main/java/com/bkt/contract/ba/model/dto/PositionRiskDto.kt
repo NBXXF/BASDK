@@ -142,6 +142,14 @@ open class PositionRiskDto : PairConfigProviderModel {
     var adlQuantile: AdlQuantileDto.AdlQuantileItem? = null;
 
 
+    /**
+     * 仓位价值
+     * 本地字段 接口并未返回
+     */
+    @Expose(serialize = false, deserialize = false)
+    var positionValue:NumberFormatObject?=null;
+
+
     override fun provideSymbol(): String? {
         return symbol;
     }

@@ -5,6 +5,7 @@ import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
 import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
+import com.xxf.arch.utils.NumberUtils
 import com.xxf.database.xxf.objectbox.id.IdUtils
 import io.objectbox.annotation.Convert
 import io.objectbox.annotation.Entity
@@ -102,11 +103,17 @@ open class DepthEventDtoPo : Serializable {
                     json.asJsonArray.forEach {
                         val priceBigDecimal = BigDecimal(it.asJsonArray.get(0).asString);
                         val numberBigDecimal = BigDecimal(it.asJsonArray.get(1).asString);
-                        list.add(
-                                BookItem(
-                                        NumberFormatObject(priceBigDecimal, priceBigDecimal.toPlainString()),
-                                        NumberFormatObject(numberBigDecimal, numberBigDecimal.toPlainString())
-                                ));
+                        /**
+                         * 过滤价格和数量小于等于0的情况
+                         */
+                        if (NumberUtils.compare(priceBigDecimal, 0) > 0
+                                && NumberUtils.compare(numberBigDecimal, 0) > 0) {
+                            list.add(
+                                    BookItem(
+                                            NumberFormatObject(priceBigDecimal, priceBigDecimal.toPlainString()),
+                                            NumberFormatObject(numberBigDecimal, numberBigDecimal.toPlainString())
+                                    ));
+                        }
                     }
                 }
             } catch (e: Throwable) {

@@ -8,6 +8,7 @@ import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
 import com.bkt.contract.ba.sdk.ContractProxySocketService
 import com.bkt.contract.ba.service.inner.TradeDbService
+import com.xxf.arch.utils.NumberUtils
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
@@ -53,7 +54,14 @@ interface TradeService : ExportService {
                                         }
                                         return t.sortedByDescending { it.time.origin };
                                     }
-                                });
+                                }).map {
+                                    it.filter {
+                                        /**
+                                         * 过滤价格和数量为0的情况
+                                         */
+                                        NumberUtils.compare(it.qty.origin, 0) > 0 && NumberUtils.compare(it.price.origin, 0) > 0;
+                                    }
+                                };
                     }
                 });
     }
@@ -75,7 +83,14 @@ interface TradeService : ExportService {
                                 });
                     }
                 }),
-                TradeDbService.subChange(symbol).map { it.trades }
+                TradeDbService.subChange(symbol).map {
+                    it.trades.filter {
+                        /**
+                         * 过滤价格和数量为0的情况
+                         */
+                        NumberUtils.compare(it.qty.origin, 0) > 0 && NumberUtils.compare(it.price.origin, 0) > 0;
+                    }
+                }
         ).startWith(
                 /**
                  * 先请求网络

@@ -3,6 +3,7 @@ package com.bkt.contract.ba.sdk
 import com.bkt.contract.ba.enums.PositionMarginType
 import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.po.DepthEventDtoPo
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.xxf.arch.json.datastructure.ListOrEmpty
 import com.xxf.arch.json.datastructure.ListOrSingle
@@ -273,7 +274,7 @@ interface ContractProxyApiService {
     @FormUrlEncoded
     fun cancelAllOrder(@Field("symbol") symbol: String,
                        @Field("recvWindow") recvWindow: Long?,
-                       @Field("timestamp") timestamp: Long): Observable<BktResDto<ListOrSingle<OrderInfoDto>>>;
+                       @Field("timestamp") timestamp: Long): Observable<BktResDto<JsonElement>>;
 
 
     /**

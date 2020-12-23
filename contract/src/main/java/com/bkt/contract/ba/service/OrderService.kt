@@ -7,6 +7,7 @@ import com.bkt.contract.ba.model.event.OrderUpdateEvent
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
 import com.bkt.contract.ba.sdk.ContractProxySocketService
+import com.google.gson.JsonElement
 import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.json.MapTypeToken
 import com.xxf.arch.json.datastructure.ListOrSingle
@@ -319,10 +320,10 @@ interface OrderService : ExportService {
     /**
      * 针对交易对 撤销全部订单
      */
-    fun cancelAllOrder(symbol: String, recvWindow: Long?): Observable<ListOrSingle<OrderInfoDto>> {
+    fun cancelAllOrder(symbol: String, recvWindow: Long?): Observable<JsonElement> {
         return BaClient.instance.getApiService(symbol)
-                .flatMap(object : Function<ContractProxyApiService, ObservableSource<ListOrSingle<OrderInfoDto>>> {
-                    override fun apply(t: ContractProxyApiService): ObservableSource<ListOrSingle<OrderInfoDto>> {
+                .flatMap(object : Function<ContractProxyApiService, ObservableSource<JsonElement>> {
+                    override fun apply(t: ContractProxyApiService): ObservableSource<JsonElement> {
                         return t.cancelAllOrder(symbol, recvWindow, System.currentTimeMillis())
                                 .map(HttpDataFunction());
                     }

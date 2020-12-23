@@ -270,9 +270,10 @@ interface ContractProxyApiService {
     // @DELETE("v1/allOpenOrders")
     //用自己转发的
     @POST("v1/orderCancelAll")
-    fun cancelAllOrder(@Query("symbol") symbol: String,
-                       @Query("recvWindow") recvWindow: Long?,
-                       @Query("timestamp") timestamp: Long): Observable<BktResDto<ListOrSingle<OrderInfoDto>>>;
+    @FormUrlEncoded
+    fun cancelAllOrder(@Field("symbol") symbol: String,
+                       @Field("recvWindow") recvWindow: Long?,
+                       @Field("timestamp") timestamp: Long): Observable<BktResDto<ListOrSingle<OrderInfoDto>>>;
 
 
     /**
@@ -282,11 +283,12 @@ interface ContractProxyApiService {
     // @DELETE("v1/order")
     //用自己转发的
     @POST("v1/orderCancel")
-    fun cancelOrder(@Query("symbol") symbol: String,
-                    @Query("orderId") orderId: String?,
-                    @Query("origClientOrderId") origClientOrderId: String?,
-                    @Query("recvWindow") recvWindow: Long?,
-                    @Query("timestamp") timestamp: Long): Observable<BktResDto<OrderInfoDto>>;
+    @FormUrlEncoded
+    fun cancelOrder(@Field("symbol") symbol: String,
+                    @Field("orderId") orderId: String?,
+                    @Field("origClientOrderId") origClientOrderId: String?,
+                    @Field("recvWindow") recvWindow: Long?,
+                    @Field("timestamp") timestamp: Long): Observable<BktResDto<OrderInfoDto>>;
 
     /**
      * 调整逐仓保证金

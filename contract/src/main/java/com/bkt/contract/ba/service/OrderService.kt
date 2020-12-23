@@ -132,10 +132,10 @@ interface OrderService : ExportService {
      * 按交易对获取
      */
     fun getPositionRisk(symbol: String,
-                        recvWindow: Long?): Observable<ListOrSingle<PositionRiskDto>> {
+                        recvWindow: Long?): Observable<List<PositionRiskDto>> {
         return PairService.INSTANCE.getPairType(symbol)
-                .flatMap(object : Function<ContractType, ObservableSource<ListOrSingle<PositionRiskDto>>> {
-                    override fun apply(type: ContractType): ObservableSource<ListOrSingle<PositionRiskDto>> {
+                .flatMap(object : Function<ContractType, ObservableSource<List<PositionRiskDto>>> {
+                    override fun apply(type: ContractType): ObservableSource<List<PositionRiskDto>> {
                         return getPositionRiskInner(type, symbol, recvWindow);
                     }
                 })
@@ -145,7 +145,7 @@ interface OrderService : ExportService {
      * 按类型获取持仓
      */
     fun getPositionRisk(type: ContractType,
-                        recvWindow: Long?): Observable<ListOrSingle<PositionRiskDto>> {
+                        recvWindow: Long?): Observable<List<PositionRiskDto>> {
         return getPositionRiskInner(type, null, recvWindow);
     }
 
@@ -155,15 +155,20 @@ interface OrderService : ExportService {
      */
     private fun getPositionRiskInner(type: ContractType,
                                      symbol: String?,
-                                     recvWindow: Long?): Observable<ListOrSingle<PositionRiskDto>> {
+                                     recvWindow: Long?): Observable<List<PositionRiskDto>> {
         return Observable.zip(
                 UserService.INSTANCE.getLeverageBrackets(type),
                 UserService.INSTANCE.getAccount(type, recvWindow),
                 CommonService.INSTANCE.getAdlQuantileByType(type, recvWindow),
                 BaClient.instance.initializer?.getApiService(type)!!.getPositionRisk(symbol, recvWindow, System.currentTimeMillis())
-                        .map(HttpDataFunction()),
-                object : io.reactivex.functions.Function4<Map<String, List<LeverageBracketDto.BracketsBean>>, AccountInfoDto, LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, ListOrSingle<PositionRiskDto>, ListOrSingle<PositionRiskDto>> {
-                    override fun apply(leverageMap: Map<String, List<LeverageBracketDto.BracketsBean>>, accountInfoDto: AccountInfoDto, adlQuantiles: LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, positionRisks: ListOrSingle<PositionRiskDto>): ListOrSingle<PositionRiskDto> {
+                        .map(HttpDataFunction())
+                        .map {
+                            it.filter {
+                                NumberUtils.compare(it.positionAmt?.origin, 0) > 0;
+                            }
+                        },
+                object : io.reactivex.functions.Function4<Map<String, List<LeverageBracketDto.BracketsBean>>, AccountInfoDto, LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, List<PositionRiskDto>, List<PositionRiskDto>> {
+                    override fun apply(leverageMap: Map<String, List<LeverageBracketDto.BracketsBean>>, accountInfoDto: AccountInfoDto, adlQuantiles: LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, positionRisks: List<PositionRiskDto>): List<PositionRiskDto> {
                         val positionMap: MutableMap<String, AccountInfoDto.PositionDetailsDto> = mutableMapOf();
                         accountInfoDto.positions?.forEach {
                             it.symbol?.let { it1 -> positionMap.put(it1, it) };

@@ -147,7 +147,6 @@ open class PositionRiskDto : PairConfigProviderModel {
      *
      * 保证金率
      * 逐仓仓位维持保证金/（逐仓模式下钱包余额+未实现盈亏）
-     * isolatedMargin/(逐仓模式下钱包余额+unRealizedProfit)
      *
      * https://docs.qq.com/doc/DV1NzZWVCZXdQbW1Q
      */

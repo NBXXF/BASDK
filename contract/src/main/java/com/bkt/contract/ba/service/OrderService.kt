@@ -17,8 +17,6 @@ import com.xxf.arch.utils.NumberUtils
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
-import io.reactivex.functions.Function3
-import retrofit2.http.Field
 
 /**
  * @Description: 订单下单service
@@ -160,12 +158,16 @@ interface OrderService : ExportService {
                                      recvWindow: Long?): Observable<ListOrSingle<PositionRiskDto>> {
         return Observable.zip(
                 UserService.INSTANCE.getLeverageBrackets(type),
-                UserService.INSTANCE.getAllBalanceToMap(null),
+                UserService.INSTANCE.getAccount(type, recvWindow),
                 CommonService.INSTANCE.getAdlQuantileByType(type, recvWindow),
                 BaClient.instance.initializer?.getApiService(type)!!.getPositionRisk(symbol, recvWindow, System.currentTimeMillis())
                         .map(HttpDataFunction()),
-                object : io.reactivex.functions.Function4<Map<String, List<LeverageBracketDto.BracketsBean>>, Map<String, CoinBalanceDto>, LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, ListOrSingle<PositionRiskDto>, ListOrSingle<PositionRiskDto>> {
-                    override fun apply(leverageMap: Map<String, List<LeverageBracketDto.BracketsBean>>, balances: Map<String, CoinBalanceDto>, adlQuantiles: LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, positionRisks: ListOrSingle<PositionRiskDto>): ListOrSingle<PositionRiskDto> {
+                object : io.reactivex.functions.Function4<Map<String, List<LeverageBracketDto.BracketsBean>>, AccountInfoDto, LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, ListOrSingle<PositionRiskDto>, ListOrSingle<PositionRiskDto>> {
+                    override fun apply(leverageMap: Map<String, List<LeverageBracketDto.BracketsBean>>, accountInfoDto: AccountInfoDto, adlQuantiles: LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, positionRisks: ListOrSingle<PositionRiskDto>): ListOrSingle<PositionRiskDto> {
+                        val positionMap: MutableMap<String, AccountInfoDto.PositionDetailsDto> = mutableMapOf();
+                        accountInfoDto.positions?.forEach {
+                            it.symbol?.let { it1 -> positionMap.put(it1, it) };
+                        }
                         /**
                          * 持倉接口並未返回
                          * 需要赋值这三个字段
@@ -181,19 +183,12 @@ interface OrderService : ExportService {
                             }
 
                             /**
-                             * isolatedMargin/(逐仓模式下钱包余额+unRealizedProfit)
+                             * 逐仓仓位维持保证金/（逐仓模式下钱包余额+未实现盈亏）
                              */
-                            val pairConfigs = PairService.INSTANCE.getPairConfigs();
-                            val pairConfig = pairConfigs.get(it.symbol);
-                            if (pairConfig != null) {
-                                var balance: CoinBalanceDto? = balances.get(pairConfig.baseAsset);
-                                if (balance == null) {
-                                    balance = balances.get(pairConfig.quoteAsset);
-                                }
-                                if (balance != null) {
-                                    val marginRateDecimal = NumberUtils.divide(it.isolatedMargin?.origin, NumberUtils.add(balance.balance?.origin, it.unRealizedProfit?.origin))
-                                    it.marginRate = NumberFormatObject(marginRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(marginRateDecimal));
-                                }
+                            val positionDetails: AccountInfoDto.PositionDetailsDto? = positionMap.get(it.symbol);
+                            if (positionDetails != null) {
+                                val marginRateDecimal = NumberUtils.divide(positionDetails.maintMargin?.origin, it.unRealizedProfit?.origin);
+                                it.marginRate = NumberFormatObject(marginRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(marginRateDecimal));
                             }
 
                             it.adlQuantile = adlQuantiles.get(it.symbol);

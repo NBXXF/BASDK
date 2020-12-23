@@ -75,71 +75,71 @@ class AccountInfoDto {
          * 账户余额
          */
         @JsonAdapter(Number_UNFormatTypeAdapter::class)
-        var walletbalance: NumberFormatObject? = null
+        var walletBalance: NumberFormatObject? = null
 
         /**
          * 全部持仓未实现盈亏
          */
         @JsonAdapter(Number_UNFormatTypeAdapter::class)
-        var unrealizedprofit: NumberFormatObject? = null
+        var unrealizedProfit: NumberFormatObject? = null
 
         /**
          * 保证金余额
          */
         @JsonAdapter(Number_UNFormatTypeAdapter::class)
-        var marginbalance: NumberFormatObject? = null
+        var marginBalance: NumberFormatObject? = null
 
         /**
          * 维持保证金
          */
         @JsonAdapter(Number_UNFormatTypeAdapter::class)
-        var maintmargin: NumberFormatObject? = null
+        var maintMargin: NumberFormatObject? = null
 
         /**
          * 当前所需起始保证金(按最新标标记价格)
          */
         @JsonAdapter(Number_UNFormatTypeAdapter::class)
-        var initialmargin: NumberFormatObject? = null
+        var initialMargin: NumberFormatObject? = null
 
         /**
          * 当前所需持仓起始保证金(按最新标标记价格)
          */
         @JsonAdapter(Number_UNFormatTypeAdapter::class)
-        var positioninitialmargin: NumberFormatObject? = null
+        var positionInitialMargin: NumberFormatObject? = null
 
         /**
          * 当前所需挂单起始保证金(按最新标标记价格)
          */
         @JsonAdapter(Number_UNFormatTypeAdapter::class)
-        var openorderinitialmargin: NumberFormatObject? = null
+        var openOrderInitialMargin: NumberFormatObject? = null
 
         /**
          * 最大可提款金额
          */
         @JsonAdapter(Number_UNFormatTypeAdapter::class)
-        var maxwithdrawamount: NumberFormatObject? = null
+        var maxWithdrawAmount: NumberFormatObject? = null
 
         /**
          * 可用于全仓的账户余额
          */
         @JsonAdapter(Number_UNFormatTypeAdapter::class)
-        var crosswalletbalance: NumberFormatObject? = null
+        var crossWalletBalance: NumberFormatObject? = null
 
         /**
          * 所有全仓持仓的未实现盈亏
          */
         @JsonAdapter(Number_UNFormatTypeAdapter::class)
-        var crossunpnl: NumberFormatObject? = null
+        var crossUnPnl: NumberFormatObject? = null
 
         /**
          * 可用下单余额
          */
         @JsonAdapter(Number_UNFormatTypeAdapter::class)
-        var availablebalance: NumberFormatObject? = null
+        var availableBalance: NumberFormatObject? = null
 
 
         override fun toString(): String {
-            return "BalanceDetailsDto(asset=$asset, walletbalance=$walletbalance, unrealizedprofit=$unrealizedprofit, marginbalance=$marginbalance, maintmargin=$maintmargin, initialmargin=$initialmargin, positioninitialmargin=$positioninitialmargin, openorderinitialmargin=$openorderinitialmargin, maxwithdrawamount=$maxwithdrawamount, crosswalletbalance=$crosswalletbalance, crossunpnl=$crossunpnl, availablebalance=$availablebalance)"
+            return "BalanceDetailsDto(asset=$asset, walletbalance=$walletBalance, unrealizedprofit=$unrealizedProfit, marginbalance=$marginBalance, maintmargin=$maintMargin, initialmargin=$initialMargin, positioninitialmargin=$positionInitialMargin, openorderinitialmargin=$openOrderInitialMargin, maxwithdrawamount=$maxWithdrawAmount, crosswalletbalance=$crossWalletBalance, crossunpnl=$crossUnPnl, availablebalance=$availableBalance)"
         }
 
 

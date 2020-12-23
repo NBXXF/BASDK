@@ -203,6 +203,26 @@ interface UserService : ExportService {
     }
 
     /**
+     * 从账户信息中获取资产
+     * [key="asset",value]
+     */
+    fun getUserAssets(type: ContractType,
+                      recvWindow: Long?,
+                      cacheType: CacheType = CacheType.onlyRemote,
+                      cacheTime: Long = TimeUnit.MINUTES.toMillis(5)): Observable<Map<String, AccountInfoDto.BalanceDetailsDto>> {
+        return getAccount(type, recvWindow, cacheType, cacheTime)
+                .map(object : Function<AccountInfoDto, Map<String, AccountInfoDto.BalanceDetailsDto>> {
+                    override fun apply(t: AccountInfoDto): Map<String, AccountInfoDto.BalanceDetailsDto> {
+                        val map: LinkedHashMap<String, AccountInfoDto.BalanceDetailsDto> = linkedMapOf();
+                        t.assets?.forEach {
+                            it.asset?.let { it1 -> map.put(it1, it) };
+                        }
+                        return map;
+                    }
+                })
+    }
+
+    /**
      * 获取用户配置
      * [key=symbol,value]
      */

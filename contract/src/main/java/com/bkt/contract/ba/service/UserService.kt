@@ -2,6 +2,7 @@ package com.bkt.contract.ba.service
 
 import com.bkt.contract.ba.common.HttpDataFunction
 import com.bkt.contract.ba.enums.ContractType
+import com.bkt.contract.ba.model.UserConfigModel
 import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.event.AccountUpdateEvent
 import com.bkt.contract.ba.sdk.BaClient
@@ -18,7 +19,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * @Description: 用户service
-   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
+ * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/16 11:37
  */
 interface UserService : ExportService {
@@ -197,8 +198,28 @@ interface UserService : ExportService {
     ): Observable<AccountInfoDto> {
         return BaClient.instance
                 .initializer!!.getApiService(type)
-                .getAccount(cacheType, cacheTime, recvWindow, System.currentTimeMillis())
+                .getAccount(if (type == ContractType.USDT) "v2" else "v1", cacheType, cacheTime, recvWindow, System.currentTimeMillis())
                 .map(HttpDataFunction());
+    }
+
+    /**
+     * 获取用户配置
+     * [key=symbol,value]
+     */
+    fun getUserConfig(type: ContractType,
+                      recvWindow: Long?,
+                      cacheType: CacheType = CacheType.onlyRemote,
+                      cacheTime: Long = TimeUnit.MINUTES.toMillis(5)): Observable<Map<String, UserConfigModel>> {
+        return getAccount(type, recvWindow, cacheType, cacheTime)
+                .map(object : Function<AccountInfoDto, Map<String, UserConfigModel>> {
+                    override fun apply(t: AccountInfoDto): Map<String, UserConfigModel> {
+                        var configMap: MutableMap<String, UserConfigModel> = mutableMapOf();
+                        t.positions?.forEach {
+                            it.symbol?.let { it1 -> configMap.put(it1, UserConfigModel(it.leverage)) };
+                        };
+                        return configMap;
+                    }
+                });
     }
 
     /**

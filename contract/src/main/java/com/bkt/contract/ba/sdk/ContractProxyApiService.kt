@@ -379,8 +379,9 @@ interface ContractProxyApiService {
      * 对于单向持仓模式，"positions"仅会展示"BOTH"方向的持仓
      * 对于双向持仓模式，"positions"会展示所有"BOTH", "LONG", 和"SHORT"方向的持仓
      */
-    @GET("v1/account")
+    @GET("{version}/account")
     fun getAccount(
+            @Path("version") version: String,
             @Cache type: CacheType,
             @Header("cache") cacheTime: Long,
             @Query("recvWindow") recvWindow: Long?,

@@ -21,7 +21,7 @@ import retrofit2.http.Field
 
 /**
  * @Description: 订单下单service
-   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
+ * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/14 11:27
  */
 interface OrderService : ExportService {
@@ -168,17 +168,11 @@ interface OrderService : ExportService {
                         /**
                          * 持倉接口並未返回
                          * 需要赋值这三个字段
-                        var earningRate: NumberFormatObject? = null
                         var marginRate: NumberFormatObject? = null;
                         var maintenanceMarginRate: NumberFormatObject? = null;
                         var adlQuantile: AdlQuantileDto.AdlQuantileItem? = null;
                          */
                         positionRisks.forEach {
-                            /**
-                             * unRealizedProfit/isolatedMargin *100
-                             */
-                            val earningRateDecimal = NumberUtils.divide(it.unRealizedProfit?.origin, it.isolatedMargin?.origin, Math.max(it.unRealizedProfit?.origin!!.scale(), it.isolatedMargin?.origin!!.scale()));
-                            it.earningRate = NumberFormatObject(earningRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(earningRateDecimal));
 
                             val leverageBracket: List<LeverageBracketDto.BracketsBean>? = leverageMap.get(CommonService.INSTANCE.convertPair(it.symbol));
                             if (leverageBracket != null) {
@@ -197,17 +191,7 @@ interface OrderService : ExportService {
                                 }
                                 if (balance != null) {
                                     val marginRateDecimal = NumberUtils.divide(it.isolatedMargin?.origin, NumberUtils.add(balance.balance?.origin, it.unRealizedProfit?.origin))
-                                    it.marginRate = NumberFormatObject(marginRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(earningRateDecimal));
-                                }
-
-                                /**
-                                 * 仓位价值计算
-                                 */
-                                if (pairConfig.contractClassifyType == ContractType.USD) {
-                                    val positionValueDecimal = NumberUtils.multiply(pairConfig.contractSize, it.positionAmt?.origin);
-                                    it.positionValue = NumberFormatObject(positionValueDecimal, NumberUtils.formatRoundDown(positionValueDecimal, 0, pairConfig.pricePrecision));
-                                } else {
-                                    it.positionValue = it.positionAmt;
+                                    it.marginRate = NumberFormatObject(marginRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(marginRateDecimal));
                                 }
                             }
 

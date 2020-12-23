@@ -3,17 +3,50 @@ package com.bkt.contract.ba.model.dto
 import com.bkt.contract.ba.enums.MarginType
 import com.bkt.contract.ba.enums.PositionDirection
 import com.bkt.contract.ba.model.PairConfigProviderModel
+import com.bkt.contract.ba.service.CommonService
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.JsonAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapter
+import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_FormatTypeAdapter
+import com.xxf.arch.utils.NumberUtils
+import java.lang.reflect.Type
 
 /**
  * @Description: 持仓
-   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
+ * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/15 13:36
  */
+@JsonAdapter(PositionRiskDto.PositionRiskDtoJsonAdapter::class)
 open class PositionRiskDto : PairConfigProviderModel {
+
+    internal class PositionRiskDtoJsonAdapter : JsonDeserializer<PositionRiskDto> {
+        override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): PositionRiskDto {
+            val deserialize = context!!.deserialize<WithoutJsonAdapterDto>(json, WithoutJsonAdapterDto::class.java);
+            if (deserialize.positionAmt != null && deserialize.markPrice != null) {
+                deserialize.positionValue = CommonService.INSTANCE.calculatePositionValue(
+                        deserialize.symbol!!,
+                        deserialize.positionAmt!!.origin,
+                        deserialize.markPrice!!.origin);
+            }
+
+            if (deserialize.unRealizedProfit != null && deserialize.isolatedMargin != null) {
+                val earningRateDecimal = NumberUtils.divide(
+                        deserialize.unRealizedProfit?.origin,
+                        deserialize.isolatedMargin?.origin,
+                        Math.max(deserialize.unRealizedProfit?.origin!!.scale(), deserialize.isolatedMargin?.origin!!.scale()));
+                deserialize.earningRate = NumberFormatObject(earningRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(earningRateDecimal));
+            }
+            return deserialize;
+        }
+    }
+
+    internal class WithoutJsonAdapterDto : PositionRiskDto() {
+    }
+
     /**
      *   {
     "entryPrice": "0.00000", // 开仓均价
@@ -147,7 +180,7 @@ open class PositionRiskDto : PairConfigProviderModel {
      * 本地字段 接口并未返回
      */
     @Expose(serialize = false, deserialize = false)
-    var positionValue:NumberFormatObject?=null;
+    var positionValue: NumberFormatObject? = null;
 
 
     override fun provideSymbol(): String? {

@@ -29,7 +29,7 @@ import kotlin.math.max
 
 /**
  * @Description: 公共服务
-   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
+ * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/12 16:37
  */
 interface CommonService : ExportService {
@@ -70,6 +70,28 @@ interface CommonService : ExportService {
         val riseFallRange = getRiseFallRange(closePrice, openPrice);
         return NumberFormatObject(riseFallRange, Number_percent_auto_2_2_DOWN_Signed_FormatTypeAdapter().format(riseFallRange));
     }
+
+
+    /**
+     * 计算仓位价值
+     */
+    fun calculatePositionValue(symbol: String, positionSize: Number, marketPrice: Number): NumberFormatObject? {
+        try {
+            val pairConfig = PairService.INSTANCE.getPairConfig(symbol);
+            var positionValueDecimal: BigDecimal? = null;
+            if (pairConfig?.contractClassifyType == ContractType.USDT) {
+                positionValueDecimal = NumberUtils.multiply(positionSize, marketPrice);
+            } else {
+                positionValueDecimal = NumberUtils.divide(NumberUtils.multiply(positionSize, pairConfig?.contractSize), marketPrice);
+            }
+            return NumberFormatObject(positionValueDecimal, NumberUtils.formatRoundDown(positionSize, 0, pairConfig?.pricePrecision
+                    ?: 2));
+        } catch (e: Throwable) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     /**
      * symbol 转pair

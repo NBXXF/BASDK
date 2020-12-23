@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.model.dto
 
+import com.bkt.contract.ba.common.jsontypeadapter.Number_Abs_UNFormatTypeAdapter
 import com.bkt.contract.ba.enums.MarginType
 import com.bkt.contract.ba.enums.PositionDirection
 import com.bkt.contract.ba.model.PairConfigProviderModel
@@ -111,7 +112,7 @@ open class PositionRiskDto : PairConfigProviderModel {
     /**
      *  头寸数量，符号代表多空方向, 正数为多，负数为空
      */
-    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    @JsonAdapter(Number_Abs_UNFormatTypeAdapter::class)
     var positionAmt: NumberFormatObject? = null
 
     /**

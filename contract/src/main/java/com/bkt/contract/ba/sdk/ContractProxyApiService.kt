@@ -12,7 +12,7 @@ import retrofit2.http.*
 
 /**
  * @Description: ba Proxy http api
-   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
+ * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/1 20:10
  */
 
@@ -319,6 +319,7 @@ interface ContractProxyApiService {
      * 调整开仓杠杆 (TRADE)
      */
     @POST("v1/leverage")
+    @FormUrlEncoded
     fun changeLeverage(@Field("symbol") symbol: String,
                        @Field("leverage") leverage: Int,
                        @Field("recvWindow") recvWindow: Long?,

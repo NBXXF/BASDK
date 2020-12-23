@@ -17,7 +17,7 @@ import java.math.BigDecimal
 
 /**
  * @Description: 深度  socket和http 复用一个模型
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/3 17:13
  */
 @Entity

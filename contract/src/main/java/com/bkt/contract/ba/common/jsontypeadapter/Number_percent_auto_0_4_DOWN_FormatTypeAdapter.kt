@@ -8,7 +8,7 @@ import java.util.*
 
 /**
  * @Description: 百分数格式化 0-4位小数, 安卓源码会自动*100
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/11/5 15:36
  *
  *

@@ -5,7 +5,7 @@ import java.io.Serializable
 
 /**
  * @Description: 订单状态
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/1 20:18
  *
  * 文档地址:https://binance-docs.github.io/apidocs/futures/cn/#api

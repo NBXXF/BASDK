@@ -5,7 +5,7 @@ import io.reactivex.functions.Function
 
 /**
  * @Description: 交易对信息转换成name list
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/10 9:43
  */
 internal class PairInfoToPairNameListFunction : Function<List<PairInfoPo>, List<String>> {

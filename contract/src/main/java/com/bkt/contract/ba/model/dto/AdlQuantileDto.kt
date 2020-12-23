@@ -5,7 +5,7 @@ package com.bkt.contract.ba.model.dto
  *
  *
  * https://binance-docs.github.io/apidocs/testnet/cn/#user_data-8
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/16 18:11
  */
 class AdlQuantileDto {

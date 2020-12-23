@@ -6,7 +6,7 @@ import com.xxf.database.xxf.objectbox.MergeFunction
 
 /**
  * @Description: 交易对对应的成交
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/11 14:25
  */
 class PairTradePoMergeFunction : MergeFunction<PairTradePo> {

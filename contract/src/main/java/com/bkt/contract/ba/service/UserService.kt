@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * @Description: 用户service
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/16 11:37
  */
 interface UserService : ExportService {

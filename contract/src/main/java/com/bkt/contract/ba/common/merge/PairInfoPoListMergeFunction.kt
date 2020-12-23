@@ -6,7 +6,7 @@ import com.xxf.database.xxf.objectbox.ListMergeFunction
 
 /**
  * @Description: 交易对信息合并
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/7 10:46
  */
 internal class PairInfoPoListMergeFunction : ListMergeFunction<PairInfoPo> {

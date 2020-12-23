@@ -7,7 +7,7 @@ import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_FormatTypeAdapter
 /**
  * @Description: 杠杆分层标准
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/16 9:52
  */
 class LeverageBracketDto {

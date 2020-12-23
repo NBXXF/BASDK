@@ -6,7 +6,7 @@ import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapt
 
 /**
  * @Description: T调整杠杆倍数返回结果
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/17 10:02
  */
 class ChangeLeverageResDto {

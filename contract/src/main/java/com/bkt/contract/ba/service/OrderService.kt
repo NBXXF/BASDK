@@ -6,6 +6,7 @@ import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.event.OrderUpdateEvent
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.sdk.ContractProxyApiService
+import com.bkt.contract.ba.sdk.ContractProxySocketService
 import com.xxf.arch.json.JsonUtils
 import com.xxf.arch.json.MapTypeToken
 import com.xxf.arch.json.datastructure.ListOrSingle
@@ -20,7 +21,7 @@ import retrofit2.http.Field
 
 /**
  * @Description: 订单下单service
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/14 11:27
  */
 interface OrderService : ExportService {
@@ -33,6 +34,7 @@ interface OrderService : ExportService {
 
     /**
      * 下单
+     *  会发送订单socket,接收事件请订阅 subOrderChange()
      * @param order
      */
     fun createOrder(order: OrderRequestDto): Observable<OrderInfoDto> {
@@ -40,7 +42,17 @@ interface OrderService : ExportService {
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<OrderInfoDto>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<OrderInfoDto> {
                         return t.createOrder(JsonUtils.toMap(JsonUtils.toJsonString(order), MapTypeToken<String, Any>()))
-                                .map(HttpDataFunction());
+                                .map(HttpDataFunction())
+                                .doOnNext {
+                                    /**
+                                     * 主动模拟socket发送一遍信号
+                                     * 订单变化socket 不会时时
+                                     */
+                                    val orderUpdateEvent = OrderUpdateEvent();
+                                    orderUpdateEvent.orderEventType = OrderEventType.NEW;
+                                    orderUpdateEvent.order = it;
+                                    ContractProxySocketService.bus.onNext(orderUpdateEvent);
+                                };
                     }
                 });
     }

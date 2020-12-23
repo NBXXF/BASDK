@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 /**
  * @Description: 合约类型
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/8 14:27
  */
 enum class ContractType(val value: String) {

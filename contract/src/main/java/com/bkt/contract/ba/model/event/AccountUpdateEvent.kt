@@ -10,7 +10,7 @@ import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapt
 /**
  * @Description: 账户信息(余额+持仓) 这是ba的沙雕设计
  * https://binance-docs.github.io/apidocs/testnet/cn/#balance-position
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/17 16:20
  */
 class AccountUpdateEvent {

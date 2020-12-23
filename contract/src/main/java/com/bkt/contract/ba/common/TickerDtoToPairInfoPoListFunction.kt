@@ -6,7 +6,7 @@ import io.reactivex.functions.Function
 
 /**
  * @Description: ticker dto转pairinfo po
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/10 10:01
  */
 internal class TickerDtoToPairInfoPoListFunction : Function<List<TickerEventDto>, List<PairInfoPo>> {

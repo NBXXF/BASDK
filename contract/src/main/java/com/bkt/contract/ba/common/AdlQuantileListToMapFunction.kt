@@ -8,7 +8,7 @@ import kotlin.collections.LinkedHashMap
 
 /**
  * @Description: 转换AdlQuantileItem 为[key=symbol,value]
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/16 18:42
  */
 class AdlQuantileListToMapFunction : Function<ListOrSingle<AdlQuantileDto>, LinkedHashMap<String, AdlQuantileItem>> {

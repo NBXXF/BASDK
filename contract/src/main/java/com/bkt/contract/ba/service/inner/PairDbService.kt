@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @Description: 交易对db service
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/9 15:14
  */
 internal object PairDbService {

@@ -12,7 +12,7 @@ import com.xxf.arch.http.url.UrlProvider
 
 /**
  * @Description: 合约api 采用伪代理模式;只是配置微服务api基本信息(如主机,拦截器等);其核心声明和实现并不在此
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/2 10:13
  *
  *

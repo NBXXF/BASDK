@@ -6,7 +6,7 @@ import com.google.gson.annotations.JsonAdapter
 
 /**
  * @Description: 下单请求模型
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/14 14:03
  *
  * 接口参考:https://binance-docs.github.io/apidocs/testnet/cn/#trade-2

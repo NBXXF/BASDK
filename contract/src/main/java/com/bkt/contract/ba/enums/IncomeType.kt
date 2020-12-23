@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 /**
  * @Description: 收益类型
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/15 15:00
  */
 enum class IncomeType(val value: String) {

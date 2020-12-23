@@ -5,7 +5,7 @@ import java.io.Serializable
 
 /**
  * @Description: (逐仓) (全仓)
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/15 13:45
  */
 enum class MarginType (val value: String) : Serializable {

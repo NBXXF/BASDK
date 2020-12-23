@@ -14,7 +14,7 @@ import java.lang.reflect.Type
  * 当有新订单创建、订单有新成交或者新的状态变化时会推送此类事件 event type统一为 ORDER_TRADE_UPDATE
  *
  * https://binance-docs.github.io/apidocs/testnet/cn/#060a012f0b
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/17 15:13
  */
 @JsonAdapter(OrderUpdateEvent.OrderUpdateJsonAdapter::class)
@@ -23,10 +23,10 @@ open class OrderUpdateEvent : BaseSEvent() {
     /**
      * 订单 动作 eg.新增 或者删除等等,具体参考枚举
      */
-    val orderEventType: OrderEventType? = null;
+    var orderEventType: OrderEventType? = null;
 
     @SerializedName("o")
-    val order: OrderInfoDto? = null;
+    var order: OrderInfoDto? = null;
 
     inner class OrderUpdateJsonAdapter : JsonDeserializer<OrderUpdateEvent> {
         override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): OrderUpdateEvent {

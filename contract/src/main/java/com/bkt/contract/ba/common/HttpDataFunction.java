@@ -8,7 +8,7 @@ import io.reactivex.functions.Function;
 
 /**
  * @Description: TODO @XGode
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/21 11:34
  */
 public class HttpDataFunction<T> implements Function<IBktBaseResDto<T>, T> {

@@ -5,7 +5,7 @@ import java.io.Serializable
 
 /**
  * @Description: 有效方式 (timeInForce):
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/1 20:50
  */
 enum class TimeInForce(val value: String):Serializable {

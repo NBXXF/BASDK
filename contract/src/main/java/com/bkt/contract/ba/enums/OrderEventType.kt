@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 /**
  * @Description: order socket事件的具体执行类型
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/17 15:19
  */
 enum class OrderEventType(val value: String) {

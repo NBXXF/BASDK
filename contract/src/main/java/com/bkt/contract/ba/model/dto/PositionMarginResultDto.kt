@@ -5,7 +5,7 @@ import java.math.BigDecimal
 
 /**
  * @Description: 调整逐仓保证金 返回结果
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/16 16:23
  */
 class PositionMarginResultDto : BaResultDto() {

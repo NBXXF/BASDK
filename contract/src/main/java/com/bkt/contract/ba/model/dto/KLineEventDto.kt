@@ -14,7 +14,7 @@ import java.math.BigDecimal
 
 /**
  * @Description: k线单条数据模型  兼容socket和http模型
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/3 18:52
  */
 @JsonAdapter(KLineEventDto.KLineJsonTypeAdapter::class)

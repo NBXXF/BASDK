@@ -11,7 +11,7 @@ import io.objectbox.converter.PropertyConverter
 
 /**
  * @Description: 交易对对应的 成交 po
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/11 14:14
  */
 @Entity

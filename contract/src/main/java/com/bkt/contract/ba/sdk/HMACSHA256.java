@@ -5,7 +5,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 /**
  * @Description: HMACSHA256 工具类
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/17 20:47
  */
 public class HMACSHA256 {

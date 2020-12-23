@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 /**
  * @Description: socket 事件
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/3 16:10
  */
 enum class SocketEvent(val value: String) {

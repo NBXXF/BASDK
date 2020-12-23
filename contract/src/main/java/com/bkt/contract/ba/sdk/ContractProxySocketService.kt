@@ -34,11 +34,14 @@ import java.util.concurrent.Callable
 
 /**
  * @Description: ba Proxy socket api
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/2 20:45
  */
 abstract class ContractProxySocketService : WsStatusListener {
-    private val bus: Subject<Any> = PublishSubject.create<Any>().toSerialized();
+    companion object {
+        internal val bus: Subject<Any> = PublishSubject.create<Any>().toSerialized();
+    }
+
     private val buffer: LinkedHashMap<SocketEvent, SocketRequestBody> = linkedMapOf();
 
     class TickerEventWrapper(val list: List<TickerEventDto>);
@@ -213,7 +216,7 @@ abstract class ContractProxySocketService : WsStatusListener {
                         .filter {
                             it.order != null
                                     && it.orderEventType != null
-                                    && type == it.order.getPairConfig()?.contractType;
+                                    && type == it.order!!.getPairConfig()?.contractType;
                         }
             }
         });

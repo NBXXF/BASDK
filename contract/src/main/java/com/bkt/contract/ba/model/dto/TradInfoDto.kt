@@ -11,7 +11,7 @@ import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_HH_c_m
 
 /**
  * @Description: 成交信息
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/15 13:59
  */
 open class TradInfoDto : PairConfigProviderModel {

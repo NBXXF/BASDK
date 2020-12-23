@@ -7,7 +7,7 @@ import io.reactivex.annotations.CheckReturnValue
 
 /**
  * @Description: 提供配置属性获取
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/16 17:39
  */
 interface PairConfigProviderModel {

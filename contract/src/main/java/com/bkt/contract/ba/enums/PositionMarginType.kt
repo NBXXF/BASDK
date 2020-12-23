@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 /**
  * @Description: 调整保证金模式
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/16 16:28
  */
 enum class PositionMarginType(val value: Int) {

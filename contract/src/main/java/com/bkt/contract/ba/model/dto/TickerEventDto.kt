@@ -14,7 +14,7 @@ import java.math.BigDecimal
 
 /**
  * @Description: ticker 最新价 成交等信息；event 和dto 复用一个模型
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/2 16:52
  */
 @JsonAdapter(TickerEventDto.TickerEventDtoJsonAdapter::class)

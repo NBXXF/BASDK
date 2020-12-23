@@ -29,7 +29,7 @@ import kotlin.math.max
 
 /**
  * @Description: 公共服务
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/12 16:37
  */
 interface CommonService : ExportService {

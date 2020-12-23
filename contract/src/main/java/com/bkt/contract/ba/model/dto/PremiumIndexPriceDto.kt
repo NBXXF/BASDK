@@ -12,7 +12,7 @@ import java.lang.reflect.Type
 
 /**
  * @Description: 指数价 http socket 复用一个
- * @Author: XGod
+   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/11 17:16
  */
 @JsonAdapter(PremiumIndexPriceDto.PremiumIndexPriceFormatTypeAdapter::class)

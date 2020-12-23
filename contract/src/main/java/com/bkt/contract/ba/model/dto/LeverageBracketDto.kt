@@ -5,9 +5,10 @@ import com.bkt.contract.ba.service.CommonService
 import com.google.gson.annotations.JsonAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_FormatTypeAdapter
+
 /**
  * @Description: 杠杆分层标准
-   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
+ * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/16 9:52
  */
 class LeverageBracketDto {
@@ -86,12 +87,12 @@ class LeverageBracketDto {
         val initialLeverage: Int = 0
 
         /**
-         * 该层对应的数量上限
+         * 该层对应的数量上限  仅限USDT
          */
         val notionalCap: Double = 0.0
 
         /**
-         * 该层对应的数量下限
+         * 该层对应的数量下限  仅限USDT
          */
         val notionalFloor: Double = 0.0
 
@@ -102,15 +103,24 @@ class LeverageBracketDto {
         val maintMarginRatio: NumberFormatObject? = null
 
         /**
+         *  该层对应的数量上限  仅限USD
+         */
+        val qtyCap: Int = 0;
+
+        /**
+         *  该层对应的数量上限  仅限USD
+         */
+        val qtylFloor: Int = 0;
+
+        /**
          * 速算数
          */
         val cum = 0.0
 
+
         override fun toString(): String {
-            return "BracketsBean(bracket=$bracket, initialLeverage=$initialLeverage, notionalCap=$notionalCap, notionalFloor=$notionalFloor, maintMarginRatio=$maintMarginRatio, cum=$cum)"
+            return "BracketsBean(bracket=$bracket, initialLeverage=$initialLeverage, notionalCap=$notionalCap, notionalFloor=$notionalFloor, maintMarginRatio=$maintMarginRatio, qtyCap=$qtyCap, qtylFloor=$qtylFloor, cum=$cum)"
         }
-
-
     }
 
     override fun toString(): String {

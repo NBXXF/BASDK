@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @Description: 交易对db service
-   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
+ * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/9 15:14
  */
 internal object PairDbService {
@@ -86,6 +86,28 @@ internal object PairDbService {
                     }
                 })
                 .subscribeOn(Schedulers.io());
+    }
+
+
+    /**
+     * 查询单个交易对
+     */
+    fun query(symbol: String): Observable<PairInfoPo> {
+        return Observable
+                .defer(object : Callable<ObservableSource<PairInfoPo>> {
+                    override fun call(): ObservableSource<PairInfoPo> {
+                        val findFirst = ObjectBoxFactory.getBoxStore()
+                                .boxFor(PairInfoPo::class.java)
+                                .query()
+                                .equal(PairInfoPo_.symbol, symbol)
+                                .build().findFirst();
+                        if (findFirst == null) {
+                            return Observable.empty();
+                        }
+                        return Observable.just(findFirst);
+                    }
+
+                }).subscribeOn(Schedulers.io());
     }
 
 

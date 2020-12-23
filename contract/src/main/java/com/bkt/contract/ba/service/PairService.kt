@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * @Description: 交易对service
-   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
+ * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/9 14:52
  */
 interface PairService : ExportService {
@@ -162,17 +162,18 @@ interface PairService : ExportService {
      * 为空 返回Observable.empty()
      */
     fun getPair(symbol: String): Observable<PairInfoPo> {
-        return getPairs()
-                .flatMap(object : Function<List<PairInfoPo>, ObservableSource<PairInfoPo>> {
-                    override fun apply(t: List<PairInfoPo>): ObservableSource<PairInfoPo> {
-                        for (item: PairInfoPo in t) {
-                            if (TextUtils.equals(item.symbol, symbol)) {
-                                return Observable.just(item);
+        return PairDbService.query(symbol)
+                .switchIfEmpty(getPairs()
+                        .flatMap(object : Function<List<PairInfoPo>, ObservableSource<PairInfoPo>> {
+                            override fun apply(t: List<PairInfoPo>): ObservableSource<PairInfoPo> {
+                                for (item: PairInfoPo in t) {
+                                    if (TextUtils.equals(item.symbol, symbol)) {
+                                        return Observable.just(item);
+                                    }
+                                }
+                                return Observable.empty();
                             }
-                        }
-                        return Observable.empty();
-                    }
-                });
+                        }));
     }
 
     /**

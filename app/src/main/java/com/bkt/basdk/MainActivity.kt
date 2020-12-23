@@ -7,26 +7,21 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import com.bkt.basdk.ui.UserActivity
-import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.sdk.BaClient
-import com.bkt.contract.ba.service.CommonService
 import com.bkt.contract.ba.service.PairService
-import com.bkt.contract.ba.service.PriceService
 import com.xxf.arch.XXF
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.StringReader
 
 class MainActivity : AppCompatActivity() {
+    var start: Long = 0;
+    var start2: Long = 0;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val view: View = findViewById(R.id.test);
         userInfoBtn.setOnClickListener {
-            startActivity(Intent(it.context,UserActivity::class.java));
+            startActivity(Intent(it.context, UserActivity::class.java));
         }
         view.setOnClickListener {
             CodeDescUtil.test();
@@ -42,21 +37,31 @@ class MainActivity : AppCompatActivity() {
                      .subscribe {
                          XXF.getLogger().d("================>serverTime:" + it);
                      }*/
-           /* val contractMultipliers = BaClient.instance.getService(CommonService::class.java).getContractMultipliers();
-            XXF.getLogger().d("============>contractMultipliers:" + contractMultipliers);
-           */ BaClient.instance.getService(PairService::class.java).getPairs()
+            /* val contractMultipliers = BaClient.instance.getService(CommonService::class.java).getContractMultipliers();
+             XXF.getLogger().d("============>contractMultipliers:" + contractMultipliers);
+            */
+            start = System.currentTimeMillis();
+            BaClient.instance.getService(PairService::class.java).getPairs()
                     .observeOn(AndroidSchedulers.mainThread())
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
-                        XXF.getLogger().d("============>getPairs.......");
+                        XXF.getLogger().d("============>getPairs......." + (System.currentTimeMillis() - start));
                     }
 
- /*           BaClient.instance.getService(PriceService::class.java).getTickerPrice(ContractType.USDT)
+            start2 = System.currentTimeMillis();
+            BaClient.instance.getService(PairService::class.java).getPairType("BTCUSDT")
                     .observeOn(AndroidSchedulers.mainThread())
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
-                        XXF.getLogger().d("============>tickerPrice:" + it);
-                    }*/
+                        XXF.getLogger().d("============>getPair......." + (System.currentTimeMillis() - start2));
+                    }
+
+            /*           BaClient.instance.getService(PriceService::class.java).getTickerPrice(ContractType.USDT)
+                               .observeOn(AndroidSchedulers.mainThread())
+                               .`as`(XXF.bindLifecycle(this))
+                               .subscribe {
+                                   XXF.getLogger().d("============>tickerPrice:" + it);
+                               }*/
             /*   BaClient.instance.getService(TradeService::class.java).getTrades("BTCUSDT", CacheType.firstCache, TimeUnit.MINUTES.toMillis(5))
                        .doOnError {
                            XXF.getLogger().d("============>depth err:" + it);
@@ -91,17 +96,17 @@ class MainActivity : AppCompatActivity() {
                            XXF.getLogger().d("============>LeverageBrackets:" + it);
                        }*/
 
-   /*         BaClient.instance.getService(CommonService::class.java).getAdlQuantileByType(ContractType.USDT, null)
-                    .`as`(XXF.bindLifecycle(this))
-                    .subscribe {
-                        XXF.getLogger().d("============>getAdlQuantileByType:" + it);
-                    }
+            /*         BaClient.instance.getService(CommonService::class.java).getAdlQuantileByType(ContractType.USDT, null)
+                             .`as`(XXF.bindLifecycle(this))
+                             .subscribe {
+                                 XXF.getLogger().d("============>getAdlQuantileByType:" + it);
+                             }
 
-            BaClient.instance.getService(CommonService::class.java).getHttpCodeDesc(true)
-                    .`as`(XXF.bindLifecycle(this))
-                    .subscribe {
-                        XXF.getLogger().d("=============>httpCode:" + it);
-                    }*/
+                     BaClient.instance.getService(CommonService::class.java).getHttpCodeDesc(true)
+                             .`as`(XXF.bindLifecycle(this))
+                             .subscribe {
+                                 XXF.getLogger().d("=============>httpCode:" + it);
+                             }*/
 
         }
         /*     BaClient.instance.getService(PairService::class.java).getPairs(ContractType.USDT)
@@ -190,15 +195,15 @@ class MainActivity : AppCompatActivity() {
                           XXF.getLogger().d("==============>yes:" + it);
                       }*/
 
-      /*  BaClient.instance.getService(CommonService::class.java)
-                .subAdlQuantileByType(ContractType.USDT, null)
-                .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
-                .subscribe {
-                    XXF.getLogger().d("==============>subAdlQuantileByType:" + it);
-                }
+        /*  BaClient.instance.getService(CommonService::class.java)
+                  .subAdlQuantileByType(ContractType.USDT, null)
+                  .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
+                  .subscribe {
+                      XXF.getLogger().d("==============>subAdlQuantileByType:" + it);
+                  }
 
 
-        Cat(Person()).say();*/
+          Cat(Person()).say();*/
     }
 
 

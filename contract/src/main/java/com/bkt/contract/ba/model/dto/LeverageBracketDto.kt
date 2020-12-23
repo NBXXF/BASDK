@@ -5,6 +5,7 @@ import com.bkt.contract.ba.service.CommonService
 import com.google.gson.annotations.JsonAdapter
 import com.xxf.arch.json.typeadapter.format.formatobject.NumberFormatObject
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_FormatTypeAdapter
+import java.math.BigDecimal
 
 /**
  * @Description: 杠杆分层标准
@@ -87,14 +88,14 @@ class LeverageBracketDto {
         val initialLeverage: Int = 0
 
         /**
-         * 该层对应的数量上限  仅限USDT
+         * 该层对应的名义价值上限  仅限USDT
          */
-        val notionalCap: Double = 0.0
+        val notionalCap: BigDecimal? = null;
 
         /**
-         * 该层对应的数量下限  仅限USDT
+         * 该层对应的名义价值下限  仅限USDT
          */
-        val notionalFloor: Double = 0.0
+        val notionalFloor: BigDecimal? = null;
 
         /**
          * 该层对应的维持保证金率
@@ -105,17 +106,17 @@ class LeverageBracketDto {
         /**
          *  该层对应的数量上限  仅限USD
          */
-        val qtyCap: Int = 0;
+        val qtyCap: BigDecimal? = null;
 
         /**
          *  该层对应的数量上限  仅限USD
          */
-        val qtylFloor: Int = 0;
+        val qtylFloor: BigDecimal? = null;
 
         /**
          * 速算数
          */
-        val cum = 0.0
+        val cum: BigDecimal? = null;
 
 
         override fun toString(): String {

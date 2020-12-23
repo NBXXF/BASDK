@@ -298,7 +298,7 @@ interface ContractProxyApiService {
             @Field("symbol") symbol: String,
             @Field("positionSide") positionSide: String?,
             @Field("amount") amount: String,
-            @Field("type") type: PositionMarginType,
+            @Field("type") type: Int,
             @Field("recvWindow") recvWindow: Long?,
             @Field("timestamp") timestamp: Long
     ): Observable<BktResDto<PositionMarginResultDto>>;

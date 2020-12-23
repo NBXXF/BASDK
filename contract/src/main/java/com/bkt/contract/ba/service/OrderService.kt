@@ -355,7 +355,7 @@ interface OrderService : ExportService {
         return BaClient.instance.getApiService(symbol)
                 .flatMap(object : Function<ContractProxyApiService, ObservableSource<PositionMarginResultDto>> {
                     override fun apply(t: ContractProxyApiService): ObservableSource<PositionMarginResultDto> {
-                        return t.changePositionMargin(symbol, if (positionSide == null) null else positionSide.value, amount, type, recvWindow, System.currentTimeMillis())
+                        return t.changePositionMargin(symbol, if (positionSide == null) null else positionSide.value, amount, type.value, recvWindow, System.currentTimeMillis())
                                 .map(HttpDataFunction())
                     }
                 });

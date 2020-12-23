@@ -164,7 +164,7 @@ interface OrderService : ExportService {
                         .map(HttpDataFunction())
                         .map {
                             it.filter {
-                                NumberUtils.compare(it.positionAmt?.origin, 0) > 0;
+                                NumberUtils.compare(it.positionAmt?.origin, 0) != 0;
                             }
                         },
                 object : io.reactivex.functions.Function4<Map<String, List<LeverageBracketDto.BracketsBean>>, AccountInfoDto, LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, List<PositionRiskDto>, List<PositionRiskDto>> {

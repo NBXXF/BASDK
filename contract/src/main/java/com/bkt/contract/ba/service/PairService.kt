@@ -3,6 +3,7 @@ package com.bkt.contract.ba.service
 import android.text.TextUtils
 import androidx.annotation.Nullable
 import com.bkt.contract.ba.common.HttpDataFunction
+import com.bkt.contract.ba.common.PairsFilterFunction
 import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.model.dto.*
 import com.bkt.contract.ba.model.po.PairInfoPo
@@ -110,7 +111,8 @@ interface PairService : ExportService {
                     }
                 })
                 .switchIfEmpty(innerSyncPair())
-                .onErrorResumeNext(innerSyncPair());
+                .onErrorResumeNext(innerSyncPair())
+                .map(PairsFilterFunction());
     }
 
 
@@ -132,7 +134,7 @@ interface PairService : ExportService {
                         }
                         return pairPosList;
                     }
-                })
+                }).map(PairsFilterFunction());
     }
 
     /**
@@ -153,7 +155,7 @@ interface PairService : ExportService {
                         }
                         return pairPosList;
                     }
-                })
+                }).map(PairsFilterFunction());
     }
 
 
@@ -231,7 +233,8 @@ interface PairService : ExportService {
                                 return Observable.empty();
                             }
                         }),
-                PairDbService.subChange());
+                PairDbService.subChange())
+                .map(PairsFilterFunction());
     }
 
     /**
@@ -251,7 +254,8 @@ interface PairService : ExportService {
                                 return Observable.empty();
                             }
                         }),
-                PairDbService.subChange(type));
+                PairDbService.subChange(type))
+                .map(PairsFilterFunction());
     }
 
     /**
@@ -279,7 +283,7 @@ interface PairService : ExportService {
                             }
                         }),
                 PairDbService.subChange(*symbols)
-        );
+        ).map(PairsFilterFunction());
     }
 
     /**

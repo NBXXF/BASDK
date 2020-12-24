@@ -158,7 +158,6 @@ interface OrderService : ExportService {
                                      recvWindow: Long?): Observable<List<PositionRiskDto>> {
         return Observable.zip(
                 UserService.INSTANCE.getLeverageBrackets(type),
-                UserService.INSTANCE.getAccount(type, recvWindow),
                 CommonService.INSTANCE.getAdlQuantileByType(type, recvWindow),
                 BaClient.instance.initializer?.getApiService(type)!!.getPositionRisk(symbol, recvWindow, System.currentTimeMillis())
                         .map(HttpDataFunction())
@@ -167,12 +166,10 @@ interface OrderService : ExportService {
                                 NumberUtils.compare(it.positionAmt?.origin, 0) != 0;
                             }
                         },
-                object : io.reactivex.functions.Function4<Map<String, List<LeverageBracketDto.BracketsBean>>, AccountInfoDto, LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, List<PositionRiskDto>, List<PositionRiskDto>> {
-                    override fun apply(leverageMap: Map<String, List<LeverageBracketDto.BracketsBean>>, accountInfoDto: AccountInfoDto, adlQuantiles: LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, positionRisks: List<PositionRiskDto>): List<PositionRiskDto> {
-                        val positionMap: MutableMap<String, AccountInfoDto.PositionDetailsDto> = mutableMapOf();
-                        accountInfoDto.positions?.forEach {
-                            it.symbol?.let { it1 -> positionMap.put(it1, it) };
-                        }
+                object : io.reactivex.functions.Function3<Map<String, List<LeverageBracketDto.BracketsBean>>,  LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, List<PositionRiskDto>, List<PositionRiskDto>> {
+                    override fun apply(leverageMap: Map<String, List<LeverageBracketDto.BracketsBean>>,
+                                       adlQuantiles: LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>,
+                                       positionRisks: List<PositionRiskDto>): List<PositionRiskDto> {
                         /**
                          * 持倉接口並未返回
                          * 需要赋值这三个字段
@@ -181,30 +178,17 @@ interface OrderService : ExportService {
                         var adlQuantile: AdlQuantileDto.AdlQuantileItem? = null;
                          */
                         positionRisks.forEach {
+                            it.adlQuantile = adlQuantiles.get(it.symbol);
+
 
                             val leverageBracket: List<LeverageBracketDto.BracketsBean>? = leverageMap.get(CommonService.INSTANCE.convertPair(it.symbol));
                             var bracket: LeverageBracketDto.BracketsBean? = null;
                             if (leverageBracket != null) {
-                                it.leverageBracket=bracket;
+
                                 bracket = leverageBracket.getBracket(it.leverage);
-                                it.maintenanceMarginRate = bracket?.maintMarginRatio;
+                                it.leverageBracket=bracket;
+                                it.reset();
                             }
-
-                            /**
-                             * 逐仓仓位维持保证金/（逐仓模式下钱包余额+未实现盈亏）
-                             */
-                            val positionDetails: AccountInfoDto.PositionDetailsDto? = positionMap.get(it.symbol);
-                            if (positionDetails != null) {
-                                val isolatedMainMargin = NumberUtils.subtract(
-                                        NumberUtils.multiply(
-                                                NumberUtils.multiply(it.positionAmt?.origin?.abs(), it.markPrice?.origin),
-                                                it.maintenanceMarginRate?.origin),
-                                        bracket?.cum);
-                                val marginRateDecimal = NumberUtils.divide(isolatedMainMargin, NumberUtils.add(it.isolatedWallet?.origin, it.unRealizedProfit?.origin));
-                                it.marginRate = NumberFormatObject(marginRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(marginRateDecimal));
-                            }
-
-                            it.adlQuantile = adlQuantiles.get(it.symbol);
                         }
                         return positionRisks;
                     }

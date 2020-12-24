@@ -28,20 +28,7 @@ open class PositionRiskDto : PairConfigProviderModel {
     internal class PositionRiskDtoJsonAdapter : JsonDeserializer<PositionRiskDto> {
         override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): PositionRiskDto {
             val deserialize = context!!.deserialize<WithoutJsonAdapterDto>(json, WithoutJsonAdapterDto::class.java);
-            deserialize.markPrice?.origin?.let { deserialize.reset(it) }
-            /**
-             * 计算仓位保证金
-             */
-            if (deserialize.unRealizedProfit != null && deserialize.isolatedMargin != null) {
-                val isolatedWalletDecimal = NumberUtils.subtract(deserialize.isolatedMargin?.origin!!, deserialize.unRealizedProfit?.origin!!);
-                deserialize.isolatedWallet = NumberFormatObject(isolatedWalletDecimal, Number_UNFormatTypeAdapter().format(isolatedWalletDecimal));
-
-                val earningRateDecimal = NumberUtils.divide(
-                        deserialize.unRealizedProfit?.origin,
-                        deserialize.isolatedMargin?.origin,
-                        Math.max(deserialize.unRealizedProfit?.origin!!.scale(), deserialize.isolatedWallet?.origin!!.scale()));
-                deserialize.earningRate = NumberFormatObject(earningRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(earningRateDecimal));
-            }
+            deserialize.reset();
             return deserialize;
         }
     }
@@ -199,16 +186,43 @@ open class PositionRiskDto : PairConfigProviderModel {
     /**
      * 重置  价格变化 其他字段要变
      */
-    fun reset(markPrice: BigDecimal) {
-        this.markPrice = NumberFormatObject(markPrice, markPrice.toPlainString());
+    fun reset() {
         if (this.positionAmt != null && this.markPrice != null) {
             this.positionValue = CommonService.INSTANCE.calculatePositionValue(
                     this.symbol!!,
                     this.positionAmt!!.origin,
                     this.markPrice!!.origin);
         }
+        /**
+         * 计算仓位保证金
+         */
+        if (unRealizedProfit != null && isolatedMargin != null) {
+            val isolatedWalletDecimal = NumberUtils.subtract(isolatedMargin?.origin!!, unRealizedProfit?.origin!!);
+            this.isolatedWallet = NumberFormatObject(isolatedWalletDecimal, Number_UNFormatTypeAdapter().format(isolatedWalletDecimal));
+
+            val earningRateDecimal = NumberUtils.divide(
+                    this.unRealizedProfit?.origin,
+                    this.isolatedMargin?.origin,
+                    Math.max(this.unRealizedProfit?.origin!!.scale(), this.isolatedWallet?.origin!!.scale()));
+            this.earningRate = NumberFormatObject(earningRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(earningRateDecimal));
+        }
+
         if (leverageBracket != null) {
+            /**
+             * 维持保证金率
+             */
             this.maintenanceMarginRate = leverageBracket?.maintMarginRatio;
+
+            /**
+             * 逐仓仓位维持保证金/（逐仓模式下钱包余额+未实现盈亏）
+             */
+            val isolatedMainMargin = NumberUtils.subtract(
+                    NumberUtils.multiply(
+                            NumberUtils.multiply(positionAmt?.origin?.abs(), this.markPrice?.origin),
+                            maintenanceMarginRate?.origin),
+                    leverageBracket?.cum);
+            val marginRateDecimal = NumberUtils.divide(isolatedMainMargin, NumberUtils.add(isolatedWallet?.origin, unRealizedProfit?.origin));
+            this.marginRate = NumberFormatObject(marginRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(marginRateDecimal));
         }
     }
 

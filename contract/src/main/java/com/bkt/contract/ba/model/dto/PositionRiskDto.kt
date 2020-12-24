@@ -33,12 +33,17 @@ open class PositionRiskDto : PairConfigProviderModel {
                         deserialize.positionAmt!!.origin,
                         deserialize.markPrice!!.origin);
             }
-
+            /**
+             * 计算仓位保证金
+             */
             if (deserialize.unRealizedProfit != null && deserialize.isolatedMargin != null) {
+                val isolatedWalletDecimal = NumberUtils.subtract(deserialize.isolatedMargin?.origin!!, deserialize.unRealizedProfit?.origin!!);
+                deserialize.isolatedWallet = NumberFormatObject(isolatedWalletDecimal, Number_UNFormatTypeAdapter().format(isolatedWalletDecimal));
+
                 val earningRateDecimal = NumberUtils.divide(
                         deserialize.unRealizedProfit?.origin,
                         deserialize.isolatedMargin?.origin,
-                        Math.max(deserialize.unRealizedProfit?.origin!!.scale(), deserialize.isolatedMargin?.origin!!.scale()));
+                        Math.max(deserialize.unRealizedProfit?.origin!!.scale(), deserialize.isolatedWallet?.origin!!.scale()));
                 deserialize.earningRate = NumberFormatObject(earningRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(earningRateDecimal));
             }
             return deserialize;
@@ -81,10 +86,16 @@ open class PositionRiskDto : PairConfigProviderModel {
     var isAutoAddMargin: Boolean? = null
 
     /**
-     *  逐仓保证金
+     *  逐仓保证金 (这个包含了盈亏)
      */
     @JsonAdapter(Number_UNFormatTypeAdapter::class)
     var isolatedMargin: NumberFormatObject? = null
+
+    /**
+     *  逐仓保证金
+     */
+    @JsonAdapter(Number_UNFormatTypeAdapter::class)
+    var isolatedWallet: NumberFormatObject? = null;
 
     /**
      * 当前杠杆倍数

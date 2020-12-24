@@ -1,5 +1,6 @@
 package com.bkt.contract.ba.model.dto
 
+import android.text.TextUtils
 import com.bkt.contract.ba.enums.*
 import com.bkt.contract.ba.model.PairConfigProviderModel
 import com.google.gson.annotations.JsonAdapter
@@ -11,7 +12,7 @@ import com.xxf.arch.json.typeadapter.format.impl.time.Time_yyyy_s_MM_s_dd_HH_c_m
 
 /**
  * @Description: 订单信息  socket和socket 事件：ORDER_TRADE_UPDATE 复用一个模型
-   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
+ * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/14 14:27
  */
 open class OrderInfoDto : PairConfigProviderModel {
@@ -230,4 +231,13 @@ open class OrderInfoDto : PairConfigProviderModel {
         return "OrderInfoDto(avgPrice=$avgPrice, clientOrderId=$clientOrderId, executedQty=$executedQty, orderId=$orderId, origQty=$origQty, origType=$origType, price=$price, reduceOnly=$reduceOnly, side=$side, positionSide=$positionSide, status=$status, stopPrice=$stopPrice, closePosition=$closePosition, symbol=$symbol, time=$time, timeInForce=$timeInForce, type=$type, activatePrice=$activatePrice, priceRate=$priceRate, workingType=$workingType)"
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as OrderInfoDto
+
+        if (!TextUtils.equals(orderId, other.orderId)) return false
+        return true
+    }
 }

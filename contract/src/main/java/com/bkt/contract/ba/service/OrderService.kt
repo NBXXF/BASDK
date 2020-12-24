@@ -17,6 +17,7 @@ import com.xxf.arch.utils.NumberUtils
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
 import io.reactivex.functions.Function
+import java.math.BigDecimal
 
 /**
  * @Description: 订单下单service
@@ -166,7 +167,7 @@ interface OrderService : ExportService {
                                 NumberUtils.compare(it.positionAmt?.origin, 0) != 0;
                             }
                         },
-                object : io.reactivex.functions.Function3<Map<String, List<LeverageBracketDto.BracketsBean>>,  LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, List<PositionRiskDto>, List<PositionRiskDto>> {
+                object : io.reactivex.functions.Function3<Map<String, List<LeverageBracketDto.BracketsBean>>, LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>, List<PositionRiskDto>, List<PositionRiskDto>> {
                     override fun apply(leverageMap: Map<String, List<LeverageBracketDto.BracketsBean>>,
                                        adlQuantiles: LinkedHashMap<String, AdlQuantileDto.AdlQuantileItem>,
                                        positionRisks: List<PositionRiskDto>): List<PositionRiskDto> {
@@ -185,8 +186,8 @@ interface OrderService : ExportService {
                             var bracket: LeverageBracketDto.BracketsBean? = null;
                             if (leverageBracket != null) {
 
-                                bracket = leverageBracket.getBracket(it.leverage);
-                                it.leverageBracket=bracket;
+                                bracket = leverageBracket.getBracket(it.positionValue?.origin!!);
+                                it.leverageBracket = bracket;
                                 it.reset();
                             }
                         }
@@ -198,15 +199,16 @@ interface OrderService : ExportService {
     /**
      * 通过杠杆倍数获取维持保证金率
      */
-    private fun List<LeverageBracketDto.BracketsBean>.getBracket(leverage: Int): LeverageBracketDto.BracketsBean? {
+    private fun List<LeverageBracketDto.BracketsBean>.getBracket(positionValue: BigDecimal): LeverageBracketDto.BracketsBean? {
         var firstMatch: LeverageBracketDto.BracketsBean? = null;
         for (item: LeverageBracketDto.BracketsBean in this) {
-            if (leverage <= item.initialLeverage) {
+            if (NumberUtils.compare(positionValue, item.notionalFloor) >= 0 && NumberUtils.compare(positionValue, item.notionalCap) <= 0) {
                 firstMatch = item;
             }
         }
         return firstMatch;
     }
+
 
     /**
      * 获取历史成交

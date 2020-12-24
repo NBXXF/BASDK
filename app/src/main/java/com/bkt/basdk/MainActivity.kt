@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                     .observeOn(AndroidSchedulers.mainThread())
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
-                        XXF.getLogger().d("============>getPairs......." + (System.currentTimeMillis() - start));
+                        XXF.getLogger().d("============>getPairs......." + it);
                     }
 
             start2 = System.currentTimeMillis();

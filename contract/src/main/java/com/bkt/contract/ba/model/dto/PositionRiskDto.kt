@@ -15,6 +15,7 @@ import com.xxf.arch.json.typeadapter.format.impl.number.Number_UNFormatTypeAdapt
 import com.xxf.arch.json.typeadapter.format.impl.number.Number_percent_auto_2_2_DOWN_FormatTypeAdapter
 import com.xxf.arch.utils.NumberUtils
 import java.lang.reflect.Type
+import java.math.BigDecimal
 
 /**
  * @Description: 持仓
@@ -27,12 +28,7 @@ open class PositionRiskDto : PairConfigProviderModel {
     internal class PositionRiskDtoJsonAdapter : JsonDeserializer<PositionRiskDto> {
         override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): PositionRiskDto {
             val deserialize = context!!.deserialize<WithoutJsonAdapterDto>(json, WithoutJsonAdapterDto::class.java);
-            if (deserialize.positionAmt != null && deserialize.markPrice != null) {
-                deserialize.positionValue = CommonService.INSTANCE.calculatePositionValue(
-                        deserialize.symbol!!,
-                        deserialize.positionAmt!!.origin,
-                        deserialize.markPrice!!.origin);
-            }
+            deserialize.markPrice?.origin?.let { deserialize.reset(it) }
             /**
              * 计算仓位保证金
              */
@@ -193,6 +189,28 @@ open class PositionRiskDto : PairConfigProviderModel {
     @Expose(serialize = false, deserialize = false)
     var positionValue: NumberFormatObject? = null;
 
+
+    /**
+     * 本地字段
+     */
+    @Expose(serialize = false, deserialize = false)
+    var leverageBracket: LeverageBracketDto.BracketsBean? = null;
+
+    /**
+     * 重置  价格变化 其他字段要变
+     */
+    fun reset(markPrice: BigDecimal) {
+        this.markPrice = NumberFormatObject(markPrice, markPrice.toPlainString());
+        if (this.positionAmt != null && this.markPrice != null) {
+            this.positionValue = CommonService.INSTANCE.calculatePositionValue(
+                    this.symbol!!,
+                    this.positionAmt!!.origin,
+                    this.markPrice!!.origin);
+        }
+        if (leverageBracket != null) {
+            this.maintenanceMarginRate = leverageBracket?.maintMarginRatio;
+        }
+    }
 
     override fun provideSymbol(): String? {
         return symbol;

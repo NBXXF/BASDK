@@ -185,6 +185,7 @@ interface OrderService : ExportService {
                             val leverageBracket: List<LeverageBracketDto.BracketsBean>? = leverageMap.get(CommonService.INSTANCE.convertPair(it.symbol));
                             var bracket: LeverageBracketDto.BracketsBean? = null;
                             if (leverageBracket != null) {
+                                it.leverageBracket=bracket;
                                 bracket = leverageBracket.getBracket(it.leverage);
                                 it.maintenanceMarginRate = bracket?.maintMarginRatio;
                             }

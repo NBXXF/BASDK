@@ -34,7 +34,7 @@ import java.util.concurrent.Callable
 
 /**
  * @Description: ba Proxy socket api
-   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
+ * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/2 20:45
  */
 abstract class ContractProxySocketService : WsStatusListener {
@@ -213,6 +213,11 @@ abstract class ContractProxySocketService : WsStatusListener {
         return getWsManager().flatMap(object : Function<WsManager, ObservableSource<OrderUpdateEvent>> {
             override fun apply(t: WsManager): ObservableSource<OrderUpdateEvent> {
                 return bus.ofType(OrderUpdateEvent::class.java)
+                        .doOnSubscribe {
+                            subEvent(SocketEvent.ORDER_TRADE_UPDATE, SocketRequestBody.subscribeBody(listOf("ORDER_TRADE_UPDATE")), t);
+                        }.doOnDispose {
+                            unSubEvent(SocketEvent.ORDER_TRADE_UPDATE, SocketRequestBody.unSubscribeBody(listOf("ORDER_TRADE_UPDATE")), t);
+                        }
                         .filter {
                             it.order != null
                                     && it.orderEventType != null
@@ -229,6 +234,11 @@ abstract class ContractProxySocketService : WsStatusListener {
         return getWsManager().flatMap(object : Function<WsManager, ObservableSource<AccountUpdateEvent.AccountChangeInfo>> {
             override fun apply(t: WsManager): ObservableSource<AccountUpdateEvent.AccountChangeInfo> {
                 return bus.ofType(AccountUpdateEvent::class.java)
+                        .doOnSubscribe {
+                            subEvent(SocketEvent.ACCOUNT_UPDATE, SocketRequestBody.subscribeBody(listOf("ACCOUNT_UPDATE")), t);
+                        }.doOnDispose {
+                            unSubEvent(SocketEvent.ACCOUNT_UPDATE, SocketRequestBody.unSubscribeBody(listOf("ACCOUNT_UPDATE")), t);
+                        }
                         .filter { it.account != null }
                         .map { it.account }
             }

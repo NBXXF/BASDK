@@ -11,10 +11,9 @@ import io.reactivex.functions.Function
  */
 class PairsFilterFunction : Function<List<PairInfoPo>, List<PairInfoPo>> {
     override fun apply(t: List<PairInfoPo>): List<PairInfoPo> {
-    /*    val filter = t.filter {
-            it.config != null && it.config?.contractType == BaContractType.PERPETUAL;
+        val filter = t.filter {
+            it.config != null;
         }
-        return filter;*/
-        return t;
+        return filter;
     }
 }

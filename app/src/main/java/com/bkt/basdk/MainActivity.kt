@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                     .observeOn(AndroidSchedulers.mainThread())
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
-                        XXF.getLogger().d("============>getPairs......." + it);
+                        XXF.getLogger().d("============>getPairs......." + it.size);
                     }
 
             start2 = System.currentTimeMillis();
@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
                 .subPairs("BTCUSDT")
                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                 .subscribe {
-                    XXF.getLogger().d("==============>it3:" + it.size)
+                    XXF.getLogger().d("==============>it3:" + Thread.currentThread().name+"  "+it);
                 };
 
         /*    BaClient.instance.getService(PairService::class.java)

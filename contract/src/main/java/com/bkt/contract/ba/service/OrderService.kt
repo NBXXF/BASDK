@@ -183,8 +183,10 @@ interface OrderService : ExportService {
                         positionRisks.forEach {
 
                             val leverageBracket: List<LeverageBracketDto.BracketsBean>? = leverageMap.get(CommonService.INSTANCE.convertPair(it.symbol));
+                            var bracket: LeverageBracketDto.BracketsBean? = null;
                             if (leverageBracket != null) {
-                                it.maintenanceMarginRate = leverageBracket.getBracket(it.leverage)?.maintMarginRatio;
+                                bracket = leverageBracket.getBracket(it.leverage);
+                                it.maintenanceMarginRate = bracket?.maintMarginRatio;
                             }
 
                             /**
@@ -192,7 +194,12 @@ interface OrderService : ExportService {
                              */
                             val positionDetails: AccountInfoDto.PositionDetailsDto? = positionMap.get(it.symbol);
                             if (positionDetails != null) {
-                                val marginRateDecimal = NumberUtils.divide(positionDetails.maintMargin?.origin, it.unRealizedProfit?.origin);
+                                val isolatedMainMargin = NumberUtils.subtract(
+                                        NumberUtils.multiply(
+                                                NumberUtils.multiply(it.positionAmt?.origin?.abs(), it.markPrice?.origin),
+                                                it.maintenanceMarginRate?.origin),
+                                        bracket?.cum);
+                                val marginRateDecimal = NumberUtils.divide(isolatedMainMargin, NumberUtils.add(it.isolatedWallet?.origin, it.unRealizedProfit?.origin));
                                 it.marginRate = NumberFormatObject(marginRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(marginRateDecimal));
                             }
 

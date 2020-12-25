@@ -12,14 +12,16 @@ import com.bkt.contract.ba.sdk.ContractProxySocketService
 import com.xxf.arch.json.datastructure.ListOrSingle
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
+import io.reactivex.Scheduler
 import io.reactivex.functions.Function
+import io.reactivex.schedulers.Schedulers
 import retrofit2.CacheType
 import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
 /**
  * @Description: 价格和资金汇率服务
-   * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
+ * @Author: XGod  xuanyouwu@163.com  17611639080  https://github.com/NBXXF     https://blog.csdn.net/axuanqq
  * @CreateDate: 2020/12/11 19:49
  */
 interface PriceService : ExportService {
@@ -45,8 +47,8 @@ interface PriceService : ExportService {
                         return t.getPremiumIndex(type, cacheTime, symbol, pair)
                                 .map(HttpDataFunction())
                                 .map {
-                            it.get(0)
-                        };
+                                    it.get(0)
+                                };
                     }
                 })
     }
@@ -63,6 +65,22 @@ interface PriceService : ExportService {
                         return t.subMarkPrice(symbol);
                     }
                 });
+    }
+
+    /**
+     * 按类型订阅市价和汇率结算
+     * 增量 没聚合  如果只关心 指数价变化 请用 {@link #subIndexPrice(symbol: String)}
+     */
+    fun subMarkPrice(type: ContractType): Observable<PremiumIndexPriceDto> {
+        return BaClient.instance.getSocketService("", type)
+                .flatMap(object : Function<ContractProxySocketService, ObservableSource<PremiumIndexPriceDto>> {
+                    override fun apply(t: ContractProxySocketService): ObservableSource<PremiumIndexPriceDto> {
+                        val symbols = PairService.INSTANCE.getPairs(type).blockingFirst().map {
+                            it.symbol;
+                        };
+                        return t.subMarkPrices(symbols as List<String>);
+                    }
+                }).subscribeOn(Schedulers.io());
     }
 
     /**

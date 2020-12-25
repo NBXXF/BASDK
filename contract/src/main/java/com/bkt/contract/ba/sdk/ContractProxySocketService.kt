@@ -189,6 +189,26 @@ abstract class ContractProxySocketService : WsStatusListener {
     }
 
     /**
+     * 订阅市价 和汇率结算
+     */
+    fun subMarkPrices(symbols: List<String>): Observable<PremiumIndexPriceDto> {
+        return getWsManager().flatMap(object : Function<WsManager, ObservableSource<PremiumIndexPriceDto>> {
+            override fun apply(t: WsManager): ObservableSource<PremiumIndexPriceDto> {
+                return bus.ofType(PremiumIndexPriceDto::class.java)
+                        .doOnSubscribe {
+                            subEvent(SocketEvent.DepthUpdate, SocketRequestBody.subscribeBody(symbols.map {
+                                String.format("%s@markPrice", it.toLowerCase())
+                            }), t);
+                        }.doOnDispose {
+                            unSubEvent(SocketEvent.DepthUpdate, SocketRequestBody.unSubscribeBody((symbols.map {
+                                String.format("%s@markPrice", it.toLowerCase())
+                            })), t);
+                        }.filter { symbols.contains(it.symbol) };
+            }
+        });
+    }
+
+    /**
      * 订阅指数价
      * 注意 只有usd有
      * ustd 并没有该socket

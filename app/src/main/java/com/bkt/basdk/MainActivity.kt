@@ -7,8 +7,10 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import com.bkt.basdk.ui.UserActivity
+import com.bkt.contract.ba.enums.ContractType
 import com.bkt.contract.ba.sdk.BaClient
 import com.bkt.contract.ba.service.PairService
+import com.bkt.contract.ba.service.PriceService
 import com.xxf.arch.XXF
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_main.*
@@ -135,12 +137,12 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        BaClient.instance.getService(PairService::class.java)
+   /*     BaClient.instance.getService(PairService::class.java)
                 .subPairs("BTCUSDT")
                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                 .subscribe {
                     XXF.getLogger().d("==============>it3:" + Thread.currentThread().name + "  " + it);
-                };
+                };*/
 
         /*    BaClient.instance.getService(PairService::class.java)
                     .subPairs(ContractType.USD)
@@ -206,6 +208,13 @@ class MainActivity : AppCompatActivity() {
 
 
           Cat(Person()).say();*/
+
+        BaClient.instance.getService(PriceService::class.java)
+                .subMarkPrice(ContractType.USDT)
+                .`as`(XXF.bindLifecycle(this))
+                .subscribe {
+                    XXF.getLogger().d("==============>subMarkPrice:" + it);
+                }
     }
 
 

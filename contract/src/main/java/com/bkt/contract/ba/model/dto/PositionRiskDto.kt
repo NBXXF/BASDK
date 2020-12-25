@@ -199,12 +199,6 @@ open class PositionRiskDto : PairConfigProviderModel {
         if (unRealizedProfit != null && isolatedMargin != null) {
             val isolatedWalletDecimal = NumberUtils.subtract(isolatedMargin?.origin!!, unRealizedProfit?.origin!!);
             this.isolatedWallet = NumberFormatObject(isolatedWalletDecimal, Number_UNFormatTypeAdapter().format(isolatedWalletDecimal));
-
-            val earningRateDecimal = NumberUtils.divide(
-                    this.unRealizedProfit?.origin,
-                    this.isolatedMargin?.origin,
-                    Math.max(this.unRealizedProfit?.origin!!.scale(), this.isolatedWallet?.origin!!.scale()));
-            this.earningRate = NumberFormatObject(earningRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(earningRateDecimal));
         }
 
         if (leverageBracket != null) {
@@ -223,7 +217,39 @@ open class PositionRiskDto : PairConfigProviderModel {
                     leverageBracket?.cum);
             val marginRateDecimal = NumberUtils.divide(isolatedMainMargin, NumberUtils.add(isolatedWallet?.origin, unRealizedProfit?.origin));
             this.marginRate = NumberFormatObject(marginRateDecimal, Number_percent_auto_2_2_DOWN_FormatTypeAdapter().format(marginRateDecimal));
+
+
+            /**
+             * 计算回报率
+             */
+            this.earningRate = CommonService.INSTANCE.calculateEarningRate(symbol!!,
+                    positionSide!!,
+                    entryPrice?.origin!!,
+                    markPrice?.origin!!,
+                    positionAmt?.origin!!,
+                    leverage,
+                    unRealizedProfit?.origin!!)
         }
+    }
+
+    /**
+     * 计算预估强平价
+     */
+    fun calculatePredictClosePrice(inputMargin: BigDecimal): NumberFormatObject? {
+        try {
+            return CommonService.INSTANCE.calculatePredictClosePrice(
+                    symbol!!,
+                    positionSide!!,
+                    inputMargin,
+                    isolatedWallet?.origin!!,
+                    positionAmt?.origin!!,
+                    entryPrice?.origin!!,
+                    this.maintenanceMarginRate?.origin!!,
+                    leverageBracket?.cum!!)
+        } catch (e: Throwable) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     override fun provideSymbol(): String? {

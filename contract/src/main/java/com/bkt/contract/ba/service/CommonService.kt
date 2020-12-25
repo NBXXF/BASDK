@@ -3,6 +3,7 @@ package com.bkt.contract.ba.service
 import com.bkt.contract.ba.common.AdlQuantileListToMapFunction
 import com.bkt.contract.ba.common.HttpDataFunction
 import com.bkt.contract.ba.enums.ContractType
+import com.bkt.contract.ba.enums.PositionDirection
 import com.bkt.contract.ba.model.CodeDescModel
 import com.bkt.contract.ba.model.dto.AdlQuantileDto
 import com.bkt.contract.ba.model.dto.ServerTimeDto
@@ -86,6 +87,119 @@ interface CommonService : ExportService {
             }
             return NumberFormatObject(positionValueDecimal, NumberUtils.formatRoundDown(positionSize, 0, pairConfig?.pricePrecision
                     ?: 2));
+        } catch (e: Throwable) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 计算预估强平价
+     * WB:  isolatedMargin - unRealizedProfit + input(输入的保证金)
+    L :  positionAmt绝对值
+    //杠杆分层标准
+    MMR_L: maintMarginRatio
+    cum_L: cum
+    CM： contractSize（symbol里面拿）
+    EP_L: entryPrice
+
+
+
+    if env == .usdt {
+    if positonModel.positionSide == .long {
+    let tmp1 = WB + cum_L - L * EP_L
+    let tmp2 = L * MMR_L - L
+    LP = tmp1 / tmp2
+    } else {
+    let tmp1 = WB + cum_L + L * EP_L
+    let tmp2 = L * MMR_L + L
+    LP = tmp1 / tmp2
+    }
+
+    } else {
+    if positonModel.positionSide == .long {
+    let tmp1 = L * MMR_L + L
+    let tmp2 = (WB + cum_L) / CM + L / EP_L
+    LP = tmp1 / tmp2
+    } else {
+    let tmp1 = L * MMR_L - L
+    let tmp2 = (WB + cum_L) / CM - L / EP_L
+    LP = tmp1 / tmp2
+    }
+    }
+     */
+    fun calculatePredictClosePrice(symbol: String,
+                                   positionSide: PositionDirection,
+                                   inputMargin: BigDecimal,
+                                   isolatedWallet: BigDecimal,
+                                   positionAmt: BigDecimal,
+                                   entryPrice: BigDecimal,
+                                   maintMarginRatio: BigDecimal,
+                                   cum: BigDecimal): NumberFormatObject? {
+        try {
+            val pairConfig = PairService.INSTANCE.getPairConfig(symbol);
+            val WB = isolatedWallet + inputMargin;
+            val L = positionAmt.abs();
+            val MMR_L = maintMarginRatio;
+            val cum_L = cum;
+            val CM = BigDecimal(pairConfig?.contractSize!!);
+            val EP_L = entryPrice;
+            var LP: BigDecimal = BigDecimal(0);
+
+            if (pairConfig?.contractClassifyType == ContractType.USDT) {
+                if (positionSide == PositionDirection.LONG) {
+                    val tmp1 = WB + cum_L - L * EP_L
+                    val tmp2 = L * MMR_L - L
+                    LP = tmp1 / tmp2
+                } else {
+                    val tmp1 = WB + cum_L + L * EP_L
+                    val tmp2 = L * MMR_L + L
+                    LP = tmp1 / tmp2
+                }
+            } else {
+                if (positionSide == PositionDirection.LONG) {
+                    val tmp1 = L * MMR_L + L
+                    val tmp2 = (WB + cum_L) / CM + L / EP_L
+                    LP = tmp1 / tmp2
+                } else {
+                    val tmp1 = L * MMR_L - L
+                    val tmp2 = (WB + cum_L) / CM - L / EP_L
+                    LP = tmp1 / tmp2
+                }
+            }
+            return NumberFormatObject(LP, NumberUtils.formatRoundDown(LP, 0, pairConfig.pricePrecision));
+        } catch (e: Throwable) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 计算回报率==收益率
+     * 未实现盈亏 = 持仓数量 * 开仓方向 * (标记价格 - 开仓价格)
+    回报率% = 未实现盈亏 USDT / 起始保证金 = ( ( 标记价格 - 开仓价格 ) * 开仓方向 * 持仓数量 ) / （持仓数量* 合约乘数 * 标记价格* 起始保证金率）
+     *起始保证金率 = 1 / 杠杆倍数
+    开仓方向: 为买单为 1；卖单为 -1
+    币本位:
+    未实现盈亏 = 持仓数量 * 合约乘数 * 开仓方向 * (1 / 开仓价格 - 1 / 标记价格)
+    回报率%= 未实现盈亏 * 标记价格 / [绝对值(持仓数量) * 合约乘数 * 起始保证金率]
+     */
+    fun calculateEarningRate(symbol: String,
+                             positionSide: PositionDirection,
+                             entryPrice: BigDecimal,
+                             markPrice: BigDecimal,
+                             positionAmt: BigDecimal,
+                             leverage: Int,
+                             unRealizedProfit: BigDecimal): NumberFormatObject? {
+        try {
+            val pairConfig = PairService.INSTANCE.getPairConfig(symbol);
+            var earningRateDecimal: BigDecimal? = null;
+            if (pairConfig?.contractClassifyType == ContractType.USDT) {
+                earningRateDecimal = ((markPrice - entryPrice) * positionAmt * (if (positionSide == PositionDirection.LONG) 1.toBigDecimal() else -1.toBigDecimal())) / (positionAmt * markPrice * (BigDecimal(1.0 / leverage)))
+            } else {
+                earningRateDecimal = (unRealizedProfit * markPrice) / (positionAmt.abs() * pairConfig?.contractSize!!.toBigDecimal() * (1.0 / leverage).toBigDecimal());
+            }
+            return NumberFormatObject(earningRateDecimal, Number_percent_auto_2_2_DOWN_Signed_FormatTypeAdapter().format(earningRateDecimal));
         } catch (e: Throwable) {
             e.printStackTrace();
         }

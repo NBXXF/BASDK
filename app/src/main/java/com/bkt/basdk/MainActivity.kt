@@ -12,6 +12,7 @@ import com.bkt.contract.ba.service.PairService
 import com.xxf.arch.XXF
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_main.*
+import java.math.BigDecimal
 
 class MainActivity : AppCompatActivity() {
     var start: Long = 0;
@@ -40,12 +41,13 @@ class MainActivity : AppCompatActivity() {
             /* val contractMultipliers = BaClient.instance.getService(CommonService::class.java).getContractMultipliers();
              XXF.getLogger().d("============>contractMultipliers:" + contractMultipliers);
             */
+            XXF.getLogger().d("==================>xxxx2:+" + (BigDecimal(1.0) + BigDecimal(2.0)));
             start = System.currentTimeMillis();
             BaClient.instance.getService(PairService::class.java).getPairs()
                     .observeOn(AndroidSchedulers.mainThread())
                     .`as`(XXF.bindLifecycle(this))
                     .subscribe {
-                        XXF.getLogger().d("============>getPairs......." + it.size);
+                        XXF.getLogger().d("============>getPairs......." + (it + it));
                     }
 
             start2 = System.currentTimeMillis();
@@ -137,7 +139,7 @@ class MainActivity : AppCompatActivity() {
                 .subPairs("BTCUSDT")
                 .`as`(XXF.bindLifecycle(this, Lifecycle.Event.ON_PAUSE))
                 .subscribe {
-                    XXF.getLogger().d("==============>it3:" + Thread.currentThread().name+"  "+it);
+                    XXF.getLogger().d("==============>it3:" + Thread.currentThread().name + "  " + it);
                 };
 
         /*    BaClient.instance.getService(PairService::class.java)
